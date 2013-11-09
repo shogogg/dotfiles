@@ -3,5 +3,7 @@ alias ls=projects
 alias c=compile
 alias t=test
 alias r=run
+alias s=start
 alias tc=test:compile
+alias idea=gen-idea
 
