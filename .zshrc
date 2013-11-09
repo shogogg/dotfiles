@@ -88,7 +88,7 @@ RPROMPT="%1(v|%F{green}%1v%f|)"
 # ================================
 
 ## sbt
-export SBT_OPTS="-Xmx2048m -XX:MaxPermSize=2048m"
+export SBT_OPTS="-Xmx2048m -XX:MaxPermSize=2048m -XX:ReservedCodeCacheSize=256m"
 
 ## Android
 export ANDROID_HOME=/opt/local/android-sdk-macosx
