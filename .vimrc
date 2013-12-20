@@ -78,6 +78,11 @@ endif
 " ==============================================
 NeoBundle 'Shougo/unite.vim'
 
+" ==============================================
+"   Others
+" ==============================================
+NeoBundle 'derekwyatt/vim-scala'
+NeoBundle 'vim-ruby/vim-ruby'
 
 " Installation check.
 NeoBundleCheck
