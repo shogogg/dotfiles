@@ -1,5 +1,6 @@
 # Update and upgrade
 update
+upgrade
 
 # 基本コマンド
 install git rename tree wget
