@@ -95,3 +95,6 @@ export ANDROID_HOME=/opt/local/android-sdk-macosx
 export ANDROID_SDK_HOME="$ANDROID_HOME"
 export ANDROID_SDK_ROOT="$ANDROID_HOME"
 
+## karma
+export CHROME_BIN="$(pwd)/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
