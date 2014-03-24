@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE}")"; pwd)"
-DOT_FILES=(.gitconfig .gitignore .sbtrc .vimrc .zshrc)
+DOT_FILES=(.gemrc .gitconfig .gitignore .sbtrc .vimrc .zshrc)
 
 for file in ${DOT_FILES[@]}; do
   rm -rf ~/$file
