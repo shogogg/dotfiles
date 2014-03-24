@@ -87,6 +87,9 @@ RPROMPT="%1(v|%F{green}%1v%f|)"
 # Other Settings
 # ================================
 
+## grep
+export GREP_OPTIONS='--color=auto'
+
 ## sbt
 export SBT_OPTS="-Xmx2048m -XX:MaxPermSize=2048m -XX:ReservedCodeCacheSize=256m"
 
