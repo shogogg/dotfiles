@@ -22,7 +22,7 @@ cask install alfred
 cask install dropbox
 cask install firefox
 cask install google-chrome
-cask install intellij-idea-community
+cask install intellij-idea-ce
 cask install iterm2
 cask install libreoffice
 cask install phpstorm
