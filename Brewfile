@@ -20,6 +20,7 @@ install brew-cask
 # Cask packages
 cask install alfred
 cask install dropbox
+cask install firefox
 cask install google-chrome
 cask install intellij-idea-community
 cask install iterm2
