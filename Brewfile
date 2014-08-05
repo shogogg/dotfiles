@@ -26,6 +26,7 @@ cask install intellij-idea-ce
 cask install iterm2
 cask install libreoffice
 cask install phpstorm
+cask install sequel-pro
 cask install sourcetree
 cask install vagrant
 cask install virtualbox
