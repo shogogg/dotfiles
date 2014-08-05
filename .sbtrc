@@ -2,6 +2,7 @@ alias cd=project
 alias ls=projects
 alias c=compile
 alias t=test
+alias to=test-only
 alias r=run
 alias s=start
 alias tc=test:compile
