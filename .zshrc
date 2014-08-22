@@ -39,9 +39,10 @@ bindkey "^N" history-beginning-search-forward-end
 
 ## Path
 NODE_BIN=$HOME/.nodebrew/current/bin
+ANYENV_BIN=$HOME/.anyenv/bin
 ANDROID_TOOLS=/opt/local/android-sdk-macosx/tools
 ANDROID_PLATFORM_TOOLS=/opt/local/android-sdk-macosx/platform-tools
-export PATH="$HOME/bin:$PATH:$NODE_BIN:$ANDROID_TOOLS:$ANDROID_PLATFORM_TOOLS"
+export PATH="$HOME/bin:$PATH:$ANYENV_BIN:$NODE_BIN:$ANDROID_TOOLS:$ANDROID_PLATFORM_TOOLS"
 
 ## Alias
 alias ll='ls -l'
@@ -101,3 +102,5 @@ export ANDROID_SDK_ROOT="$ANDROID_HOME"
 ## karma
 export CHROME_BIN="$(pwd)/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
+## anyenv
+eval "$(anyenv init -)"
