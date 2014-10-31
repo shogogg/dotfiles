@@ -50,6 +50,7 @@ alias la='ls -la'
 alias pd='popd'
 alias vi='vim'
 alias st='stree'
+alias g='gulp'
 
 
 # ================================
