@@ -26,6 +26,7 @@ brew_install phantomjs
 brew_install rename
 brew_install sbt
 brew_install scala
+brew_install terminal-notifier
 brew_install tree
 brew_install typesafe-activator
 brew_install wget

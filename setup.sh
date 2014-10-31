@@ -17,3 +17,11 @@ if [ ! -f ~/.vim/colors/molokai.vim ]; then
   mkdir -p ~/.vim/colors 
   curl https://raw.github.com/tomasr/molokai/master/colors/molokai.vim > ~/.vim/colors/molokai.vim
 fi
+
+# setup zsh-notify
+if [ ! -d ~/.zsh.d ]; then
+  mkdir ~/.zsh.d
+fi
+if [ ! -f ~/.zsh.d/zsh-notify/notify.plugin.zsh ]; then
+  git clone git@github.com:marzocchi/zsh-notify.git ~/.zsh.d/zsh-notify
+fi
