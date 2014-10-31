@@ -15,6 +15,7 @@ brew_install caskroom/cask/brew-cask
 
 brew tap caskroom/homebrew-versions
 
+brew_install direnv
 brew_install ffmpeg
 brew_install git
 brew_install giter8
