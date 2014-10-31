@@ -31,6 +31,7 @@ brew_install typesafe-activator
 brew_install wget
 
 cask_install alfred
+cask_install apache-directory-studio
 cask_install atom
 cask_install dash
 cask_install dropbox
