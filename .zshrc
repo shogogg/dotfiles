@@ -108,6 +108,7 @@ eval "$(anyenv init -)"
 
 ## direnv
 eval "$(direnv hook $0)"
+export DIRENV_LOG_FORMAT=""
 
 ## zsh-notify
 export SYS_NOTIFIER=/usr/local/bin/terminal-notifier
