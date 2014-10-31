@@ -106,6 +106,9 @@ export CHROME_BIN="$(pwd)/Applications/Google Chrome.app/Contents/MacOS/Google C
 ## anyenv
 eval "$(anyenv init -)"
 
+## direnv
+eval "$(direnv hook $0)"
+
 ## zsh-notify
 export SYS_NOTIFIER=/usr/local/bin/terminal-notifier
 export NOTIFY_COMMAND_COMPLETE_TIMEOUT="5"
