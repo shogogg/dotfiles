@@ -18,6 +18,7 @@ brew tap caskroom/homebrew-versions
 brew_install ffmpeg
 brew_install git
 brew_install giter8
+brew_install lftp
 brew_install maven
 brew_install mobile-shell
 brew_install nkf
