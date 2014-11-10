@@ -7,6 +7,7 @@ DOT_FILES=(
   .gitignore
   .sbtconfig
   .sbtrc
+  .vim
   .vimrc
   .zsh.d
   .zshrc
@@ -22,10 +23,6 @@ git submodule init
 git submodule update
 
 # setup vim
-if [ ! -d ~/.vim/bundle/neobundle.vim ]; then
-  mkdir -p ~/.vim/bundle/neobundle.vim
-  git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim
-fi
 if [ ! -f ~/.vim/colors/molokai.vim ]; then
   mkdir -p ~/.vim/colors 
   curl https://raw.github.com/tomasr/molokai/master/colors/molokai.vim > ~/.vim/colors/molokai.vim
