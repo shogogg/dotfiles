@@ -2,6 +2,7 @@
 
 base_dir="$(cd -- "$(dirname -- "${BASH_SOURCE}")"; pwd)"
 dot_files=(
+  .anyenv
   .gemrc
   .gitconfig
   .gitignore

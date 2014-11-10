@@ -7,3 +7,6 @@
 [submodule ".vim/colors/molokai"]
 	path = .vim/colors/molokai
 	url = git@github.com:tomasr/molokai.git
+[submodule ".anyenv"]
+	path = .anyenv
+	url = git@github.com:riywo/anyenv.git
