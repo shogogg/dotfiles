@@ -4,3 +4,6 @@
 [submodule ".vim/bundle/neobundle.vim"]
 	path = .vim/bundle/neobundle.vim
 	url = git://github.com/Shougo/neobundle.vim
+[submodule ".vim/colors/molokai"]
+	path = .vim/colors/molokai
+	url = git@github.com:tomasr/molokai.git

@@ -21,9 +21,3 @@ done
 # setup submodules
 git submodule init
 git submodule update
-
-# setup vim
-if [ ! -f ~/.vim/colors/molokai.vim ]; then
-  mkdir -p ~/.vim/colors 
-  curl https://raw.github.com/tomasr/molokai/master/colors/molokai.vim > ~/.vim/colors/molokai.vim
-fi
