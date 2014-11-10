@@ -1,7 +1,7 @@
 #!/bin/bash
 
-BASE_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE}")"; pwd)"
-DOT_FILES=(
+base_dir="$(cd -- "$(dirname -- "${BASH_SOURCE}")"; pwd)"
+dot_files=(
   .gemrc
   .gitconfig
   .gitignore
@@ -13,9 +13,9 @@ DOT_FILES=(
   .zshrc
 )
 
-for file in ${DOT_FILES[@]}; do
-  rm -f ~/$file
-  ln -s "$BASE_DIR/$file" ~/
+for file in ${dot_files[@]}; do
+  rm -f "${HOME}/${file}"
+  ln -s "${base_dir}/${file}" "${HOME}/"
 done
 
 # setup submodules
