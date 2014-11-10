@@ -1,19 +1,23 @@
 [user]
-	name = shogo
-	email = shogo@studiofly.net
+  name = shogo
+  email = shogo@studiofly.net
 [alias]
-	co = checkout
-	br = branch
-	ci = commit
-	sm = submodule
-	cp = cherry-pick
-	stat = status
+  co = checkout
+  br = branch
+  ci = commit
+  sm = submodule
+  cp = cherry-pick
+  stat = status
 [color]
-	ui = true
+  ui = true
+[pull]
+  rebase = preserve
 [push]
-	default = upstream
+  default = upstream
+[merge]
+  ff = false
 [core]
-	excludesfile = ~/.gitignore
+  excludesfile = ~/.gitignore
   autocrlf = input
   editor = vim
 
