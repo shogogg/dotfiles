@@ -44,8 +44,9 @@ set smartcase      " 大文字を含む検索では大文字・小文字を判�
 if has('vim_starting')
   set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
-call neobundle#rc(expand('~/.vim/bundle/'))
+call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundleFetch 'Shougo/neobundle.vim'
+call neobundle#end()
 
 " ==============================================
 "   vimproc
