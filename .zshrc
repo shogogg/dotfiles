@@ -38,11 +38,15 @@ bindkey "^P" history-beginning-search-backward-end
 bindkey "^N" history-beginning-search-forward-end
 
 ## Path
-NODE_BIN=$HOME/.nodebrew/current/bin
-ANYENV_BIN=$HOME/.anyenv/bin
-ANDROID_TOOLS=/opt/local/android-sdk-macosx/tools
-ANDROID_PLATFORM_TOOLS=/opt/local/android-sdk-macosx/platform-tools
-export PATH="$HOME/bin:$PATH:$ANYENV_BIN:$NODE_BIN:$ANDROID_TOOLS:$ANDROID_PLATFORM_TOOLS"
+typeset -U path cdpath fpath manpath
+path=(
+  ~/bin(N-/)
+  ~/.anyenv/bin(N-/)
+  ~/.nodebrew/current/bin(N-/)
+  /opt/local/android-sdk-macosx/tools(N-/)
+  /opt/local/android-sdk-macosx/platform-tools(N-/)
+  $path
+)
 
 ## Alias
 alias ll='ls -l'
