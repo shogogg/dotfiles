@@ -22,3 +22,16 @@ done
 # setup submodules
 git submodule init
 git submodule update
+
+# setup anyenv
+export PATH="$HOME/.anyenv/bin:$PATH"
+eval "$(anyenv init -)"
+
+# setup rbenv
+if [ -z "$(anyenv envs | grep rbenv)" ]; then
+  anyenv install rbenv
+fi
+if cd ~/.anyenv/envs/rbenv/plugins; then
+  test -d rbenv-binstubs || git clone git@github.com:ianheggie/rbenv-binstubs.git
+  test -d rbenv-gem-rehash || git clone git@github.com:sstephenson/rbenv-gem-rehash.git
+fi
