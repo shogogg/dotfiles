@@ -1,120 +1,21 @@
 autoload -Uz add-zsh-hook
 
-# ================================
-# General Settings
-# ================================
-export EDITOR=vim
-export LANG=ja_JP.UTF-8
+source ~/.zsh.d/env.zsh
+source ~/.zsh.d/alias.zsh
+source ~/.zsh.d/complement.zsh
+source ~/.zsh.d/history.zsh
+source ~/.zsh.d/prompt.zsh
+source ~/.zsh.d/path.zsh
 
-setopt auto_pushd
-setopt correct
-setopt magic_equal_subst
+# 個別設定
+source ~/.zsh.d/common/*.zsh
 
-## Complement
-autoload -U compinit; compinit -u
-setopt auto_list
-setopt auto_menu
-setopt list_packed
-setopt list_types
-bindkey "^[[Z" reverse-menu-complete
-
-## Glob
-setopt extended_glob
-
-## History
-HISTFILE=~/.zsh_history
-HISTSIZE=9999
-SAVEHIST=9999
-setopt bang_hist
-setopt extended_history
-setopt hist_ignore_dups
-setopt share_history
-setopt hist_reduce_blanks
-
-autoload history-search-end
-zle -N history-beginning-search-backward-end history-search-end
-zle -N history-beginning-search-forward-end history-search-end
-bindkey "^P" history-beginning-search-backward-end
-bindkey "^N" history-beginning-search-forward-end
-
-## Path
-typeset -U path cdpath fpath manpath
-path=(
-  ~/bin(N-/)
-  ~/.anyenv/bin(N-/)
-  ~/.nodebrew/current/bin(N-/)
-  /opt/local/android-sdk-macosx/tools(N-/)
-  /opt/local/android-sdk-macosx/platform-tools(N-/)
-  $path
-)
-
-## Alias
-alias ll='ls -l'
-alias la='ls -la'
-alias pd='popd'
-alias vi='vim'
-alias st='stree'
-alias g='gulp'
-
-
-# ================================
-# Look and Feel Settings
-# ================================
-export LSCOLORS=DxGxcxdxCxegedabagacad
-export CLICOLOR=1
-export TERM=xterm-256color
-
-## Prompt
-autoload -U colors; colors
-autoload -Uz vcs_info
-
-zstyle ':vcs_info:*' formats '[%s:%r#%b]'
-zstyle ':vcs_info:*' actionformats '(%a) [%s:%r#%b]'
-function _precmd_vcs_info() {
-  psvar=()
-  LANG=ja_JP.UTF-8 vcs_info
-  [[ -n "$vcs_info_msg_0_" ]] && psvar[1]="$vcs_info_msg_0_"
-}
-add-zsh-hook precmd _precmd_vcs_info
-
-local PROMPT_COLOR=yellow
-if [ ${UID} -eq 0 ]; then
-  local PROMPT_COLOR=red
-fi
-
-PROMPT="
-%F{$PROMPT_COLOR}%n@%m: %~%f
-%B%(!,#,$)%b "
-
-RPROMPT="%1(v|%F{green}%1v%f|)"
-
-
-# ================================
-# Other Settings
-# ================================
-
-## grep
-export GREP_OPTIONS='--color=auto'
-
-## sbt
-export SBT_OPTS="-Xmx2048m -XX:MaxPermSize=2048m -XX:ReservedCodeCacheSize=256m"
-
-## Android
-export ANDROID_HOME=/opt/local/android-sdk-macosx
-export ANDROID_SDK_HOME="$ANDROID_HOME"
-export ANDROID_SDK_ROOT="$ANDROID_HOME"
-
-## karma
-export CHROME_BIN="$(pwd)/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-
-## anyenv
-eval "$(anyenv init -)"
-
-## direnv
-eval "$(direnv hook $0)"
-export DIRENV_LOG_FORMAT=""
-
-## zsh-notify
-export SYS_NOTIFIER=/usr/local/bin/terminal-notifier
-export NOTIFY_COMMAND_COMPLETE_TIMEOUT="5"
-source ~/.zsh.d/zsh-notify/notify.plugin.zsh
+# OS別個別設定
+case ${OSTYPE} in
+  darwin*)
+    source ~/.zsh.d/osx/*.zsh
+    ;;
+  linux*)
+    source ~/.zsh.d/linux/*.zsh
+    ;;
+esac
