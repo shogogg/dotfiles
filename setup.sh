@@ -17,6 +17,10 @@ for file in ${DOT_FILES[@]}; do
   ln -s "$BASE_DIR/$file" ~/
 done
 
+# setup submodules
+git submodule init
+git submodule update
+
 # setup vim
 if [ ! -d ~/.vim/bundle/neobundle.vim ]; then
   mkdir -p ~/.vim/bundle/neobundle.vim
