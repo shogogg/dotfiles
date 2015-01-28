@@ -86,6 +86,7 @@ NeoBundle 'derekwyatt/vim-scala'
 NeoBundle 'vim-ruby/vim-ruby'
 NeoBundle 'mattn/emmet-vim'
 NeoBundle 'kchmck/vim-coffee-script'
+NeoBundle 'groenewege/vim-less'
 
 " Installation check.
 NeoBundleCheck
