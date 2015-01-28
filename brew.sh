@@ -11,27 +11,30 @@ cask_install(){
 brew update
 brew cleanup
 
-brew_install caskroom/cask/brew-cask
 
-brew tap caskroom/homebrew-versions
+# Scala
+brew_install sbt
+brew_install scala
+brew_install giter8
 
+# Others
 brew_install direnv
 brew_install ffmpeg
 brew_install git
-brew_install giter8
 brew_install lftp
 brew_install maven
 brew_install mobile-shell
 brew_install nkf
 brew_install phantomjs
 brew_install rename
-brew_install sbt
-brew_install scala
 brew_install terminal-notifier
 brew_install tree
 brew_install typesafe-activator
 brew_install wget
 
+# Cask
+brew_install caskroom/cask/brew-cask
+brew tap caskroom/homebrew-versions
 cask_install alfred
 cask_install apache-directory-studio
 cask_install atom
