@@ -11,6 +11,10 @@ cask_install(){
 brew update
 brew cleanup
 
+# PHP
+brew_install zlib
+brew_install php55
+brew_install homebrew/php/composer
 
 # Scala
 brew_install sbt
