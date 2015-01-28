@@ -84,6 +84,7 @@ NeoBundle 'Shougo/unite.vim'
 " ==============================================
 NeoBundle 'derekwyatt/vim-scala'
 NeoBundle 'vim-ruby/vim-ruby'
+NeoBundle 'mattn/emmet-vim'
 
 " Installation check.
 NeoBundleCheck
