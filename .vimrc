@@ -85,6 +85,7 @@ NeoBundle 'Shougo/unite.vim'
 NeoBundle 'derekwyatt/vim-scala'
 NeoBundle 'vim-ruby/vim-ruby'
 NeoBundle 'mattn/emmet-vim'
+NeoBundle 'kchmck/vim-coffee-script'
 
 " Installation check.
 NeoBundleCheck
