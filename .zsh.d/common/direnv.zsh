@@ -1,2 +1,2 @@
-eval "$(direnv hook $0)"
+eval "$(direnv hook zsh)"
 export DIRENV_LOG_FORMAT=""
