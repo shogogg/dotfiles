@@ -8,14 +8,14 @@ source ~/.zsh.d/prompt.zsh
 source ~/.zsh.d/path.zsh
 
 # 個別設定
-source ~/.zsh.d/common/*.zsh
+for x in ~/.zsh.d/common/*.zsh; do source $x; done
 
 # OS別個別設定
 case ${OSTYPE} in
   darwin*)
-    source ~/.zsh.d/osx/*.zsh
+    for x in ~/.zsh.d/osx/*.zsh; do source $x; done
     ;;
   linux*)
-    source ~/.zsh.d/linux/*.zsh
+    for x in ~/.zsh.d/linux/*.zsh; do source $x; done
     ;;
 esac
