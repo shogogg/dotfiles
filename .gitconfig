@@ -1,5 +1,5 @@
 [user]
-  name = shogo
+  name = shogogg
   email = shogo@studiofly.net
 [alias]
   co = checkout
@@ -8,6 +8,7 @@
   sm = submodule
   cp = cherry-pick
   stat = status
+  me = merge
 [color]
   ui = true
 [pull]
