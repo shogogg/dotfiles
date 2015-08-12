@@ -4,5 +4,6 @@
 .idea
 bower_components
 node_modules
+.vim/.netrwhist
 .vim/bundle/.neobundle
 .vim/bundle/NeoBundle.lock
