@@ -1,26 +1,26 @@
 [user]
-  name = shogogg
-  email = shogo@studiofly.net
+	name = shogogg
+	email = shogo@studiofly.net
 [alias]
-  co = checkout
-  br = branch
-  ci = commit
-  sm = submodule
-  cp = cherry-pick
-  stat = status
-  me = merge
+	co = checkout
+	br = branch
+	ci = commit
+	sm = submodule
+	cp = cherry-pick
+	stat = status
+	me = merge
 [color]
-  ui = true
+	ui = true
 [pull]
-  rebase = preserve
+	rebase = preserve
 [push]
-  default = upstream
+	default = upstream
 [merge]
-  ff = false
+	ff = false
 [core]
-  excludesfile = ~/.gitignore
-  autocrlf = input
-  editor = vim
+	excludesfile = ~/.gitignore
+	autocrlf = input
+	editor = vim
 
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
