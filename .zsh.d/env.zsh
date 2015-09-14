@@ -4,9 +4,6 @@ export TERM=xterm-256color
 export LSCOLORS=DxGxcxdxCxegedabagacad
 export CLICOLOR=1
 
-# cd したときに自動で pushd する
-setopt auto_pushd
-
 # コマンドの入力ミスを補正する
 setopt correct
 
