@@ -2,6 +2,8 @@
 *.swp
 .DS_Store
 .idea
+.envrc
+.phpstorm.meta.php
 bower_components
 node_modules
 .vim/.netrwhist
