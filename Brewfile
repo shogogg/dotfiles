@@ -1,5 +1,6 @@
 # tap
 tap 'caskroom/cask'
+tap 'caskroom/fonts'
 tap 'caskroom/versions'
 tap 'homebrew/binary'
 tap 'homebrew/brewdler'
@@ -21,6 +22,9 @@ brew 'sbt'
 brew 'scala'
 brew 'typesafe-activator'
 
+# for Homebrew
+brew 'brew-cask'
+
 # for others
 brew 'direnv'
 brew 'ffmpeg'
@@ -37,6 +41,7 @@ brew 'rename'
 brew 'terminal-notifier'
 brew 'tree'
 brew 'wget'
+brew 'zsh-completions'
 
 # Cask
 cask 'alfred'
@@ -53,7 +58,12 @@ cask 'java7'
 cask 'libreoffice'
 cask 'phpstorm'
 cask 'sequel-pro'
+cask 'skyfonts'
 cask 'slack'
 cask 'sourcetree'
 cask 'vagrant'
 cask 'virtualbox'
+
+# Cask (Fonts)
+cask 'font-m-plus'
+cask 'font-source-han-code-jp'
