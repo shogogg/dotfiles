@@ -1,30 +1,33 @@
 [user]
-	name = shogogg
-	email = shogo@studiofly.net
+  name = shogogg
+  email = shogo@studiofly.net
 [alias]
-	co = checkout
-	br = branch
-	ci = commit
-	sm = submodule
-	cp = cherry-pick
-	stat = status
-	me = merge
+  co = checkout
+  br = branch
+  ci = commit
+  sm = submodule
+  cp = cherry-pick
+  st = status
+  stat = status
+  me = merge --no-commit --no-ff
+  fap = !git fetch --all -p && git pull
+  graph = log --graph --date=short --decorate=short --pretty
 [color]
-	ui = true
+  ui = true
 [pull]
-	rebase = preserve
+  rebase = preserve
 [push]
-	default = upstream
+  default = upstream
 [merge]
-	ff = false
+  ff = false
 [core]
-	excludesfile = ~/.gitignore
-	autocrlf = input
-	editor = vim
+  excludesfile = ~/.gitignore
+  autocrlf = input
+  editor = vim
 
 [difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
+  cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+  path =
 [mergetool "sourcetree"]
-	cmd = /opt/homebrew-cask/Caskroom/sourcetree/2.0.2/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
+  cmd = /opt/homebrew-cask/Caskroom/sourcetree/2.0.2/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+  trustExitCode = true
