@@ -66,9 +66,10 @@ NeoBundle 'Shougo/vimproc', {
 NeoBundle 'itchyny/lightline.vim'
 set laststatus=2
 let g:lightline = {
-  \ 'colorscheme': 'wombat',
-  \ 'separator':    {'left': "\uE0B0", 'right': "\uE0B2"},
-  \ 'subseparator': {'left': "\uE0B1", 'right': "\uE0B3"}
+  \   'colorscheme': 'wombat',
+  \   'component': {
+  \     'readonly': '%{&readonly?"READ ONLY":""}'
+  \   }
   \ }
 if !has('gui_running')
   set t_Co=256
