@@ -98,6 +98,7 @@ NeoBundle 'vim-ruby/vim-ruby'
 NeoBundle 'mattn/emmet-vim'
 NeoBundle 'kchmck/vim-coffee-script'
 NeoBundle 'groenewege/vim-less'
+NeoBundle 'plasticboy/vim-markdown'
 
 " Installation check.
 NeoBundleCheck
