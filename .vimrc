@@ -108,4 +108,3 @@ filetype plugin indent on
 
 " Syntax Highligt を有効にする
 syntax on
-
