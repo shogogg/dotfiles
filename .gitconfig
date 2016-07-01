@@ -17,7 +17,7 @@
 [pull]
   rebase = preserve
 [push]
-  default = upstream
+  default = current
 [merge]
   ff = false
 [core]
