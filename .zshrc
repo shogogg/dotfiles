@@ -1,11 +1,11 @@
 autoload -Uz add-zsh-hook
 
 source ~/.zsh.d/env.zsh
+source ~/.zsh.d/path.zsh
 source ~/.zsh.d/alias.zsh
 source ~/.zsh.d/complement.zsh
 source ~/.zsh.d/history.zsh
 source ~/.zsh.d/prompt.zsh
-source ~/.zsh.d/path.zsh
 source ~/.zsh.d/keybind.zsh
 source ~/.zsh.d/antigen.zsh
 
