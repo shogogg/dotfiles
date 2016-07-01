@@ -1,4 +1,5 @@
-autoload -U compinit; compinit -u
+autoload -U compinit
+compinit -u
 setopt auto_list
 setopt auto_menu
 setopt list_packed
