@@ -1,5 +1,5 @@
-alias ll='ls -l'
-alias la='ls -la'
+alias ll='ls -lh'
+alias la='ls -lha'
 alias pd='popd'
 alias vi='vim'
 alias st='stree'
