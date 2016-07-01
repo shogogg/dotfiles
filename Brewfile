@@ -26,6 +26,8 @@ brew 'typesafe-activator'
 brew 'brew-cask'
 
 # for others
+brew 'docker'
+brew 'docker-machine'
 brew 'direnv'
 brew 'ffmpeg'
 brew 'fontforge'
