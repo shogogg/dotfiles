@@ -1,4 +1,4 @@
-alias ll='ls -lh'
 alias la='ls -lha'
-alias vi='vim'
+alias ll='ls -lh'
 alias st='stree'
+alias vi='vim'
