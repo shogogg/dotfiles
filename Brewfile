@@ -7,6 +7,7 @@ tap 'homebrew/brewdler'
 tap 'homebrew/dupes'
 tap 'homebrew/php'
 tap 'homebrew/versions'
+tap 'shogogg/homebrew-cask-atok'
 
 # for android
 brew 'android-sdk'
@@ -48,6 +49,7 @@ brew 'zsh-completions'
 # Cask
 cask 'alfred'
 cask 'apache-directory-studio'
+cask 'atok-passport'
 cask 'atom'
 cask 'dash'
 caks 'docker'
