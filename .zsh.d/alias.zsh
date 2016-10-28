@@ -1,3 +1,8 @@
+alias ga='git add'
+alias grh='git reset --hard'
+alias gsp='git stash pop'
+alias gss='git add . && git stash save'
+alias gst='git status'
 alias la='ls -lha'
 alias ll='ls -lh'
 alias st='stree'
