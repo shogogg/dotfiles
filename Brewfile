@@ -71,5 +71,11 @@ cask 'vagrant'
 cask 'virtualbox'
 
 # Cask (Fonts)
+cask 'font-coda'
 cask 'font-m-plus'
+cask 'font-noto-sans'
+cask 'font-noto-sans-cjk'
+cask 'font-roboto'
+cask 'font-roboto-mono'
+cask 'font-source-code-pro'
 cask 'font-source-han-code-jp'
