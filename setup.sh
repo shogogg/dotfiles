@@ -27,6 +27,10 @@ git submodule update
 export PATH="$HOME/.anyenv/bin:$PATH"
 eval "$(anyenv init -)"
 
+# setup anyenv-update
+mkdir -p $(anyenv root)/plugins
+git clone https://github.com/znz/anyenv-update.git $(anyenv root)/plugins/anyenv-update
+
 # setup rbenv
 if [ -z "$(anyenv envs | grep rbenv)" ]; then
   anyenv install rbenv
