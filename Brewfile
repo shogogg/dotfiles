@@ -13,8 +13,10 @@ tap 'shogogg/homebrew-cask-atok'
 brew 'android-sdk'
 
 # for php
+brew 'autoconf'
+brew 'automake'
+brew 'php-build'
 brew 'zlib'
-brew 'php55'
 brew 'homebrew/php/composer'
 
 # for scala
