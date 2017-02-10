@@ -31,6 +31,16 @@ eval "$(anyenv init -)"
 mkdir -p $(anyenv root)/plugins
 git clone https://github.com/znz/anyenv-update.git $(anyenv root)/plugins/anyenv-update
 
+# setup ndenv
+if [ -z "$(anyenv envs | grep ndenv)" ]; then
+  anyenv install ndenv
+fi
+
+# setup phpenv
+if [ -z "$(anyenv envs | grep phpenv)" ]; then
+  anyenv install rbenv
+fi
+
 # setup rbenv
 if [ -z "$(anyenv envs | grep rbenv)" ]; then
   anyenv install rbenv
