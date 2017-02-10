@@ -32,6 +32,7 @@ brew 'yarn'
 brew 'brew-cask'
 
 # for others
+brew 'ansible'
 brew 'direnv'
 brew 'ffmpeg'
 brew 'fontforge'
