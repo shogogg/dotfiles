@@ -23,6 +23,9 @@ brew 'sbt'
 brew 'scala'
 brew 'typesafe-activator'
 
+# for javascript
+brew 'yarn'
+
 # for Homebrew
 brew 'brew-cask'
 
