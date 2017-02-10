@@ -12,3 +12,4 @@ setopt magic_equal_subst
 
 # 拡張GLOBを有効にする
 setopt extended_glob
+setopt nonomatch
