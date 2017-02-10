@@ -49,60 +49,26 @@ nnoremap k gk
 inoremap <silent> jj <ESC>
 
 " ==============================================
-"   NeoBundle
+"   dein.vim
 " ==============================================
-if has('vim_starting')
-  set runtimepath+=~/.vim/bundle/neobundle.vim/
-endif
-call neobundle#begin(expand('~/.vim/bundle/'))
-NeoBundleFetch 'Shougo/neobundle.vim'
-call neobundle#end()
+let s:dein_dir = expand('~/.vim/dein')
+let s:dein_toml = '~/.vim/dein.toml'
+set runtimepath+=~/.vim/dein/repos/github.com/Shougo/dein.vim
 
-" ==============================================
-"   vimproc
-" ==============================================
-NeoBundle 'Shougo/vimproc', {
-  \ 'build': {
-  \   'windows': 'make -f make_mingw32.mak',
-  \   'cygwin':  'make -f make_cygwin.mak',
-  \   'mac':     'make -f make_mac.mak',
-  \   'unix':    'make -f make_unix.mak',
-  \   },
-  \ }
-
-" ==============================================
-"   lightline
-" ==============================================
-NeoBundle 'itchyny/lightline.vim'
-set laststatus=2
-let g:lightline = {
-  \   'colorscheme': 'wombat',
-  \   'component': {
-  \     'readonly': '%{&readonly?"READ ONLY":""}'
-  \   }
-  \ }
-if !has('gui_running')
-  set t_Co=256
+if dein#load_state(s:dein_dir)
+  call dein#begin(s:dein_dir)
+  call dein#load_toml(s:dein_toml, {'lazy': 0})
+  call dein#end()
+  call dein#save_state()
 endif
 
-" ==============================================
-"   unite
-" ==============================================
-NeoBundle 'Shougo/unite.vim'
+if dein#check_install()
+  call dein#install()
+endif
 
 " ==============================================
 "   Others
 " ==============================================
-NeoBundle 'derekwyatt/vim-scala'
-NeoBundle 'vim-ruby/vim-ruby'
-NeoBundle 'mattn/emmet-vim'
-NeoBundle 'kchmck/vim-coffee-script'
-NeoBundle 'groenewege/vim-less'
-NeoBundle 'plasticboy/vim-markdown'
-
-" Installation check.
-NeoBundleCheck
-
 " ファイルタイプ関連を有効にする
 filetype plugin indent on
 
