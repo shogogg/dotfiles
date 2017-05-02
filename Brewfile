@@ -16,6 +16,7 @@ brew 'android-sdk'
 brew 'autoconf'
 brew 'automake'
 brew 'php-build'
+brew 'phpbrew'
 brew 'zlib'
 brew 'homebrew/php/composer'
 
