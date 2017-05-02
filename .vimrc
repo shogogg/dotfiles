@@ -12,6 +12,7 @@ colorscheme molokai
 " ==============================================
 set nocompatible   " vi 互換モードをOFF
 set encoding=utf-8 nobomb
+set backspace=indent,eol,start
 scriptencoding utf-8
 
 " ==============================================
