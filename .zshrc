@@ -7,7 +7,7 @@ source ~/.zsh.d/complement.zsh
 source ~/.zsh.d/history.zsh
 source ~/.zsh.d/prompt.zsh
 source ~/.zsh.d/keybind.zsh
-source ~/.zsh.d/antigen.zsh
+source ~/.zsh.d/zplug.zsh
 
 # 個別設定
 for x in ~/.zsh.d/common/*.zsh; do source $x; done

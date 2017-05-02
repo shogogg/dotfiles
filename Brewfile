@@ -31,11 +31,17 @@ brew 'yarn'
 # for Homebrew
 brew 'brew-cask'
 
+# for zsh
+brew 'terminal-notifier'
+brew 'zplug'
+brew 'zsh-completions'
+
 # for others
 brew 'ansible'
 brew 'direnv'
 brew 'ffmpeg'
 brew 'fontforge'
+brew 'fzy'
 brew 'git'
 brew 'gnupg2'
 brew 'jq'
@@ -48,10 +54,8 @@ brew 'peco'
 brew 'phantomjs'
 brew 'pup'
 brew 'rename'
-brew 'terminal-notifier'
 brew 'tree'
 brew 'wget'
-brew 'zsh-completions'
 
 # Cask
 cask 'alfred'

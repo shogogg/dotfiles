@@ -4,9 +4,6 @@
 [submodule ".anyenv"]
 	path = .anyenv
 	url = git@github.com:riywo/anyenv.git
-[submodule ".zsh.d/antigen"]
-	path = .zsh.d/antigen
-	url = git://github.com/zsh-users/antigen.git
 [submodule ".vim/dein/repos/github.com/Shougo/dein.vim"]
 	path = .vim/dein/repos/github.com/Shougo/dein.vim
 	url = https://github.com/Shougo/dein.vim.git
