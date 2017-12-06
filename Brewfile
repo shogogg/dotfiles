@@ -1,96 +1,100 @@
-# tap
-tap 'caskroom/cask'
-tap 'caskroom/fonts'
-tap 'caskroom/versions'
-tap 'homebrew/binary'
-tap 'homebrew/brewdler'
-tap 'homebrew/dupes'
-tap 'homebrew/php'
-tap 'homebrew/versions'
-tap 'shogogg/homebrew-cask-atok'
+# core
+tap "homebrew/core"
+brew "ansible"
+brew "autoconf"
+brew "automake"
+brew "awscli"
+brew "curl"
+brew "direnv"
+brew "ffmpeg", args: ['with-fdk-aac', 'with-libass', 'with-webp', 'with-x265', 'with-freetype', 'with-libvorbis', 'with-libvpx', 'with-opus']
+brew "fontforge"
+brew "fzy"
+brew "git"
+brew "giter8"
+brew "gnupg", link: false
+brew "go"
+brew "gpg-agent"
+brew "gradle"
+brew "jq"
+brew "kotlin"
+brew "lame"
+brew "lftp"
+brew "mas"
+brew "maven"
+brew "mosh"
+brew "nkf"
+brew "openssh"
+brew "peco"
+brew "phantomjs"
+brew "pup"
+brew "rename"
+brew "scala"
+brew "sbt"
+brew "terminal-notifier"
+brew "tree"
+brew "vim"
+brew "wget"
+brew "yarn"
+brew "zlib"
+brew "zplug"
+brew "zsh"
+brew "zsh-completions"
 
-# for android
-brew 'android-sdk'
+# php
+tap "homebrew/php"
+brew "composer"
+brew "php-build"
+brew "phpbrew"
 
-# for php
-brew 'autoconf'
-brew 'automake'
-brew 'php-build'
-brew 'phpbrew'
-brew 'zlib'
-brew 'homebrew/php/composer'
+# cask
+tap "caskroom/cask"
+cask "adobe-reader-ja"
+cask "alfred"
+cask "apache-directory-studio"
+cask "appcleaner"
+cask "atom"
+cask "dash"
+cask "docker"
+cask "dropbox"
+cask "firefox-ja"
+cask "google-backup-and-sync"
+cask "google-chrome"
+cask "google-drive-file-stream"
+cask "intellij-idea"
+cask "iterm2"
+cask "jad"
+cask "java7"
+cask "karabiner"
+cask "mysqlworkbench"
+cask "sequel-pro"
+cask "skype"
+cask "slack"
+cask "sourcetree"
+cask "toggldesktop"
+cask "vagrant"
+cask "virtualbox"
 
-# for scala
-brew 'giter8'
-brew 'sbt'
-brew 'scala'
-brew 'typesafe-activator'
+# fonts
+tap "caskroom/fonts"
+cask "font-coda"
+cask "font-m-plus"
+cask "font-noto-sans"
+cask "font-noto-sans-cjk"
+cask "font-roboto"
+cask "font-roboto-mono"
+cask "font-source-code-pro"
+cask "font-source-han-code-jp"
 
-# for javascript
-brew 'yarn'
+# atok
+tap "shogogg/homebrew-cask-atok"
+cask "atok-passport"
 
-# for Homebrew
-brew 'brew-cask'
-
-# for zsh
-brew 'terminal-notifier'
-brew 'zplug'
-brew 'zsh-completions'
-
-# for others
-brew 'ansible'
-brew 'direnv'
-brew 'ffmpeg'
-brew 'fontforge'
-brew 'fzy'
-brew 'git'
-brew 'gnupg2'
-brew 'jq'
-brew 'lame'
-brew 'lftp'
-brew 'maven'
-brew 'mobile-shell'
-brew 'nkf'
-brew 'peco'
-brew 'phantomjs'
-brew 'pup'
-brew 'rename'
-brew 'tree'
-brew 'wget'
-
-# Cask
-cask 'alfred'
-cask 'apache-directory-studio'
-cask 'atok-passport'
-cask 'atom'
-cask 'dash'
-caks 'docker'
-cask 'dropbox'
-cask 'firefox-ja'
-cask 'google-chrome'
-cask 'google-drive'
-cask 'intellij-idea'
-cask 'iterm2'
-cask 'jad'
-cask 'java7'
-cask 'karabiner'
-cask 'libreoffice'
-cask 'mysqlworkbench'
-cask 'phpstorm'
-cask 'sequel-pro'
-cask 'skype'
-cask 'slack'
-cask 'sourcetree'
-cask 'toggldesktop'
-cask 'vagrant'
-cask 'virtualbox'
-
-# Cask (Fonts)
-cask 'font-coda'
-cask 'font-m-plus'
-cask 'font-noto-sans'
-cask 'font-noto-sans-cjk'
-cask 'font-roboto'
-cask 'font-roboto-mono'
-cask 'font-source-code-pro'
-cask 'font-source-han-code-jp'
+# mas
+mas "Cleaner for Memory", id: 748212890
+mas "File Viewer", id: 495987613
+mas "Keynote", id: 409183694
+mas "LINE", id: 539883307
+mas "The Unarchiver", id: 425424353
+mas "Trello", id: 1278508951
+mas "TweetDeck", id: 485812721
+mas "YoruFukurou", id: 428834068
