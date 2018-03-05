@@ -9,10 +9,10 @@ source ~/.zsh.d/prompt.zsh
 source ~/.zsh.d/keybind.zsh
 source ~/.zsh.d/zplug.zsh
 
-# 個別設定
+# common settings
 for x in ~/.zsh.d/common/*.zsh; do source $x; done
 
-# OS別個別設定
+# settings by os
 case ${OSTYPE} in
   darwin*)
     for x in ~/.zsh.d/osx/*.zsh; do source $x; done
