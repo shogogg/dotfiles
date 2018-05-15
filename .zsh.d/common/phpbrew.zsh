@@ -3,7 +3,8 @@ function switch_php_version(){
   if [ -f "${version_file}" ]; then
     phpbrew use php-$(cat "${version_file}")
   else
-    phpbrew off > /dev/null
+    source ${HOME}/.phpbrew/init
+    phpbrew switch "${PHPBREW_PHP}"
   fi
 }
 
