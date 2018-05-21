@@ -37,6 +37,11 @@ if [ -z "$(anyenv envs | grep ndenv)" ]; then
   anyenv install ndenv
 fi
 
+# setup pyenv
+if [ -z "$(anyenv envs | grep pyenv)" ]; then
+  anyenv install pyenv
+fi
+
 # setup rbenv
 if [ -z "$(anyenv envs | grep rbenv)" ]; then
   anyenv install rbenv
