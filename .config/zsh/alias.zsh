@@ -1,3 +1,4 @@
+alias artisan='php artisan'
 alias ga='git add'
 alias gco='git checkout'
 alias grh='git reset --hard'
