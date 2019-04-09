@@ -1,6 +1,7 @@
 # core
 tap "homebrew/core"
 brew "ansible"
+brew "anyenv"
 brew "autoconf"
 brew "automake"
 brew "awscli"
