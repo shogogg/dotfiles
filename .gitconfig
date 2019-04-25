@@ -2,16 +2,18 @@
   name = shogogg
   email = shogo@studiofly.net
 [alias]
-  co = checkout
   br = branch
   ci = commit
-  sm = submodule
+  co = checkout
   cp = cherry-pick
-  st = status
-  stat = status
-  me = merge --no-commit --no-ff
   fap = !git fetch --all -p && git pull
   graph = log --graph --date=short --decorate=short --pretty
+  me = merge --no-commit --no-ff
+  rbc = rebase --continue
+  rbi = rebase -i
+  sm = submodule
+  st = status
+  stat = status
 [color]
   ui = true
 [pull]
