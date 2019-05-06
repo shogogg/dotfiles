@@ -5,13 +5,14 @@ brew "anyenv"
 brew "autoconf"
 brew "automake"
 brew "awscli"
+brew "composer"
 brew "curl"
+brew "deployer"
 brew "direnv"
 brew "ffmpeg", args: ['with-fdk-aac', 'with-libass', 'with-webp', 'with-x265', 'with-freetype', 'with-libvorbis', 'with-libvpx', 'with-opus']
 brew "fontforge"
 brew "fzy"
 brew "git"
-brew "giter8"
 brew "gnupg", link: false
 brew "go"
 brew "gpg-agent"
@@ -26,8 +27,6 @@ brew "mosh"
 brew "mysql-utilities"
 brew "nkf"
 brew "openssh"
-brew "peco"
-brew "phantomjs"
 brew "pup"
 brew "rename"
 brew "scala"
@@ -41,13 +40,6 @@ brew "yarn"
 brew "zlib"
 brew "zplug"
 brew "zsh"
-
-# php
-tap "homebrew/php"
-brew "composer"
-brew "deployer"
-brew "php-build"
-brew "phpbrew"
 
 # cask
 tap "homebrew/cask"
@@ -66,17 +58,13 @@ cask "google-drive-file-stream"
 cask "intellij-idea"
 cask "iterm2"
 cask "jad"
-cask "java7"
-cask "karabiner"
 cask "mysqlworkbench"
 cask "sequel-pro"
 cask "skype"
 cask "slack"
 cask "sourcetree"
-cask "teamsql"
 cask "toggldesktop"
 cask "vagrant"
-cask "visual-studio-code"
 cask "virtualbox"
 
 # fonts
@@ -102,4 +90,3 @@ mas "LINE", id: 539883307
 mas "The Unarchiver", id: 425424353
 mas "Trello", id: 1278508951
 mas "TweetDeck", id: 485812721
-mas "YoruFukurou", id: 428834068
