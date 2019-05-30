@@ -11,7 +11,7 @@ function _precmd_vcs_info() {
 add-zsh-hook precmd _precmd_vcs_info
 
 local PROMPT_COLOR=yellow
-if [ ${UID} -eq 0 ]; then
+if [ $UID -eq 0 ]; then
   local PROMPT_COLOR=red
 fi
 
