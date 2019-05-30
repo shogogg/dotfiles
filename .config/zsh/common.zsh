@@ -14,10 +14,7 @@ anyenv_update="$anyenv_root/plugins/anyenv-update"
 # composer
 #
 if [[ -d ~/.composer ]]; then
-  path=(
-    ~/.composer/vendor/bin(N-/)
-    $path
-  )
+  path=(~/.composer/vendor/bin $path)
 fi
 
 #
@@ -53,7 +50,9 @@ if ! hash phpbrew; then
   curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew \
     && chmod +x phpbrew \
     && mv phpbrew /usr/local/bin \
-    && phpbrew init
+    && phpbrew init \
+    && echo '#compdef phpbrew' > /usr/local/share/zsh/site-functions/_phpbrew \
+    && phpbrew zsh --bind phpbrew --program phpbrew >> /usr/local/share/zsh/site-functions/_phpbrew
 fi
 [[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc
 

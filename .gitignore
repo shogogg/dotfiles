@@ -6,7 +6,6 @@
 .idea
 .envrc
 .phpstorm.meta.php
-bower_components
-node_modules
+.zcompdump
 .vim/.netrwhist
 .vim/dein/

@@ -14,27 +14,27 @@ dot_files=(
 )
 
 for file in ${dot_files[@]}; do
-  rm -f "${HOME}/${file}"
-  ln -s "${base_dir}/${file}" "${HOME}/"
+  rm -f ~/$file
+  ln -s "$base_dir/$file" ~/
 done
 
 # create .config directory if not exists
-if [[ ! -d "${HOME}/.config" ]]; then
-  mkdir "${HOME}/.config"
+if [[ ! -d ~/.config ]]; then
+  mkdir ~/.config
 fi
 
 # create .config/brewfile
-rm -rf "${HOME}/.config/brewfile"
-ln -s "${base_dir}/.config/brewfile" "${HOME}/.config/"
+rm -rf ~/.config/brewfile
+ln -s "${base_dir}/.config/brewfile" ~/.config/brewfile
 
 # create .config/psysh
-rm -rf "${HOME}/.config/psysh"
-mkdir "${HOME}/.config/psysh"
-ln -s "${base_dir}/.config/psysh/config.php" "${HOME}/.config/psysh/"
+rm -rf ~/.config/psysh
+mkdir ~/.config/psysh
+ln -s "${base_dir}/.config/psysh/config.php" ~/.config/psysh/config.php
 
 # create .config/zsh
-rm -rf "${HOME}/.config/zsh"
-ln -s "${base_dir}/.config/zsh" "${HOME}/.config/"
+rm -rf ~/.config/zsh
+ln -s "${base_dir}/.config/zsh" ~/.config/zsh
 
 # setup submodules
 git submodule init
