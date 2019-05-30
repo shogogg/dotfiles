@@ -1,6 +1,7 @@
 *~
 *.swp
 *.iml
+*.zwc
 .DS_Store
 .idea
 .envrc
