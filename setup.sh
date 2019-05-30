@@ -27,6 +27,11 @@ fi
 rm -rf "${HOME}/.config/zsh"
 ln -s "${base_dir}/.config/zsh" "${HOME}/.config/"
 
+# create .config/psysh
+rm -rf "${HOME}/.config/psysh"
+mkdir "{$HOME}/.config/psysh"
+ln -s ${base_dir}/.config/psysh/config.php "${HOME}/.config/"
+
 # setup submodules
 git submodule init
 git submodule update
