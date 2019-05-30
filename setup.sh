@@ -23,14 +23,18 @@ if [[ ! -d "${HOME}/.config" ]]; then
   mkdir "${HOME}/.config"
 fi
 
-# create .config/zsh
-rm -rf "${HOME}/.config/zsh"
-ln -s "${base_dir}/.config/zsh" "${HOME}/.config/"
+# create .config/brewfile
+rm -rf "${HOME}/.config/brewfile"
+ln -s "${base_dir}/.config/brewfile" "${HOME}/.config/"
 
 # create .config/psysh
 rm -rf "${HOME}/.config/psysh"
-mkdir "{$HOME}/.config/psysh"
-ln -s ${base_dir}/.config/psysh/config.php "${HOME}/.config/"
+mkdir "${HOME}/.config/psysh"
+ln -s "${base_dir}/.config/psysh/config.php" "${HOME}/.config/psysh/"
+
+# create .config/zsh
+rm -rf "${HOME}/.config/zsh"
+ln -s "${base_dir}/.config/zsh" "${HOME}/.config/"
 
 # setup submodules
 git submodule init
