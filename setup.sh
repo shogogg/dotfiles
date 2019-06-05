@@ -6,6 +6,7 @@ dot_files=(
   .gemrc
   .gitconfig
   .gitignore
+  .hyper.js
   .phpbrewrc
   .sbtconfig
   .sbtrc

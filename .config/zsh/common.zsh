@@ -42,6 +42,36 @@ gpgconf --launch gpg-agent
 export GREP_OPTIONS='--color=auto'
 
 #
+# hyper-tab-icons-plus
+#
+title() {
+  export TITLE_OVERRIDDEN=1
+  echo -en "\e]0;$*\a"
+}
+auto_title() {
+  export TITLE_OVERRIDDEN=0
+}
+tab_title_precmd() {
+  if [[ $TITLE_OVERRIDDEN == 1 ]]; then
+    return
+  fi
+  pwd=$(pwd)
+  cwd=${pwd##*/}
+  print -Pn "\e]0;$cwd\a"
+}
+tab_title_preexec() {
+  if [[ $TITLE_OVERRIDDEN == 1 ]]; then
+    return
+  fi
+  pwd=$(pwd)
+  cwd=${pwd##*/}
+  printf "\033]0;%s\a" "${1%% *} | $cwd"
+}
+auto_title
+precmd_functions=($precmd_functions tab_title_precmd)
+preexec_functions=($preexec_functions tab_title_preexec)
+
+#
 # phpbrew
 #
 export PHPBREW_RC_ENABLE=1
