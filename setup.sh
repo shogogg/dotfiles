@@ -6,6 +6,7 @@ dot_files=(
   .gemrc
   .gitconfig
   .gitignore
+  .phpbrewrc
   .sbtconfig
   .sbtrc
   .vim
