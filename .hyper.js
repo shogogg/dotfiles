@@ -137,6 +137,17 @@ module.exports = {
     // rendering (slower, but supports transparent backgrounds)
     webGLRenderer: true,
 
+    // hyper-broadcast
+    broadcast: {
+      debug: false,
+      hotkeys: {
+          selectCurrentPane: 'Command+Alt+Shift+B',
+          selectCurrentTabPanes: 'Command+Alt+B',
+          selectAllPanes: 'Command+Shift+B',
+          toggleCurrentPane: 'Command+Alt+Control+Shift+B'
+      }
+    },
+
     // for advanced config flags please refer to https://hyper.is/#cfg
   },
 
@@ -146,7 +157,12 @@ module.exports = {
   //   `hyperpower`
   //   `@company/project`
   //   `project#1.0.1`
-  plugins: ["hyperterm-material", "hyper-statusline", "hyper-tab-icons-plus"],
+  plugins: [
+    "hyper-statusline",
+    "hyper-tab-icons-plus",
+    "hyper-broadcast",
+    "hyper-materialshell"
+  ],
 
   // in development, you can create a directory under
   // `~/.hyper_plugins/local/` and include it here
@@ -156,5 +172,5 @@ module.exports = {
   keymaps: {
     // Example
     // 'window:devtools': 'cmd+alt+o',
-  },
+  }
 };
