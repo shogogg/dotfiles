@@ -3,11 +3,6 @@ filetype off
 filetype plugin indent off
 
 " ==============================================
-"   カラースキーマ
-" ==============================================
-colorscheme molokai
-
-" ==============================================
 "   基本的な設定
 " ==============================================
 set nocompatible   " vi 互換モードをOFF
@@ -20,6 +15,7 @@ scriptencoding utf-8
 " ==============================================
 set nonumber       " 画面左に行番号を表示しない
 set ruler          " ステータスラインに行・列を表示する
+set noshowmode     " ステータスラインにモードを表示しない
 
 " ==============================================
 "   タブ・インデント関連
@@ -52,19 +48,44 @@ inoremap <silent> jj <ESC>
 " ==============================================
 "   dein.vim
 " ==============================================
-let s:dein_dir = expand('~/.vim/dein')
-let s:dein_toml = '~/.vim/dein.toml'
-set runtimepath+=~/.vim/dein/repos/github.com/Shougo/dein.vim
+set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
 
-if dein#load_state(s:dein_dir)
-  call dein#begin(s:dein_dir)
-  call dein#load_toml(s:dein_toml, {'lazy': 0})
+if dein#load_state('~/.cache/dein')
+  " BEGIN
+  call dein#begin('~/.cache/dein')
+  call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
+
+  " vimproc
+  call dein#add('Shougo/vimproc.vim', {'build' : 'make'})
+
+  " Unite.vim
+  call dein#add('Shougo/unite.vim')
+
+  " lightline.vim
+  call dein#add('itchyny/lightline.vim')
+  set laststatus=2
+  let g:lightline = {
+    \   'colorscheme': 'wombat',
+    \   'component': {
+    \     'readonly': '%{&readonly?"READ ONLY":""}'
+    \   }
+    \ }
+  if !has('gui_running')
+    set t_Co=256
+  endif
+
+  " solarized
+  call dein#add('altercation/vim-colors-solarized')
+
+  " Emmet-vim
+  call dein#add('mattn/emmet-vim')
+
+  " languages
+  call dein#add('plasticboy/vim-markdown')
+
+  " END
   call dein#end()
   call dein#save_state()
-endif
-
-if dein#check_install()
-  call dein#install()
 endif
 
 " ==============================================
@@ -73,5 +94,8 @@ endif
 " ファイルタイプ関連を有効にする
 filetype plugin indent on
 
-" Syntax Highligt を有効にする
-syntax on
+" Syntax Highlight を有効にする
+syntax enable
+
+set verbosefile=~/tmp/vim.log
+set verbose=10

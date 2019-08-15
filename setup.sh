@@ -4,14 +4,11 @@ base_dir="$(cd -- "$(dirname -- "${BASH_SOURCE}")"; pwd)"
 dot_files=(
   .editorconfig
   .gemrc
-  .gitconfig
-  .gitignore
   .hyper.js
   .phpbrewrc
   .sbtconfig
   .sbtrc
   .vim
-  .vimrc
   .zshenv
 )
 
@@ -29,6 +26,12 @@ fi
 rm -rf ~/.config/brewfile
 ln -s "${base_dir}/.config/brewfile" ~/.config/brewfile
 
+# create .config/git
+rm -rf ~/.config/git
+mkdir ~/.config/git
+ln -s "${base_dir}/.config/git/.gitconfig" ~/.config/git/.gitconfig
+ln -s "${base_dir}/.config/git/.gitignore" ~/.config/git/.gitignore
+
 # create .config/psysh
 rm -rf ~/.config/psysh
 mkdir ~/.config/psysh
@@ -41,3 +44,8 @@ ln -s "${base_dir}/.config/zsh" ~/.config/zsh
 # setup submodules
 git submodule init
 git submodule update
+
+# install dein.vim
+curl https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh > installer.sh
+sh ./installer.sh ~/.cache/dein
+rm ./installer.sh
