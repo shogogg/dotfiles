@@ -67,7 +67,7 @@ module.exports = {
     showWindowControls: '',
 
     // custom padding (CSS format, i.e.: `top right bottom left`)
-    padding: '12px 14px',
+    padding: '12px',
 
     // the full list. if you're going to provide the full color palette,
     // including the 6 x 6 color cubes and the grayscale map, just provide
@@ -137,6 +137,8 @@ module.exports = {
     // rendering (slower, but supports transparent backgrounds)
     webGLRenderer: true,
 
+    // for advanced config flags please refer to https://hyper.is/#cfg
+
     // hyper-broadcast
     broadcast: {
       debug: false,
@@ -148,7 +150,31 @@ module.exports = {
       }
     },
 
-    // for advanced config flags please refer to https://hyper.is/#cfg
+    // hyper-pane
+    paneNavigation: {
+      debug: false,
+      hotkeys: {
+        navigation: {
+          up: 'ctrl+alt+up',
+          down: 'ctrl+alt+down',
+          left: 'ctrl+alt+left',
+          right: 'ctrl+alt+right'
+        },
+        jump_prefix: 'ctrl+alt', // completed with 1-9 digits
+        permutation_modifier: 'shift', // Added to jump and navigation hotkeys for pane permutation
+        maximize: 'meta+enter'
+      },
+      showIndicators: true, // Show pane number
+      indicatorPrefix: '^⌥', // Will be completed with pane number
+      indicatorStyle: { // Added to indicator <div>
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        fontSize: '10px'
+      },
+      focusOnMouseHover: false,
+      inactivePaneOpacity: 0.5 // Set to 1 to disable inactive panes dimming
+    }
   },
 
   // a list of plugins to fetch and install from npm
@@ -161,7 +187,8 @@ module.exports = {
     "hyper-statusline",
     "hyper-tab-icons-plus",
     "hyper-broadcast",
-    "hyper-materialshell"
+    "hyper-pane",
+    "hyper-material-theme"
   ],
 
   // in development, you can create a directory under
@@ -172,5 +199,5 @@ module.exports = {
   keymaps: {
     // Example
     // 'window:devtools': 'cmd+alt+o',
-  }
+  },
 };
