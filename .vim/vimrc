@@ -63,7 +63,6 @@ if dein#load_state('~/.cache/dein')
 
   " lightline.vim
   call dein#add('itchyny/lightline.vim')
-  set laststatus=2
   let g:lightline = {
     \   'colorscheme': 'wombat',
     \   'component': {
@@ -99,3 +98,6 @@ syntax enable
 
 set verbosefile=~/tmp/vim.log
 set verbose=10
+
+" ステータスラインを常に表示する
+set laststatus=2
