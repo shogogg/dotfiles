@@ -14,8 +14,11 @@
   sm = submodule
   st = status
   stat = status
+  sw = !git branch -a | fzf | xargs git switch
 [color]
   ui = true
+[pull]
+  rebase = true
 [push]
   default = current
 [merge]
