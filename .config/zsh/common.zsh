@@ -24,6 +24,12 @@ eval "$(direnv hook zsh)"
 export DIRENV_LOG_FORMAT=""
 
 #
+# fzf
+#
+[[ -f "${HOME}/.fzf.zsh" ]] && source "${HOME}/.fzf.zsh"
+export FZF_DEFAULT_OPTS='--height 50% --inline-info --reverse'
+
+#
 # golang
 #
 export GOPATH="$HOME/.go/"

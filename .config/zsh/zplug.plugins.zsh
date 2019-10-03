@@ -1,4 +1,5 @@
 # enhancd
+export ENHANCD_FILTER=fzf:fzy:peco
 zplug "b4b4r07/enhancd", use:init.sh
 
 # history-fzy
