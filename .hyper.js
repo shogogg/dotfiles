@@ -9,10 +9,10 @@ module.exports = {
     updateChannel: 'stable',
 
     // default font size in pixels for all tabs
-    fontSize: 12,
+    fontSize: 14,
 
     // font family with optional fallbacks
-    fontFamily: '"mplus 1mn", Menlo, "DejaVu Sans Mono", Consolas, "Lucida Console", monospace',
+    fontFamily: '"Ricty Diminished with-icons", Menlo, "DejaVu Sans Mono", Consolas, "Lucida Console", monospace',
 
     // default font weight: 'normal' or 'bold'
     fontWeight: 'normal',
@@ -138,6 +138,7 @@ module.exports = {
     webGLRenderer: true,
 
     // for advanced config flags please refer to https://hyper.is/#cfg
+    scrollback: 10000,
 
     // hyper-broadcast
     broadcast: {
@@ -188,7 +189,9 @@ module.exports = {
     "hyper-tab-icons-plus",
     "hyper-broadcast",
     "hyper-pane",
-    "hyper-material-theme"
+    "hyper-material-theme",
+    "hyperborder",
+    "hypercwd"
   ],
 
   // in development, you can create a directory under
