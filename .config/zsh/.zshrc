@@ -10,7 +10,6 @@ setopt nonomatch
 #
 alias artisan='php artisan'
 alias bump='yarn upgrade-interactive'
-alias cat='bat'
 alias ga='git add'
 alias gco='git checkout'
 alias grh='git reset --hard'
@@ -67,11 +66,6 @@ bindkey "^W" vi-backward-kill-word
 bindkey '\e\C-?' vi-backward-kill-word  # ⌥ + ⌫
 bindkey '\e\e[C' vi-forward-word        # ⌥ + →
 bindkey '\e\e[D' vi-backward-word       # ⌥ + ←
-
-#
-# prompt
-#
-source "$ZDOTDIR/prompt.zsh"
 
 #
 # zplug

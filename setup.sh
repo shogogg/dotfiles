@@ -37,6 +37,10 @@ rm -rf ~/.config/psysh
 mkdir ~/.config/psysh
 ln -s "${base_dir}/.config/psysh/config.php" ~/.config/psysh/config.php
 
+# create .config/starship.toml
+rm -rf ~/.config/starship.toml
+ln -s "${base_dir}/.config/starship.toml" ~/.config/starship.toml
+
 # create .config/zsh
 rm -rf ~/.config/zsh
 ln -s "${base_dir}/.config/zsh" ~/.config/zsh

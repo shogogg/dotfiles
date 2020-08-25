@@ -1,0 +1,21 @@
+[aws.region_aliases]
+ap-northeast-1 = "tokyo"
+
+[directory]
+truncate_to_repo = false
+truncation_length = 0
+
+[git_status]
+modified = "*"
+stashed = ""
+prefix = ""
+suffix = " "
+
+[nodejs]
+disabled = true
+
+[package]
+disabled = true
+
+[php]
+disabled = true

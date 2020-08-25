@@ -13,6 +13,7 @@ anyenv_update="$anyenv_root/plugins/anyenv-update"
 #
 # composer
 #
+export COMPOSER_MEMORY_LIMIT=-1
 if [[ -d ~/.composer ]]; then
   path=(~/.composer/vendor/bin $path)
 fi
@@ -99,3 +100,8 @@ export SBT_OPTS=(
   -Xmx2048m
   -XX:ReservedCodeCacheSize=256m
 )
+
+#
+# starship
+#
+eval "$(starship init zsh)"
