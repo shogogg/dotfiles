@@ -10,6 +10,11 @@ zplug "b4b4r07/enhancd", use:init.sh
 zplug "shogogg/86f13a0aff12b9a31efb083946a500cb", from:gist
 
 #
+# yarn-completion
+#
+zplug "buonomo/yarn-completion", defer:3
+
+#
 # zsh-completion
 #
 zplug "zsh-users/zsh-completions"
