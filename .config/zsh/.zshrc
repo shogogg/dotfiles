@@ -53,7 +53,7 @@ zle -N history-beginning-search-backward-end history-search-end
 zle -N history-beginning-search-forward-end history-search-end
 
 #
-# keybind
+# key bind
 #
 bindkey -d
 bindkey "^A" beginning-of-line
@@ -94,3 +94,10 @@ case ${OSTYPE} in
     source "$ZDOTDIR/linux.zsh"
     ;;
 esac
+
+#
+# local functions
+#
+if [[ -f "$ZDOTDIR/local-functions/index.zsh" ]]; then
+  source "$ZDOTDIR/local-functions/index.zsh"
+fi
