@@ -1,7 +1,4 @@
-How to install
-================
+# How to install
 ```
-$ git clone https://github.com/shogogg/dotfiles.git
-$ dotfiles/setup.sh
+bash -c "$(curl -fsSL https://raw.github.com/shogogg/dotfiles/master/setup.sh)"
 ```
-
