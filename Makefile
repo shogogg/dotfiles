@@ -34,7 +34,12 @@ homebrew: dotfiles
 # .config
 #
 .PHONY: config
-config: git psysh starship zsh
+config: fish git psysh starship zsh
+
+.PHONY: fish
+fish:
+	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
+	@curl https://git.io/fisher --create-dirs -sLo "$(CONFIG_PATH)/$@/functions/fisher.fish"
 
 .PHONY: git
 git:
@@ -53,7 +58,6 @@ starship:
 
 .PHONY: zsh
 zsh:
-	@mkdir -p "$(HOME)/.config/$@"
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 
 #

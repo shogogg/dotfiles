@@ -1,0 +1,94 @@
+#
+# env
+#
+set fish_home (dirname (status --current-filename))
+
+set -Ux EDITOR vim
+set -Ux LANG ja_JP.UTF-8
+set -Ux TERM xterm-256color
+
+set -U fish_greeting ""
+
+#
+# aliases
+#
+alias artisan "php artisan"
+alias bump "yarn upgrade-interactive"
+alias ga "git add"
+alias gco "git checkout"
+alias grh "git reset --hard"
+alias gsp "git stash pop"
+alias gss "git add . && git stash save"
+alias gst "git status"
+alias gu "gitup"
+alias la "exa --time-style=long-iso -lha"
+alias ll "exa --time-style=long-iso -aghl"
+alias ls "exa --time-style=long-iso"
+alias pull "git pull"
+alias push "git push"
+alias st "stree"
+alias tinker "php artisan tinker"
+alias vi "vim"
+
+#
+# anyenv
+#
+if test -d ~/.anyenv
+  set -x PATH "~/.anyenv/bin" $PATH
+  status --is-interactive; and source (anyenv init - | psub)
+end
+
+#
+# composer
+#
+if test -d ~/.composer
+  set -Ux COMPOSER_MEMORY_LIMIT -1
+  set -x PATH ~/.composer/vendor/bin $PATH
+end
+
+#
+# direnv
+#
+set -Ux DIRENV_LOG_FORMAT ""
+eval (direnv hook fish)
+
+#
+# enhancd
+#
+set -Ux ENHANCD_FILTER "fzf:fzy:peco"
+set -Ux ENHANCD_ROOT "$fish_home/functions/enhancd"
+
+#
+# fzf
+#
+set -Ux FZF_DEFAULT_OPTS '--height 50% --inline-info --reverse'
+
+#
+# golang
+#
+set -Ux GOPATH ~/.go/
+
+#
+# grep
+#
+set -Ux GREP_OPTIONS "--color=auto"
+
+#
+# phpbrew
+#
+set -Ux PHPBREW_SHELL fish
+set -Ux PHPBREW_RC_ENABLE 1
+if not type -q phpbrew
+  curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew \
+    and chmod +x phpbrew \
+    and mv phpbrew /usr/local/bin \
+    and phpbrew init
+end
+if test -f ~/.phpbrew/phpbrew.fish
+  source ~/.phpbrew/phpbrew.fish
+end
+
+#
+# starship
+#
+starship init fish | source
