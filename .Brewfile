@@ -15,6 +15,7 @@ brew "ffmpeg", args: ['HEAD']
 brew "fontforge"
 brew "fzf"
 brew "gd"
+brew "gh"
 brew "ghq"
 brew "git"
 brew "gnupg"

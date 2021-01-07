@@ -138,7 +138,7 @@ module.exports = {
     webGLRenderer: true,
 
     // for advanced config flags please refer to https://hyper.is/#cfg
-    scrollback: 10000,
+    scrollback: 99999,
 
     // hyper-broadcast
     broadcast: {

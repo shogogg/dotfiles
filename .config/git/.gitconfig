@@ -13,6 +13,7 @@
   gravedigger = "!git fsck | awk '/dangling commit/ {print $3}' | xargs git logs --name-only | bat"
   logs = "!f() { git log --color=always --oneline $@ | emojify; }; f"
   me = merge --no-commit --no-ff
+  pr = "!git push -u origin && gh pr create -w"
   rbc = rebase --continue
   rbi = rebase -i
   sm = submodule

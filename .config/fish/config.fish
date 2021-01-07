@@ -2,12 +2,14 @@
 # env
 #
 set fish_home (dirname (status --current-filename))
+set fish_greeting ""
+set --prepend fish_function_path \
+  $fish_home/local-functions \
+  $fish_home/my-functions
 
 set -Ux EDITOR vim
 set -Ux LANG ja_JP.UTF-8
 set -Ux TERM xterm-256color
-
-set -U fish_greeting ""
 
 #
 # aliases
@@ -26,6 +28,7 @@ alias ll "exa --time-style=long-iso -aghl"
 alias ls "exa --time-style=long-iso"
 alias pull "git pull"
 alias push "git push"
+alias s "git branch | sed 's#remotes/[^/]*/##' | grep -v '*' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch"
 alias st "stree"
 alias tinker "php artisan tinker"
 alias vi "vim"
@@ -34,7 +37,7 @@ alias vi "vim"
 # anyenv
 #
 if test -d ~/.anyenv
-  set -x PATH "~/.anyenv/bin" $PATH
+  set -x --prepend PATH "~/.anyenv/bin"
   status --is-interactive; and source (anyenv init - | psub)
 end
 
@@ -42,8 +45,8 @@ end
 # composer
 #
 if test -d ~/.composer
+  set -x --prepend PATH ~/.composer/vendor/bin
   set -Ux COMPOSER_MEMORY_LIMIT -1
-  set -x PATH ~/.composer/vendor/bin $PATH
 end
 
 #
@@ -61,6 +64,7 @@ set -Ux ENHANCD_ROOT "$fish_home/functions/enhancd"
 #
 # fzf
 #
+set -Ux FZF_COMPLETE 0
 set -Ux FZF_DEFAULT_OPTS '--height 50% --inline-info --reverse'
 
 #
