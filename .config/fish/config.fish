@@ -50,6 +50,11 @@ if test -d ~/.composer
 end
 
 #
+# curl
+#
+set -x --prepend PATH "/usr/local/opt/curl/bin"
+
+#
 # direnv
 #
 set -Ux DIRENV_LOG_FORMAT ""
