@@ -1,6 +1,7 @@
 [user]
   name = shogogg
   email = shogo@studiofly.net
+
 [alias]
   amend = commit --amend
   br = branch
@@ -20,17 +21,32 @@
   st = status
   stat = status
   sw = "!git branch | sed 's#remotes/[^/]*/##' | grep -v '*' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch"
+  unwip = reset HEAD~
   up = !gitup
   wip = ![[ $(git log --oneline | head -n 1 | cut -d ' ' -f 2) == 'WIP' ]] && git add --all && git commit --amend -m WIP || git commit -m WIP
+
 [color]
   ui = true
+
 [pull]
   rebase = true
+
 [push]
   default = current
+
 [merge]
   ff = false
+
 [core]
   excludesfile = ~/.config/git/.gitignore
   autocrlf = input
   editor = vim
+  pager = delta
+
+[delta]
+  plus-color = "#012800"
+  minus-color = "#340001"
+  syntax-theme = Monokai Extended
+
+[interactive]
+  diffFilter = delta --color-only
