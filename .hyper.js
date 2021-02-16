@@ -202,5 +202,9 @@ module.exports = {
   keymaps: {
     // Example
     // 'window:devtools': 'cmd+alt+o',
+    'editor:moveBeginningLine': '',
+    'editor:moveEndLine': '',
+    'pane:next': 'command+right',
+    'pane:prev': 'command+left',
   },
 };
