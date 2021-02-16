@@ -76,6 +76,7 @@ set -Ux FZF_DEFAULT_OPTS '--height 50% --inline-info --reverse'
 # golang
 #
 set -Ux GOPATH ~/.go/
+set --prepend -x PATH ~/.go/bin
 
 #
 # grep
