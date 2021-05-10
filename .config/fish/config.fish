@@ -97,6 +97,9 @@ end
 if test -f ~/.phpbrew/phpbrew.fish
   source ~/.phpbrew/phpbrew.fish
 end
+if test -f .phpbrewrc
+  source .phpbrewrc
+end
 
 #
 # starship
