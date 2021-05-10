@@ -191,7 +191,8 @@ module.exports = {
     "hyper-pane",
     "hyper-material-theme",
     "hyperborder",
-    "hypercwd"
+    "hypercwd",
+    "hyperterm-summon"
   ],
 
   // in development, you can create a directory under
