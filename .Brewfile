@@ -11,7 +11,7 @@ brew "deployer"
 brew "direnv"
 brew "emojify"
 brew "exa"
-brew "ffmpeg", args: ['HEAD']
+brew "ffmpeg"
 brew "fontforge"
 brew "fzf"
 brew "gd"
