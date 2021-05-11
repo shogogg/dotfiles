@@ -84,6 +84,11 @@ set --prepend -x PATH ~/.go/bin
 set -Ux GREP_OPTIONS "--color=auto"
 
 #
+# iterm2
+#
+test -e {$HOME}/.iterm2_shell_integration.fish ; and source {$HOME}/.iterm2_shell_integration.fish
+
+#
 # phpbrew
 #
 set -Ux PHPBREW_SHELL fish
