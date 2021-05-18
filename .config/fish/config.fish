@@ -10,34 +10,35 @@ set --prepend fish_function_path \
 set -Ux EDITOR vim
 set -Ux LANG ja_JP.UTF-8
 set -Ux TERM xterm-256color
+set -x --prepend PATH ~/bin
 
 #
 # aliases
 #
-alias artisan "php artisan"
-alias bump "yarn upgrade-interactive"
-alias ga "git add"
-alias gco "git checkout"
-alias grm "git rebase master"
-alias gsp "git stash pop"
-alias gss "git add . && git stash save"
-alias gst "git status"
-alias gu "gitup"
-alias la "exa --time-style=long-iso -lha"
-alias ll "exa --time-style=long-iso -aghl"
-alias ls "exa --time-style=long-iso"
-alias pull "git pull"
-alias push "git push"
+alias artisan 'php artisan'
+alias bump 'yarn upgrade-interactive'
+alias ga 'git add'
+alias gco 'git checkout'
+alias grm 'git rebase master'
+alias gsp 'git stash pop'
+alias gss 'git add . && git stash save'
+alias gst 'git status'
+alias la 'exa --time-style=long-iso -lha'
+alias ll 'exa --time-style=long-iso -aghl'
+alias ls 'exa --time-style=long-iso'
+alias pull 'git pull'
+alias push 'git push'
 alias s "git branch | sed 's#remotes/[^/]*/##' | grep -v '*' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch"
-alias st "stree"
-alias tinker "php artisan tinker"
-alias vi "vim"
+alias st stree
+alias t tmux_interactive
+alias tinker 'php artisan tinker'
+alias vi 'vim'
 
 #
 # anyenv
 #
 if test -d ~/.anyenv
-  set -x --prepend PATH "~/.anyenv/bin"
+  set -x --prepend PATH ~/.anyenv/bin
   status --is-interactive; and source (anyenv init - | psub)
 end
 
@@ -52,7 +53,7 @@ end
 #
 # curl
 #
-set -x --prepend PATH "/usr/local/opt/curl/bin"
+set -x --prepend PATH /usr/local/opt/curl/bin
 
 #
 # direnv
@@ -70,7 +71,7 @@ set -Ux ENHANCD_ROOT "$fish_home/functions/enhancd"
 # fzf
 #
 set -Ux FZF_COMPLETE 0
-set -Ux FZF_DEFAULT_OPTS '--height 50% --inline-info --reverse'
+set -Ux FZF_DEFAULT_OPTS (__fzf_default_options)
 
 #
 # golang
@@ -110,3 +111,8 @@ end
 # starship
 #
 starship init fish | source
+
+#
+# tmux
+#
+tmux_auto_attach_session

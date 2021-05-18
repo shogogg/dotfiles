@@ -7,8 +7,11 @@ DOTFILES := $(filter-out $(DOTFILES_EXCLUSIONS), $(DOTFILES_CANDIDATES))
 CONFIG_PATH := $(DOT_PATH)/.config
 CONFIGS := $(wildcard .config/??*)
 
+BIN_PATH := $(DOT_PATH)/bin
+COMMANDS := $(wildcard bin/??*)
+
 .PHONY: all
-all: dotfiles config homebrew submodules vim
+all: dotfiles bin config homebrew vim
 
 .PHONY: list
 list:
@@ -21,6 +24,14 @@ list:
 .PHONY: dotfiles
 dotfiles:
 	@$(foreach name, $(DOTFILES), ln -fnsv $(abspath $(name)) $(HOME)/$(name);)
+
+#
+# bin
+#
+.PHONY: bin
+bin:
+	@mkdir -p "$(HOME)/bin"
+	@$(foreach name, $(COMMANDS), ln -fnsv $(abspath $(name)) $(HOME)/$(name);)
 
 #
 # Homebrew
@@ -59,14 +70,6 @@ starship:
 .PHONY: zsh
 zsh:
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
-
-#
-# git submodules
-#
-.PHONY: submodules
-submodules:
-	@git submodule init
-	@git submodule update
 
 #
 # vim

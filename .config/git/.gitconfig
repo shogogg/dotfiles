@@ -1,7 +1,3 @@
-[user]
-  name = shogogg
-  email = shogo@studiofly.net
-
 [alias]
   amend = commit --amend
   br = branch
@@ -28,15 +24,6 @@
 [color]
   ui = true
 
-[pull]
-  rebase = true
-
-[push]
-  default = current
-
-[merge]
-  ff = false
-
 [core]
   excludesfile = ~/.config/git/.gitignore
   autocrlf = input
@@ -46,7 +33,23 @@
 [delta]
   plus-color = "#012800"
   minus-color = "#340001"
-  syntax-theme = Monokai Extended
+  syntax-theme = Solarized (dark)
+
+[init]
+  defaultBranch = main
 
 [interactive]
   diffFilter = delta --color-only
+
+[merge]
+  ff = false
+
+[pull]
+  rebase = true
+
+[push]
+  default = current
+
+[user]
+  name = shogogg
+  email = shogo@studiofly.net

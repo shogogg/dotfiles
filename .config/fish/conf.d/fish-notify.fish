@@ -1,8 +1,11 @@
+set -q FISH_NOTIFY_EXCLUDED; or set -Ux FISH_NOTIFY_EXCLUDED cd ssh tmux
+
 function fish-notify --on-event fish_prompt
   set -l _display_status $status
   if test $CMD_DURATION
     set -l secs (math "$CMD_DURATION / 1000")
-    if test $secs -ge 5
+    set -l command (echo $history[1] | awk '{ print $1 }')
+    if test $secs -ge 5; and not contains $command $FISH_NOTIFY_EXCLUDED
       terminal-notifier \
         -title (if test $_display_status -eq 0; echo 'SUCCESS'; else; echo 'FAILURE'; end) \
         -subtitle $history[1] \
