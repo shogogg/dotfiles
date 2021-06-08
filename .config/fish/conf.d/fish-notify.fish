@@ -1,4 +1,4 @@
-set -q FISH_NOTIFY_EXCLUDED; or set -Ux FISH_NOTIFY_EXCLUDED cd ssh tmux
+set -q FISH_NOTIFY_EXCLUDED; or set -Ux FISH_NOTIFY_EXCLUDED cd git ssh tmux vi vim
 
 function fish-notify --on-event fish_prompt
   set -l _display_status $status

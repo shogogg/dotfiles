@@ -6,14 +6,22 @@ function __tmux_read_session_name
   echo $argv | awk '{ print $2 }' | sed 's/://g'
 end
 
+function __tmux_read_window_name
+  echo $argv | awk '{ print $2 }' | sed 's/://g'
+end
+
 function __tmux_create_session
   read -p 'echo "session name?: "' name
   if is_tmux
-    tmux new -s "$name" -d
+    tmux new-session -s "$name" -d
     tmux switch -t "$name"
   else
-    tmux new -s "$name"
+    tmux new-session -s "$name"
   end
+end
+
+function __tmux_create_window
+  tmux new-window
 end
 
 function __tmux_rename_session
@@ -28,9 +36,13 @@ function __tmux_list_actions
   if is_tmux
     echo -s (set_color brmagenta) "SPLIT" (set_color normal) ": right"
     echo -s (set_color brmagenta) "SPLIT" (set_color normal) ": down"
+    tmux list-windows 2> /dev/null | grep -v active | while read window
+      echo -s (set_color blue) "CHOOSE"(set_color normal) ": $window"
+    end
     tmux ls 2> /dev/null | grep -v attached | while read session
       echo -s (set_color blue) "SWITCH"(set_color normal) ": $session"
     end
+    echo -s (set_color yellow) "CREATE" (set_color normal) ": new window"
     echo -s (set_color yellow) "CREATE" (set_color normal) ": new session"
     echo -s (set_color magenta) "DETACH" (set_color normal)
     echo -s (set_color magenta) "KILL SESSION" (set_color normal)
@@ -50,8 +62,12 @@ function __tmux_do_action
       tmux attach -t (__tmux_read_session_name $argv)
     case 'CANCEL'
       # DO NOTHING
+    case 'CHOOSE: *'
+      tmux choose-window -t (__tmux_read_window_name $argv)
     case 'CREATE: new session'
       __tmux_create_session
+    case 'CREATE: new window'
+      __tmux_create_window
     case 'DETACH'
       tmux detach
     case 'KILL SESSION'
