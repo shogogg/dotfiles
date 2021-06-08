@@ -19,7 +19,7 @@ alias artisan 'php artisan'
 alias bump 'yarn upgrade-interactive'
 alias ga 'git add'
 alias gco 'git checkout'
-alias grm 'git rebase master'
+alias grm 'git rebase main'
 alias gsp 'git stash pop'
 alias gss 'git add . && git stash save'
 alias gst 'git status'
@@ -94,11 +94,8 @@ test -e {$HOME}/.iterm2_shell_integration.fish ; and source {$HOME}/.iterm2_shel
 #
 set -Ux PHPBREW_SHELL fish
 set -Ux PHPBREW_RC_ENABLE 1
-if not type -q phpbrew
-  curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew \
-    and chmod +x phpbrew \
-    and mv phpbrew /usr/local/bin \
-    and phpbrew init
+if not test -d ~/.phpbrew
+  phpbrew init
 end
 if test -f ~/.phpbrew/phpbrew.fish
   source ~/.phpbrew/phpbrew.fish

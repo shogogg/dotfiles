@@ -38,7 +38,7 @@ bin:
 #
 .PHONY: homebrew
 homebrew: dotfiles
-	@type brew || bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+	@type brew || bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 	@brew bundle --global
 
 #
@@ -76,6 +76,6 @@ zsh:
 #
 .PHONY: vim
 vim:
-	@curl -fsSL https://raw.githubusercontent.com/Shougo/dein.vim/master/bin/installer.sh > installer.sh
+	@curl -fsSL https://raw.githubusercontent.com/Shougo/dein.vim/HEAD/bin/installer.sh > installer.sh
 	@sh ./installer.sh ~/.cache/dein > /dev/null 2>&1
 	@rm ./installer.sh
