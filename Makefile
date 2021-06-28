@@ -45,7 +45,7 @@ homebrew: dotfiles
 # .config
 #
 .PHONY: config
-config: fish git psysh starship zsh
+config: fish git psysh starship.toml
 
 .PHONY: fish
 fish:
@@ -54,21 +54,16 @@ fish:
 
 .PHONY: git
 git:
-	@mkdir -p "$(HOME)/.config/$@"
+	@mkdir -p "$(CONFIG_PATH)/$@"
 	@ln -fnsv "$(CONFIG_PATH)/$@/.gitconfig" "$(HOME)/.config/$@/.gitconfig"
 	@ln -fnsv "$(CONFIG_PATH)/$@/.gitignore" "$(HOME)/.config/$@/.gitignore"
 
 .PHONY: psysh
 psysh:
-	@mkdir -p "$(HOME)/.config/$@"
-	@ln -fnsv "$(CONFIG_PATH)/$@/config.php" "$(HOME)/.config/$@/config.php"
+	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 
-.PHONY: starship
-starship:
-	@ln -fnsv "$(CONFIG_PATH)/$@.toml" "$(HOME)/.config/$@.toml"
-
-.PHONY: zsh
-zsh:
+.PHONY: starship.toml
+starship.toml:
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 
 #
