@@ -13,7 +13,6 @@ function fish-notify --on-event fish_prompt
         -group fish-notify \
         -remove fish-notify \
         -activate com.googlecode.iterm2 \
-        -sender com.googlecode.iterm2 \
         -sound (if test $_display_status -eq 0; echo 'default'; else; echo 'Hero'; end) \
         > /dev/null 2> /dev/null
     end
