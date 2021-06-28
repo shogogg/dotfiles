@@ -3,6 +3,7 @@
   br = branch
   brd = "!git branch | grep -v '*' | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git br -d"
   ci = commit
+  cleanup = "!git branch --merged | grep -Ev '\\*|main|master' | xargs git branch -d"
   co = checkout
   cp = cherry-pick
   fap = !git fetch --all -p && git pull
