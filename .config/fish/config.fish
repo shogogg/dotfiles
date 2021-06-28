@@ -10,7 +10,7 @@ set --prepend fish_function_path \
 set -Ux EDITOR vim
 set -Ux LANG ja_JP.UTF-8
 set -Ux TERM xterm-256color
-set -x --prepend PATH ~/bin
+fish_add_path -pm ~/bin
 
 #
 # aliases
@@ -18,6 +18,7 @@ set -x --prepend PATH ~/bin
 alias artisan 'php artisan'
 alias bump 'yarn upgrade-interactive'
 alias ga 'git add'
+alias gcd 'cd (ghq root)/(ghq list | fzf)'
 alias gco 'git checkout'
 alias grm 'git rebase main'
 alias gsp 'git stash pop'
@@ -38,7 +39,7 @@ alias vi 'vim'
 # anyenv
 #
 if test -d ~/.anyenv
-  set -x --prepend PATH ~/.anyenv/bin
+  fish_add_path -pm ~/.anyenv/bin
   status --is-interactive; and source (anyenv init - | psub)
 end
 
@@ -46,14 +47,14 @@ end
 # composer
 #
 if test -d ~/.composer
-  set -x --prepend PATH ~/.composer/vendor/bin
+  fish_add_path -pm ~/.composer/vendor/bin
   set -Ux COMPOSER_MEMORY_LIMIT -1
 end
 
 #
 # curl
 #
-set -x --prepend PATH /usr/local/opt/curl/bin
+fish_add_path -pm /usr/local/opt/curl/bin
 
 #
 # direnv
@@ -77,7 +78,7 @@ set -Ux FZF_DEFAULT_OPTS (__fzf_default_options)
 # golang
 #
 set -Ux GOPATH ~/.go/
-set --prepend -x PATH ~/.go/bin
+fish_add_path -pm ~/.go/bin
 
 #
 # grep
