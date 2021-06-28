@@ -2,6 +2,10 @@ function __tmux_has_session
   tmux has-session > /dev/null 2>&1
 end
 
+function __tmux_is_running
+  tmux info > /dev/null 2>&1
+end
+
 function __tmux_read_session_name
   echo $argv | awk '{ print $2 }' | sed 's/://g'
 end
@@ -84,23 +88,21 @@ function __tmux_do_action
 end
 
 function tmux_auto_attach_session
-  if ! status --is-interactive
+  if not status --is-interactive
     # DO NOTHING
   else if is_tmux
     echo "This is tmux session"
-  else if ! exists tmux
-    echo "TMUX NOT INSTALLED!!"
-  else
+  else if not exists tmux
+    echo "TMUX IS NOT INSTALLED!!"
+  else if __tmux_is_running
     set -l action (__tmux_list_actions | fzf --ansi)
     __tmux_do_action "$action"
+  else
+    tmux
   end
 end
 
 function tmux_interactive
-  if is_tmux
-    set -l action (__tmux_list_actions | fzf --ansi)
-    __tmux_do_action "$action"
-  else
-    tmux_auto_attach_session
-  end
+  set -l action (__tmux_list_actions | fzf --ansi)
+  __tmux_do_action "$action"
 end
