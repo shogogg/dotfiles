@@ -29,9 +29,16 @@ dotfiles:
 # bin
 #
 .PHONY: bin
-bin:
-	@mkdir -p "$(HOME)/bin"
+bin: dir
 	@$(foreach name, $(COMMANDS), ln -fnsv $(abspath $(name)) $(HOME)/$(name);)
+
+#
+# dir
+#
+.PHONY: dir
+dir:
+	@mkdir -p "$(HOME)/.config"
+	@mkdir -p "$(HOME)/bin"
 
 #
 # Homebrew
@@ -48,22 +55,22 @@ homebrew: dotfiles
 config: fish git psysh starship.toml
 
 .PHONY: fish
-fish:
+fish: dir
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 	@curl https://git.io/fisher --create-dirs -sLo "$(CONFIG_PATH)/$@/functions/fisher.fish"
 
 .PHONY: git
-git:
+git: dir
 	@mkdir -p "$(CONFIG_PATH)/$@"
 	@ln -fnsv "$(CONFIG_PATH)/$@/.gitconfig" "$(HOME)/.config/$@/.gitconfig"
 	@ln -fnsv "$(CONFIG_PATH)/$@/.gitignore" "$(HOME)/.config/$@/.gitignore"
 
 .PHONY: psysh
-psysh:
+psysh: dir
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 
 .PHONY: starship.toml
-starship.toml:
+starship.toml: dir
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 
 #
