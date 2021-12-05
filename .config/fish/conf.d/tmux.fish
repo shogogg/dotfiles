@@ -40,9 +40,6 @@ function __tmux_list_actions
   if is_tmux
     echo -s (set_color brmagenta) "SPLIT" (set_color normal) ": right"
     echo -s (set_color brmagenta) "SPLIT" (set_color normal) ": down"
-    tmux list-windows 2> /dev/null | grep -v active | while read window
-      echo -s (set_color blue) "CHOOSE"(set_color normal) ": $window"
-    end
     tmux ls 2> /dev/null | grep -v attached | while read session
       echo -s (set_color blue) "SWITCH"(set_color normal) ": $session"
     end
@@ -66,8 +63,6 @@ function __tmux_do_action
       tmux attach -t (__tmux_read_session_name $argv)
     case 'CANCEL'
       # DO NOTHING
-    case 'CHOOSE: *'
-      tmux choose-window -t (__tmux_read_window_name $argv)
     case 'CREATE: new session'
       __tmux_create_session
     case 'CREATE: new window'
