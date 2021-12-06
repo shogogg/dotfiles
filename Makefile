@@ -51,7 +51,7 @@ ifeq (, $(shell which brew))
 	@echo "Install Homebrew"
 	@bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 else
-	@echo "Homebrew alread installed!!"
+	@echo "Homebrew already installed!!"
 endif
 
 bundle: homebrew
