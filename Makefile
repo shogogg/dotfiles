@@ -13,7 +13,7 @@ COMMANDS := $(wildcard bin/??*)
 UNAME := $(shell uname -s)
 
 .PHONY: all
-all: dotfiles bin config bundle vim
+all: dotfiles bin config bundle vim key-repeat pam-tid
 
 .PHONY: list
 list:
@@ -49,7 +49,7 @@ dir:
 homebrew: dotfiles
 ifeq (, $(shell which brew))
 	@echo "Install Homebrew"
-	@bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	@curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
 else
 	@echo "Homebrew already installed!!"
 endif
@@ -101,3 +101,9 @@ ifeq ($(UNAME), Darwin)
 else
 	@echo "Nothing to do."
 endif
+
+#
+# pam_tid
+#
+pam-tid:
+	curl -fsSL https://gist.github.com/shogogg/dd6fd5d84ce7c87569038ae4f81a4101/raw/install-pam_tid-and-pam_reattach.sh | bash
