@@ -96,8 +96,8 @@ vim:
 #
 key-repeat:
 ifeq ($(UNAME), Darwin)
-	@defaults write -g InitialKeyRepeat -int 15
-	@defaults write -g KeyRepeat -int 1.6
+	@defaults write NSGlobalDomain KeyRepeat -int 1.6
+	@defaults write NSGlobalDomain InitialKeyRepeat -int 15
 else
 	@echo "Nothing to do."
 endif
