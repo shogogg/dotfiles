@@ -11,7 +11,7 @@ BIN_PATH := $(DOT_PATH)/bin
 COMMANDS := $(wildcard bin/??*)
 
 .PHONY: all
-all: dotfiles bin config homebrew vim
+all: dotfiles bin config bundle vim
 
 .PHONY: list
 list:
@@ -45,7 +45,14 @@ dir:
 #
 .PHONY: homebrew
 homebrew: dotfiles
-	@type brew || bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+ifeq (, $(shell which brew))
+	@echo "Install Homebrew"
+	@bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+else
+	@echo "Homebrew alread installed!!"
+endif
+
+bundle: homebrew
 	@brew bundle --global
 
 #
