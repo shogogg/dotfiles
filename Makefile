@@ -10,6 +10,8 @@ CONFIGS := $(wildcard .config/??*)
 BIN_PATH := $(DOT_PATH)/bin
 COMMANDS := $(wildcard bin/??*)
 
+UNAME := $(shell uname -s)
+
 .PHONY: all
 all: dotfiles bin config bundle vim
 
@@ -88,3 +90,14 @@ vim:
 	@curl -fsSL https://raw.githubusercontent.com/Shougo/dein.vim/HEAD/bin/installer.sh > installer.sh
 	@sh ./installer.sh ~/.cache/dein > /dev/null 2>&1
 	@rm ./installer.sh
+
+#
+# Key Repeat for macOS
+#
+key-repeat:
+ifeq ($(UNAME), Darwin)
+	@defaults write -g InitialKeyRepeat -int 15
+	@defaults write -g KeyRepeat -int 1.6
+else
+	@echo "Nothing to do."
+endif
