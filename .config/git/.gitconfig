@@ -54,3 +54,6 @@
 [user]
   name = shogogg
   email = shogo@studiofly.net
+
+[url "git@github.com:"]
+  insteadOf = https://github.com/
