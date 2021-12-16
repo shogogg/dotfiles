@@ -91,6 +91,11 @@ set -Ux GREP_OPTIONS "--color=auto"
 test -e {$HOME}/.iterm2_shell_integration.fish ; and source {$HOME}/.iterm2_shell_integration.fish
 
 #
+# mysql-client
+#
+fish_add_path -pm /usr/local/opt/mysql-client/bin
+
+#
 # phpbrew
 #
 set -Ux PHPBREW_SHELL fish
