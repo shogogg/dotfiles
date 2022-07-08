@@ -36,6 +36,13 @@ alias tinker 'php artisan tinker'
 alias vi 'vim'
 
 #
+# Homebrew
+#
+if status is-interactive
+  eval (/opt/homebrew/bin/brew shellenv)
+end
+
+#
 # anyenv
 #
 if test -d ~/.anyenv
