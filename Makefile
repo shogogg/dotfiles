@@ -64,7 +64,7 @@ bundle: homebrew
 config: fish git psysh starship.toml
 
 .PHONY: fish
-fish: dir
+fish: dir bundle
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 	@curl https://git.io/fisher --create-dirs -sLo "$(CONFIG_PATH)/$@/functions/fisher.fish"
 	@sudo sed -I -e '/\/usr\/local\/bin\/fish/d' /etc/shells
