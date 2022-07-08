@@ -16,7 +16,7 @@ fish_add_path -pm ~/bin
 # aliases
 #
 alias artisan 'php artisan'
-alias bump 'yarn upgrade-interactive'
+alias bump 'yarn upgrade-interactive && yarn && npx optimize-yarn-lock && yarn'
 alias ga 'git add'
 alias gcd 'cd (ghq root)/(ghq list | fzf)'
 alias gco 'git checkout'
@@ -94,21 +94,6 @@ test -e {$HOME}/.iterm2_shell_integration.fish ; and source {$HOME}/.iterm2_shel
 # mysql-client
 #
 fish_add_path -pm /usr/local/opt/mysql-client/bin
-
-#
-# phpbrew
-#
-set -Ux PHPBREW_SHELL fish
-set -Ux PHPBREW_RC_ENABLE 1
-if not test -d ~/.phpbrew
-  phpbrew init
-end
-if test -f ~/.phpbrew/phpbrew.fish
-  source ~/.phpbrew/phpbrew.fish
-end
-if test -f .phpbrewrc
-  source .phpbrewrc
-end
 
 #
 # starship
