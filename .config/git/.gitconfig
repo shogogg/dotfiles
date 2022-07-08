@@ -1,12 +1,14 @@
 [alias]
   amend = commit --amend
+  b = branch
   br = branch
-  brd = "!git branch | grep -v '*' | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git br -d"
+  bd = "!git branch | grep -v '*' | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git br -d"
   ci = commit
   cleanup = "!git branch --merged | grep -Ev '\\*|main|master' | xargs git branch -d"
   co = checkout
   cp = cherry-pick
   fap = "!git fetch --all -p && git pull && git cleanup"
+  fixit = commit --amend --no-edit
   graph = log --graph --date=short --decorate=short --pretty
   gravedigger = "!git fsck | awk '/dangling commit/ {print $3}' | xargs git logs --name-only | bat"
   logs = "!f() { git log --color=always --oneline $@ | emojify; }; f"
@@ -14,13 +16,12 @@
   pr = "!git push -u origin && gh pr create -w"
   rbc = rebase --continue
   rbi = rebase -i
-  sm = submodule
+  s = "!f() { git branch | grep -v '*' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch; }; f"
+  sr = "!f() { git branch -r | sed 's#^[^/]*/##' | grep -v 'HEAD' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch; }; f"
+  sha = "!f() { git rev-parse "${1-HEAD}"; }; f"
+  sm = "!f() { git branch -a | grep HEAD | awk '{ print $3 }' | sed -e 's!^[^/]*/!!' | xargs git switch; }; f"
   st = status
-  stat = status
-  sw = "!git branch | sed 's#remotes/[^/]*/##' | grep -v '*' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch"
-  unwip = reset HEAD~
   up = !gitup
-  wip = ![[ $(git log --oneline | head -n 1 | cut -d ' ' -f 2) == 'WIP' ]] && git add --all && git commit --amend -m WIP || git commit -m WIP
 
 [color]
   ui = true
