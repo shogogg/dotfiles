@@ -67,9 +67,9 @@ config: fish git psysh starship.toml
 fish: dir bundle
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 	@curl https://git.io/fisher --create-dirs -sLo "$(CONFIG_PATH)/$@/functions/fisher.fish"
-	@sudo sed -I -e '/\/usr\/local\/bin\/fish/d' /etc/shells
-	@echo '/usr/local/bin/fish' | sudo tee -a /etc/shells > /dev/null
-	@sudo chsh -s '/usr/local/bin/fish' $(shell whoami)
+	@sudo sed -I -e '/\/opt\/homebrew\/bin\/fish/d' /etc/shells
+	@echo '/opt/homebrew/bin/fish' | sudo tee -a /etc/shells > /dev/null
+	@sudo chsh -s '/opt/homebrew/bin/fish' $(shell whoami)
 
 .PHONY: git
 git: dir
