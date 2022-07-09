@@ -48,12 +48,12 @@ inoremap <silent> jj <ESC>
 " ==============================================
 "   dein.vim
 " ==============================================
-set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
+set runtimepath+=~/.vim/bundles/repos/github.com/Shougo/dein.vim
 
-if dein#load_state('~/.cache/dein')
+if dein#load_state('~/.vim/bundles')
   " BEGIN
-  call dein#begin('~/.cache/dein')
-  call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
+  call dein#begin('~/.vim/bundles')
+  call dein#add('~/.vim/bundles/repos/github.com/Shougo/dein.vim')
 
   " vimproc
   call dein#add('Shougo/vimproc.vim', {'build' : 'make'})
