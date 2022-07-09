@@ -13,7 +13,7 @@ COMMANDS := $(wildcard bin/??*)
 UNAME := $(shell uname -s)
 
 .PHONY: all
-all: dotfiles bin config bundle vim key-repeat pam-tid
+all: dotfiles bin config anyenv vim key-repeat pam-tid
 
 .PHONY: list
 list:
@@ -22,7 +22,7 @@ list:
 
 #
 # dotfiles
-#
+#a
 .PHONY: dotfiles
 dotfiles:
 	@$(foreach name, $(DOTFILES), ln -fnsv $(abspath $(name)) $(HOME)/$(name);)
@@ -86,12 +86,13 @@ starship.toml: dir
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 
 #
-# docker
+# anyenv
 #
-.PHONY: docker
-docker:
-	@mkdir -p "$(HOME)/.docker/cli-plugins"
-	@ln -sfn "$(shell brew --prefix docker-compose)/bin/docker-compose" "$(HOME)/.docker/cli-plugins/docker-compose"
+.PHONY: anyenv
+anyenv: bundle
+	@anyenv install --init | true
+	@anyenv install --skip-existing nodenv
+	@anyenv install --skip-existing phpenv
 
 #
 # vim
@@ -117,4 +118,4 @@ endif
 # pam_tid
 #
 pam-tid:
-	@curl -fsSL https://gist.github.com/shogogg/dd6fd5d84ce7c87569038ae4f81a4101/raw/install-pam_tid-and-pam_reattach.sh | bash
+	@curl -fsSL https://gist.github.com/shogogg/61c7867412ddfe4e09b45eb4237fc015/raw/install-pam_tid-and-pam_reattach.sh | bash
