@@ -7,7 +7,6 @@ DOTFILES := $(filter-out $(DOTFILES_EXCLUSIONS), $(DOTFILES_CANDIDATES))
 CONFIG_PATH := $(DOT_PATH)/.config
 CONFIGS := $(wildcard .config/??*)
 
-BIN_PATH := $(DOT_PATH)/bin
 COMMANDS := $(wildcard bin/??*)
 
 UNAME := $(shell uname -s)
