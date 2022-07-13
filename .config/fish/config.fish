@@ -10,6 +10,7 @@ set --prepend fish_function_path \
 set -Ux EDITOR vim
 set -Ux LANG ja_JP.UTF-8
 set -Ux TERM xterm-256color
+set -x PATH (cat /etc/paths)
 fish_add_path -pm ~/bin
 
 #
@@ -61,7 +62,7 @@ end
 #
 # curl
 #
-fish_add_path -pm /usr/local/opt/curl/bin
+fish_add_path -pm /opt/homebrew/opt/curl/bin
 
 #
 # direnv
