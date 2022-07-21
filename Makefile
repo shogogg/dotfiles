@@ -16,7 +16,10 @@ all: dotfiles bin config anyenv vim key-repeat pam-tid
 
 .PHONY: list
 list:
+	@echo 'dotfiles:'
 	@$(foreach name, $(DOTFILES), /bin/ls -dF $(name);)
+	@echo ''
+	@echo 'config:'
 	@$(foreach name, $(CONFIGS), /bin/ls -dF $(name);)
 
 #
@@ -46,7 +49,7 @@ dir:
 #
 .PHONY: homebrew
 homebrew: dotfiles
-ifeq (, $(shell which brew))
+ifeq (, $(shell type brew))
 	@echo "Install Homebrew"
 	@curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
 else
@@ -60,10 +63,10 @@ bundle: homebrew
 # .config
 #
 .PHONY: config
-config: fish git psysh starship.toml
+config: fish git iterm2 karabiner psysh starship.toml
 
 .PHONY: fish
-fish: dir bundle
+fish: dir
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 	@curl https://git.io/fisher --create-dirs -sLo "$(CONFIG_PATH)/$@/functions/fisher.fish"
 	@sudo sed -I -e '/\/opt\/homebrew\/bin\/fish/d' /etc/shells
@@ -78,6 +81,10 @@ git: dir
 
 .PHONY: iterm2
 iterm2: dir
+	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
+
+.PHONY: karabiner
+karabiner: dir
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 
 .PHONY: psysh
@@ -96,6 +103,18 @@ anyenv: bundle
 	@anyenv install --init | true
 	@anyenv install --skip-existing nodenv
 	@anyenv install --skip-existing phpenv
+
+#
+# Rust
+#
+.PHONY: rust
+rust: bundle
+ifeq (, $(shell type rustc))
+	@echo "Install Rust"
+	@rustup-init -y -q --no-modify-path
+else
+	@echo "Rust already installed!!"
+endif
 
 #
 # vim
