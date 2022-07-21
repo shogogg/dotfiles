@@ -1,2 +1,1 @@
-export ZDOTDIR=~/.config/zsh
-source ${ZDOTDIR}/.zshenv
+source "$HOME/.cargo/env"

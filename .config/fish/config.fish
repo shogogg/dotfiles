@@ -104,6 +104,11 @@ test -e {$HOME}/.iterm2_shell_integration.fish ; and source {$HOME}/.iterm2_shel
 fish_add_path -pm /usr/local/opt/mysql-client/bin
 
 #
+# rust
+#
+fish_add_path -pm ~/.cargo/bin
+
+#
 # starship
 #
 starship init fish | source
