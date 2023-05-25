@@ -130,8 +130,8 @@ vim:
 #
 key-repeat:
 ifeq ($(UNAME), Darwin)
-	@defaults write KeyRepeat -float 1.6
-	@defaults write InitialKeyRepeat -int 15
+	@defaults write -g KeyRepeat -float 1.6
+	@defaults write -g InitialKeyRepeat -int 15
 else
 	@echo "Nothing to do."
 endif

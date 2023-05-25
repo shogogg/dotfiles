@@ -1,9 +1,8 @@
 *~
 *.swp
-*.iml
 *.zwc
+.abbr
 .DS_Store
-.idea
 .envrc
 .phpstorm.meta.php
 .zcompdump

@@ -17,16 +17,22 @@ fish_add_path -pm ~/bin
 # aliases
 #
 alias artisan 'php artisan'
-alias bump 'yarn upgrade-interactive && yarn && npx optimize-yarn-lock && yarn'
-alias ga 'git add'
+alias bump 'yarn upgrade-interactive && yarn && npx yarn-deduplicate yarn.lock && yarn'
+alias d 'docker'
+alias g 'git'
+alias gad 'git add'
+alias gam 'git amend'
+alias gb 'git branch'
 alias gcd 'cd (ghq root)/(ghq list | fzf)'
-alias gco 'git checkout'
-alias grm 'git rebase main'
+alias gci 'git ci'
+alias gs 'git s'
+alias gsm 'git switch main'
 alias gsp 'git stash pop'
 alias gss 'git add . && git stash save'
 alias gst 'git status'
-alias la 'exa --time-style=long-iso -lha'
-alias ll 'exa --time-style=long-iso -aghl'
+alias gup 'git up'
+alias la 'exa --time-style=long-iso -l -h -a'
+alias ll 'exa --time-style=long-iso -l -h -a -g'
 alias ls 'exa --time-style=long-iso'
 alias pull 'git pull'
 alias push 'git push'
@@ -39,17 +45,17 @@ alias vi 'vim'
 #
 # Homebrew
 #
-if status is-interactive
-  eval (/opt/homebrew/bin/brew shellenv)
-end
+eval (/opt/homebrew/bin/brew shellenv)
 
 #
 # anyenv
 #
 if test -d ~/.anyenv
-  fish_add_path -pm ~/.anyenv/bin
-  status --is-interactive; and source (anyenv init - | psub)
+  source (anyenv init - | psub)
 end
+set -Ux PHP_BUILD_INSTALL_EXTENSION \
+  "apcu=5.1.21" \
+  "redis=5.3.7"
 
 #
 # composer
@@ -101,7 +107,7 @@ test -e {$HOME}/.iterm2_shell_integration.fish ; and source {$HOME}/.iterm2_shel
 #
 # mysql-client
 #
-fish_add_path -pm /usr/local/opt/mysql-client/bin
+fish_add_path -pm /opt/homebrew/opt/mysql-client/bin
 
 #
 # rust
