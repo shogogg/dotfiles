@@ -18,7 +18,8 @@
   pv = "!gh pr view --web"
   rbc = rebase --continue
   rbi = rebase -i
-  rem = rebase main
+  reb = rebase
+  rem = rebase -i main
   s = "!f() { git branch | grep -v '*' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch; }; f"
   sr = "!f() { git branch -r | sed 's#^[^/]*/##' | grep -v 'HEAD' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch; }; f"
   sha = "!f() { git rev-parse "${1-HEAD}"; }; f"
