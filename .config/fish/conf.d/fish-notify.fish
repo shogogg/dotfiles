@@ -1,4 +1,4 @@
-set -q FISH_NOTIFY_EXCLUDED; or set -Ux FISH_NOTIFY_EXCLUDED cd git less ssh tmux vi view vim
+set -q FISH_NOTIFY_EXCLUDED; or set -Ux FISH_NOTIFY_EXCLUDED cd g gam gci git gs less ssh tmux vi view vim
 
 function fish-notify --on-event fish_prompt
   set -l _display_status $status
@@ -13,7 +13,7 @@ function fish-notify --on-event fish_prompt
         -group fish-notify \
         -remove fish-notify \
         -activate com.googlecode.iterm2 \
-        -sound (if test $_display_status -eq 0; echo 'default'; else; echo 'Hero'; end) \
+        -sound (if test $_display_status -eq 0; echo 'Sonar'; else; echo 'Hero'; end) \
         > /dev/null 2> /dev/null
     end
   end
