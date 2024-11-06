@@ -19,8 +19,9 @@ function install-php
 
   # インストール
   env \
-    OPENSSL_CFLAGS="-I$HOMEBREW_PREFIX/opt/openssl@1.1/include" \
-    OPENSSL_LIBS="-L$HOMEBREW_PREFIX/opt/openssl@1.1/lib -lcrypto -lssl" \
+    CXXFLAGS="-std=c++17 -stdlib=libc++ -DU_USING_ICU_NAMESPACE=1" \
+    OPENSSL_CFLAGS="-I$HOMEBREW_PREFIX/opt/openssl@3/include" \
+    OPENSSL_LIBS="-L$HOMEBREW_PREFIX/opt/openssl@3/lib -lcrypto -lssl" \
     phpenv install --force $php_version
 
   # 手順で使った変数をクリーンアップ
