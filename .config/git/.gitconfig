@@ -19,11 +19,11 @@
   rbc = rebase --continue
   rbi = rebase -i
   reb = rebase
-  rem = rebase -i main
+  rem = "!git rebase -i $(git branch -a | grep HEAD | awk '{ print $3 }' | sed -e 's!^[^/]*/!!')"
   s = "!f() { git branch | grep -v '*' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch; }; f"
   sr = "!f() { git branch -r | sed 's#^[^/]*/##' | grep -v 'HEAD' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch; }; f"
   sha = "!f() { git rev-parse "${1-HEAD}"; }; f"
-  sm = "!f() { git branch -a | grep HEAD | awk '{ print $3 }' | sed -e 's!^[^/]*/!!' | xargs git switch; }; f"
+  sm = "!git switch $(git branch -a | grep HEAD | awk '{ print $3 }' | sed -e 's!^[^/]*/!!')"
   st = status
   up = !gitup
 
