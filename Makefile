@@ -121,16 +121,16 @@ endif
 #
 .PHONY: vim
 vim:
-	@curl -fsSL https://raw.githubusercontent.com/Shougo/dein.vim/HEAD/bin/installer.sh > installer.sh
-	@sh ./installer.sh ~/.cache/dein > /dev/null 2>&1
-	@rm ./installer.sh
+	curl -fsSL https://raw.githubusercontent.com/Shougo/dein-installer.vim/master/installer.sh > /tmp/installer.sh
+	sh /tmp/installer.sh ~/.cache/dein > /dev/null 2>&1
+	rm /tmp/installer.sh
 
 #
 # Key Repeat for macOS
 #
 key-repeat:
 ifeq ($(UNAME), Darwin)
-	@defaults write -g KeyRepeat -float 1.6
+	@defaults write -g KeyRepeat -int 1
 	@defaults write -g InitialKeyRepeat -int 15
 else
 	@echo "Nothing to do."
@@ -140,4 +140,4 @@ endif
 # pam_tid
 #
 pam-tid:
-	@curl -fsSL https://gist.github.com/shogogg/61c7867412ddfe4e09b45eb4237fc015/raw/install-pam_tid-and-pam_reattach.sh | bash
+	@curl -fsSL https://gist.github.com/shogogg/61c7867412ddfe4e09b45eb4237fc015/raw/install-pam_tid-and-pam_reattach.sh | sudo bash
