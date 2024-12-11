@@ -28,7 +28,7 @@ alias gcd 'cd (ghq root)/(ghq list | fzf)'
 alias gci 'git ci'
 alias gco 'git co'
 alias gs 'git s'
-alias gsm 'git switch main'
+alias gsm 'git sm'
 alias gsp 'git stash pop'
 alias gss 'git add . && git stash save'
 alias gst 'git status'
@@ -110,6 +110,16 @@ test -e {$HOME}/.iterm2_shell_integration.fish ; and source {$HOME}/.iterm2_shel
 # mysql-client
 #
 fish_add_path -pm /opt/homebrew/opt/mysql-client/bin
+
+#
+# pipx
+#
+fish_add_path -pm ~/.local/bin
+
+#
+# PostgreSQL Client
+#
+fish_add_path -pm /opt/homebrew/opt/libpq/bin
 
 #
 # rust
