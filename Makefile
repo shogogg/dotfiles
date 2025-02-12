@@ -73,6 +73,10 @@ fish: dir
 	@echo '/opt/homebrew/bin/fish' | sudo tee -a /etc/shells > /dev/null
 	@sudo chsh -s '/opt/homebrew/bin/fish' $(shell whoami)
 
+.PHONY: ghostty
+ghostty: dir
+	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
+
 .PHONY: git
 git: dir
 	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
