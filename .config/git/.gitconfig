@@ -30,6 +30,9 @@
 [color]
   ui = true
 
+[commit]
+  template = ~/.config/git/git-commit-message-template.txt
+
 [core]
   excludesfile = ~/.config/git/.gitignore
   autocrlf = input

@@ -75,9 +75,7 @@ fish: dir
 
 .PHONY: git
 git: dir
-	@mkdir -p "$(HOME)/.config/$@"
-	@ln -fnsv "$(CONFIG_PATH)/$@/.gitconfig" "$(HOME)/.config/$@/.gitconfig"
-	@ln -fnsv "$(CONFIG_PATH)/$@/.gitignore" "$(HOME)/.config/$@/.gitignore"
+	@ln -fnsv "$(CONFIG_PATH)/$@" "$(HOME)/.config/$@"
 
 .PHONY: iterm2
 iterm2: dir
