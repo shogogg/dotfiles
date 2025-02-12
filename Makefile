@@ -12,7 +12,7 @@ COMMANDS := $(wildcard bin/??*)
 UNAME := $(shell uname -s)
 
 .PHONY: all
-all: dotfiles bin config anyenv vim key-repeat pam-tid
+all: dotfiles bin config anyenv vim macos-config pam-tid
 
 .PHONY: list
 list:
@@ -128,12 +128,17 @@ vim:
 	rm /tmp/installer.sh
 
 #
-# Key Repeat for macOS
+# macOS configuration
 #
-key-repeat:
+macos-config:
 ifeq ($(UNAME), Darwin)
-	@defaults write -g KeyRepeat -int 1
-	@defaults write -g InitialKeyRepeat -int 15
+	@defaults write -g KeyRepeat -int 1                                # Increase key repeat speed
+	@defaults write -g InitialKeyRepeat -int 15                        # Shorten the delay until key repeat starts
+	@defaults write com.apple.screencapture show-thumbnail -bool false # Disable thumbnail preview for screenshots
+	@defaults write com.apple.screencapture disable-shadow -bool true  # Disable window shadows in screenshots
+	@defaults write NSGlobalDomain AppleShowAllExtensions -bool true   # Show file extensions in Finder
+	@defaults write com.apple.Finder AppleShowAllFiles -bool true      # Show hidden files in Finder
+	@defaults write com.apple.Finder ShowPathbar -bool true            # Display the path bar in Finder
 else
 	@echo "Nothing to do."
 endif
