@@ -4,10 +4,12 @@
   br = branch
   bd = "!git branch | grep -v '*' | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git br -d"
   cb = checkout -b
+  cd = "!cd $(ghq root)/$(ghq list | fzf)"
   ci = commit
   cleanup = "!git branch --merged | grep -Ev '\\*|main|master' | xargs git branch -d"
   co = checkout
   cp = cherry-pick
+  cpn = "!git branch --show-current | tr -d '\n' | pbcopy"
   fap = "!git fetch --all -p && git pull && git cleanup"
   fixit = commit --amend --no-edit
   graph = log --graph --date=short --decorate=short --pretty
@@ -20,6 +22,7 @@
   rbi = rebase -i
   reb = rebase
   rem = "!git rebase -i $(git branch -a | grep HEAD | awk '{ print $3 }' | sed -e 's!^[^/]*/!!')"
+  ri = rebase -i
   s = "!f() { git branch | grep -v '*' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch; }; f"
   sr = "!f() { git branch -r | sed 's#^[^/]*/##' | grep -v 'HEAD' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch; }; f"
   sha = "!f() { git rev-parse "${1-HEAD}"; }; f"
