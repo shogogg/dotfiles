@@ -1,4 +1,5 @@
 set -q FISH_NOTIFY_EXCLUDED; or set -Ux FISH_NOTIFY_EXCLUDED bat cd g gam gci git gs less php psysh ssh t tmux vi view vim
+set -q FISH_NOTIFY_APP; or set -Ux FISH_NOTIFY_APP com.apple.Terminal
 
 function fish-notify --on-event fish_prompt
   set -l _display_status $status
@@ -12,7 +13,7 @@ function fish-notify --on-event fish_prompt
         -message "$secs seconds" \
         -group fish-notify \
         -remove fish-notify \
-        -activate com.googlecode.iterm2 \
+        -activate $FISH_NOTIFY_APP \
         -sound (if test $_display_status -eq 0; echo 'Sonar'; else; echo 'Hero'; end) \
         > /dev/null 2> /dev/null
     end
