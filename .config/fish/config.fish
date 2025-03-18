@@ -27,6 +27,8 @@ alias gcb 'git cb'
 alias gci 'git ci'
 alias gco 'git co'
 alias gd 'cd (ghq root)/(ghq list | fzf)'
+alias gmm 'git mm'
+alias gpr 'gh pr create --web'
 alias gri 'git ri'
 alias gs 'git s'
 alias gsm 'git sm'
@@ -42,6 +44,7 @@ alias push 'git push'
 alias s "git branch | sed 's#remotes/[^/]*/##' | grep -v '*' | sort | uniq | fzf --preview 'echo {} | cut -c 3- | xargs git log --color=always' | xargs git switch"
 alias st stree
 alias t tmux_interactive
+alias tailscale '/Applications/Tailscale.app/Contents/MacOS/Tailscale'
 alias tinker 'php artisan tinker'
 alias vi 'vim'
 
