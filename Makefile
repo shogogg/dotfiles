@@ -24,7 +24,7 @@ list:
 
 #
 # dotfiles
-#a
+#
 .PHONY: dotfiles
 dotfiles:
 	@$(foreach name, $(DOTFILES), ln -fnsv $(abspath $(name)) $(HOME)/$(name);)
@@ -105,6 +105,15 @@ anyenv: bundle
 	@anyenv install --init | true
 	@anyenv install --skip-existing nodenv
 	@anyenv install --skip-existing phpenv
+
+#
+# Claude Code
+#
+.PHONY: claude
+claude:
+	@ln -fnsv "$(DOT_PATH)/.claude/CLAUDE.md" "$(HOME)/.claude/CLAUDE.md"
+	@ln -fnsv "$(DOT_PATH)/.claude/commands" "$(HOME)/.claude/commands"
+	@ln -fnsv "$(DOT_PATH)/.claude/commands" "$(HOME)/.claude/settings.json"
 
 #
 # Rust
