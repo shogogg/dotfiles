@@ -11,6 +11,9 @@ disabled = true
 [package]
 disabled = true
 
+[php]
+disabled = true
+
 [time]
 disabled = false
 format = "[$time]($style) "
