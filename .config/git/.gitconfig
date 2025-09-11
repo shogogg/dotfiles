@@ -64,6 +64,9 @@
 [push]
   default = current
 
+[sequence]
+  editor = interactive-rebase-tool
+
 [user]
   name = shogogg
   email = shogo@studiofly.net
