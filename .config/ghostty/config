@@ -16,10 +16,20 @@ cursor-style-blink = true
 font-family = PlemolJP
 font-size = 14
 
+# Ignore ligatures
+font-feature = "-calt"
+font-feature = "-dlig"
+font-feature = "-liga"
+
+#
+# Key Bindings
+#
+keybind = ¥=text:\\
+
 #
 # Window
 #
-background-opacity = 0.9
+background-opacity = 0.95
 macos-titlebar-style = hidden
 window-padding-x = 5
 window-padding-y = 5
