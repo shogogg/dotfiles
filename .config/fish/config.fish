@@ -138,4 +138,4 @@ starship init fish | source
 #
 # tmux
 #
-tmux_auto_attach_session
+# tmux_auto_attach_session
