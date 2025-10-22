@@ -1,8 +1,16 @@
 #
 # Theme
 #
-#theme = iTerm2 Solarized Dark
-theme = Solarized Dark - Patched
+theme = Solarized Dark Patched
+
+#
+# Background
+#
+background-image = ~/.config/ghostty/bg.jpg
+background-image-opacity = 0.08
+background-image-position = center
+background-image-fit = cover
+background-image-repeat = false
 
 #
 # Cursor
@@ -29,7 +37,6 @@ keybind = ¥=text:\\
 #
 # Window
 #
-background-opacity = 0.95
 macos-titlebar-style = hidden
 window-padding-x = 5
 window-padding-y = 5
