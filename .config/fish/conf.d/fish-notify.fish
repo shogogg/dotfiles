@@ -1,4 +1,4 @@
-set -q FISH_NOTIFY_EXCLUDED; or set -Ux FISH_NOTIFY_EXCLUDED bat cd claude g gam gci git gs less php psysh ssh t tmux vi view vim
+set -q FISH_NOTIFY_EXCLUDED; or set -Ux FISH_NOTIFY_EXCLUDED bat cd claude codex g gam gci git gs less php psysh ssh t tmux vi view vim
 set -q FISH_NOTIFY_APP; or set -Ux FISH_NOTIFY_APP com.apple.Terminal
 
 function fish-notify --on-event fish_prompt

@@ -1,20 +1,22 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git:*)",
-      "Bash(gh:*)",
-      "Bash(ls:*)",
       "Bash(cat:*)",
-      "Bash(pwd:*)",
       "Bash(cd:*)",
-      "Bash(find:*)",
-      "Bash(grep:*)",
-      "Bash(rg:*)",
-      "Bash(make:*)",
-      "Bash(task:*)",
-      "Bash(jq:*)",
       "Bash(curl:*)",
       "Bash(echo:*)",
+      "Bash(find:*)",
+      "Bash(gh:*)",
+      "Bash(git:*)",
+      "Bash(grep:*)",
+      "Bash(jq:*)",
+      "Bash(ls:*)",
+      "Bash(make:*)",
+      "Bash(mkdir:*)",
+      "Bash(pwd:*)",
+      "Bash(rg:*)",
+      "Bash(task:*)",
+      "Bash(test:*)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:docs.anthropic.com)"
     ],
@@ -44,7 +46,6 @@
       }
     ]
   },
-  "model": "opus",
   "feedbackSurveyState": {
     "lastShownTime": 1753946327912
   }

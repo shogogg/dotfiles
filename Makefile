@@ -12,7 +12,7 @@ COMMANDS := $(wildcard bin/??*)
 UNAME := $(shell uname -s)
 
 .PHONY: all
-all: dotfiles bin config anyenv vim macos-config pam-tid
+all: dotfiles bin claude codex config anyenv vim macos-config pam-tid
 
 .PHONY: list
 list:
@@ -111,9 +111,21 @@ anyenv: bundle
 #
 .PHONY: claude
 claude:
-	@ln -fnsv "$(DOT_PATH)/.claude/CLAUDE.md" "$(HOME)/.claude/CLAUDE.md"
-	@ln -fnsv "$(DOT_PATH)/.claude/commands" "$(HOME)/.claude/commands"
-	@ln -fnsv "$(DOT_PATH)/.claude/commands" "$(HOME)/.claude/settings.json"
+	@mkdir -p "$(HOME)/.claude"
+	@ln -fnsv "$(DOT_PATH)/AGENTS.md" "$(HOME)/.claude/CLAUDE.md"
+	@ln -fnsv "$(DOT_PATH)/prompts" "$(HOME)/.claude/commands"
+	@ln -fnsv "$(DOT_PATH)/.claude/settings.json" "$(HOME)/.claude/settings.json"
+
+#
+# Codex
+#
+.PHONY: codex
+codex:
+	@mkdir -p "$(HOME)/.codex"
+	@ln -fnsv "$(DOT_PATH)/AGENTS.md" "$(HOME)/.codex/AGENTS.md"
+	@ln -fnsv "$(DOT_PATH)/prompts" "$(HOME)/.codex/prompts"
+	@ln -fnsv "$(DOT_PATH)/.codex/notify.sh" "$(HOME)/.codex/notify.sh"
+	@ln -fnsv "$(DOT_PATH)/.codex/config.toml" "$(HOME)/.codex/config.toml"
 
 #
 # Rust
