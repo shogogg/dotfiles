@@ -2,4 +2,6 @@
 
 terminal-notifier \
   -message 'Codex is waiting for your instructions.' \
-  -sound Purr
+  -sound Purr \
+  -group 'open-ai-codex-tui' \
+  -activate 'com.mitchellh.ghostty'
