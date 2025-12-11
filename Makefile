@@ -112,9 +112,11 @@ anyenv: bundle
 .PHONY: claude
 claude:
 	@mkdir -p "$(HOME)/.claude"
-	@ln -fnsv "$(DOT_PATH)/AGENTS.md" "$(HOME)/.claude/CLAUDE.md"
-	@ln -fnsv "$(DOT_PATH)/prompts" "$(HOME)/.claude/commands"
+	@ln -fnsv "$(DOT_PATH)/.claude/notify.sh" "$(HOME)/.claude/notify.sh"
 	@ln -fnsv "$(DOT_PATH)/.claude/settings.json" "$(HOME)/.claude/settings.json"
+	@ln -fnsv "$(DOT_PATH)/ai-agent/AGENTS.md" "$(HOME)/.claude/CLAUDE.md"
+	@ln -fnsv "$(DOT_PATH)/ai-agent/prompts" "$(HOME)/.claude/commands"
+	@ln -fnsv "$(DOT_PATH)/ai-agent/skills" "$(HOME)/.claude/skills"
 
 #
 # Codex
@@ -122,10 +124,11 @@ claude:
 .PHONY: codex
 codex:
 	@mkdir -p "$(HOME)/.codex"
-	@ln -fnsv "$(DOT_PATH)/AGENTS.md" "$(HOME)/.codex/AGENTS.md"
-	@ln -fnsv "$(DOT_PATH)/prompts" "$(HOME)/.codex/prompts"
 	@ln -fnsv "$(DOT_PATH)/.codex/notify.sh" "$(HOME)/.codex/notify.sh"
 	@ln -fnsv "$(DOT_PATH)/.codex/config.toml" "$(HOME)/.codex/config.toml"
+	@ln -fnsv "$(DOT_PATH)/ai-agent/AGENTS.md" "$(HOME)/.codex/AGENTS.md"
+	@ln -fnsv "$(DOT_PATH)/ai-agent/prompts" "$(HOME)/.codex/prompts"
+	@ln -fnsv "$(DOT_PATH)/ai-agent/skills" "$(HOME)/.codex/skills"
 
 #
 # Rust
