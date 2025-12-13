@@ -5,7 +5,7 @@ description: MUST use this skill when user asks to check/review PR comments, add
 
 # Fetch PR Review Comments
 
-Fetches unresolved review comments from the GitHub pull request corresponding to the current branch.
+Fetches unresolved review comments from the GitHub pull request corresponding to the current branch using the bundled shell script.
 
 ## Instructions
 
