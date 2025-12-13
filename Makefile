@@ -115,6 +115,7 @@ claude:
 	@ln -fnsv "$(DOT_PATH)/.claude/notify.sh" "$(HOME)/.claude/notify.sh"
 	@ln -fnsv "$(DOT_PATH)/.claude/settings.json" "$(HOME)/.claude/settings.json"
 	@ln -fnsv "$(DOT_PATH)/ai-agent/AGENTS.md" "$(HOME)/.claude/CLAUDE.md"
+	@ln -fnsv "$(DOT_PATH)/ai-agent/agents" "$(HOME)/.claude/agents"
 	@ln -fnsv "$(DOT_PATH)/ai-agent/prompts" "$(HOME)/.claude/commands"
 	@ln -fnsv "$(DOT_PATH)/ai-agent/skills" "$(HOME)/.claude/skills"
 

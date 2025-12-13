@@ -21,4 +21,5 @@ allowed-tools: Bash, Read, Edit, Write, Glob, Grep
 7. CodeRabbit から受け取ったコメントの要約と、各コメントに対して行った対応をユーザーに報告する。
 
 ## Note
+- CodeRabbit のレビューは 5 分以上かかる場合があるので、しばらくお待ちください。
 - ユーザーとのコミュニケーションは日本語で行うこと。

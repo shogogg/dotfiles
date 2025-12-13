@@ -21,4 +21,5 @@ This skill provides instructions on how to use CodeRabbit CLI for code reviews, 
 7. Report back to the user with a summary of the comments received from CodeRabbit and the actions taken for each comment.
 
 ## Note
+- CodeRabbit reviews can take 5+ minutes. Please wait.
 - You should communicate to the user in Japanese.
