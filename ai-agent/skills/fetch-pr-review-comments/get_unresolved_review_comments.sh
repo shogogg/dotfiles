@@ -70,6 +70,22 @@ OUTPUT=$(gh api graphql -f query="$GRAPHQL_QUERY" -f owner="$OWNER" -f repo="$RE
 
 if [ -z "$OUTPUT" ]; then
     echo "No unresolved review comments found for PR #$PR_NUMBER."
-else
-    echo "$OUTPUT"
+    exit 0
 fi
+
+cat << __OUTPUT__
+$OUTPUT
+
+## IMPORTANT NOTES
+After reporting the comments, STOP and WAIT for user instructions.
+
+DO NOT:
+- Create todo lists for fixing the comments
+- Read or edit the mentioned files
+- Start implementing any fixes
+
+## Next Actions
+1. Report the fetched unresolved review comments in a clear format. Do not use table format.
+2. **STOP HERE** - Do not proceed to fix or address the comments yet.
+3. Wait for user to explicitly request fixes.
+__OUTPUT__

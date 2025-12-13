@@ -10,16 +10,9 @@ You should use the bundled script to do this.
 
 ## Instructions
 
-1. Run the script: `bash ~/.claude/skills/fetch-pr-review-comments/get_unresolved_review_comments.sh`
-2. Report the fetched unresolved review comments in a clear format. Do not use table format.
-3. **STOP HERE** - Do not proceed to fix or address the comments yet.
-4. Wait for user to explicitly request fixes.
+Run the script: `bash ~/.claude/skills/fetch-pr-review-comments/get_unresolved_review_comments.sh`
 
-## Important Notes
-
+## Notes
+-
 - Requires `gh` CLI to be authenticated
 - Only works when on a branch that has an associated pull request
-- After reporting the comments, STOP and WAIT for user instructions. DO NOT:
-  - Create todo lists for fixing the comments
-  - Read or edit the mentioned files
-  - Start implementing any fixes
