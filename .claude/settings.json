@@ -17,11 +17,16 @@
       "Bash(rg:*)",
       "Bash(task:*)",
       "Bash(test:*)",
+      "Bash(bash ~/.claude/skills/**)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:docs.anthropic.com)"
+      "WebFetch(domain:docs.anthropic.com)",
+      "mcp__jetbrains__*",
+      "mcp__phpstorm__*",
+      "mcp__serena__*"
     ],
     "deny": []
   },
+  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -29,7 +34,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -message 'Claude Code is waiting for your instructions.' -sound Purr"
+            "command": "bash -c \"source $HOME/.claude/notify.sh\""
           }
         ]
       }
@@ -40,12 +45,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -message 'Claude Code is waiting for your instructions.' -sound Purr"
+            "command": "bash -c \"source $HOME/.claude/notify.sh\""
           }
         ]
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y ccusage statusline",
+    "padding": 0
+  },
+  "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1753946327912
   }

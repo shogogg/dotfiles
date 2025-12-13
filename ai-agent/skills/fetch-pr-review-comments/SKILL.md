@@ -5,15 +5,12 @@ description: MUST use this skill when user asks to check/review PR comments, add
 
 # Fetch PR Review Comments
 
-Fetches unresolved review comments from the GitHub pull request corresponding to the current branch using the bundled shell script.
+Fetches unresolved review comments from the GitHub pull request corresponding to the current branch.
+You should use the bundled script to do this.
 
 ## Instructions
 
-Run the script in this skill directory to fetch unresolved review comments:
-
-```bash
-bash ~/.claude/skills/fetch-pr-review-comments/get_unresolved_review_comments.sh
-```
+Run the script like this: `bash ~/.claude/skills/fetch-pr-review-comments/get_unresolved_review_comments.sh`
 
 ## Notes
 
