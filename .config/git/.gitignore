@@ -2,9 +2,12 @@
 *.swp
 *.zwc
 .abbr
+.ai-workspace
 .claude/settings.local.json
 .DS_Store
 .envrc
 .phpstorm.meta.php
+.shogogg
 .zcompdump
 yarn-error.log
+Taskfile.yaml

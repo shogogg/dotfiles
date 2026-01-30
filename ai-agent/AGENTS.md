@@ -1,13 +1,9 @@
 # AI Agent Guidelines
+
 1. You should respond concisely and politely in Japanese.
-2. If there is Taskfile.yaml, you should `task <task name>` to run development tools below:
-    - testing
-    - linting
-    - static analysis
-3. You should always run the development tools after making changes to ensure nothing is broken if there are provided.
-   But testing and formatting are very slow, so you may run them with only changed, or related files using arguments.sc
 
 ## MCP Server Priority
+
 When analyzing, searching, or editing code:
 
 1. **First choice**: Use `serena` MCP tools (symbolic analysis, find_symbol, replace_symbol_body, etc.)
@@ -24,24 +20,11 @@ JetBrains is especially preferred for:
 - File problems inspection (get_file_problems)
 - Code reformatting (reformat_file)
 
-## Test code Guidelines
-When writing test code, you should write it concisely and follow the AAA (Arrange, Act, Assert) pattern.
+## Delegation-First Principle
 
-1. Place comments to indicate the Arrange, Act, and Assert sections.
-2. Place blank lines between these sections, and don't place blank lines within these sections.
-3. Prioritize high documentation by minimizing the use of variables and constants in the test code (DAMP: Descriptive And Meaningful Phrases).
-4. If there are no arrangements, you should omit the Arrange section.
+When executing orchestrator-type skills or multi-phase workflows:
 
-Example:
-```php
-// Arrange
-$this->http
-    ->expects('send')
-    ->andReturn(self::createHttpResponse(200, '...'));
-
-// Act
-$actual = $this->subject->get('...');
-
-// Assert
-self::assertSame('...', $actual->getContent());
-```
+1. **Always delegate substantive work to sub-agents** (`Task` tool) or specialized skills (`Skill` tool). The orchestrator should manage phase transitions and state, not perform the work itself.
+2. **Do not explore, read, or modify source code directly** from the orchestrator. Use sub-agents for codebase exploration, code analysis, implementation, and review.
+3. **Use `Read`/`Write` only for workflow management files** (state files, plan documents, result summaries) — never for source code.
+4. **Sub-agent return directives**: When launching sub-agents, always instruct them to write detailed results to output files and return only a brief completion summary (2-3 sentences) to minimize context consumption.

@@ -118,6 +118,7 @@ claude:
 	@ln -fnsv "$(DOT_PATH)/ai-agent/agents" "$(HOME)/.claude/agents"
 	@ln -fnsv "$(DOT_PATH)/ai-agent/prompts" "$(HOME)/.claude/commands"
 	@ln -fnsv "$(DOT_PATH)/ai-agent/skills" "$(HOME)/.claude/skills"
+	@ln -fnsv "$(DOT_PATH)/ai-agent/guidelines" "$(HOME)/.claude/guidelines"
 
 #
 # Codex
@@ -130,6 +131,7 @@ codex:
 	@ln -fnsv "$(DOT_PATH)/ai-agent/AGENTS.md" "$(HOME)/.codex/AGENTS.md"
 	@ln -fnsv "$(DOT_PATH)/ai-agent/prompts" "$(HOME)/.codex/prompts"
 	@ln -fnsv "$(DOT_PATH)/ai-agent/skills" "$(HOME)/.codex/skills"
+	@ln -fnsv "$(DOT_PATH)/ai-agent/guidelines" "$(HOME)/.codex/guidelines"
 
 #
 # Rust
