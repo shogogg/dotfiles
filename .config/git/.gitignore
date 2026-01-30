@@ -6,5 +6,7 @@
 .DS_Store
 .envrc
 .phpstorm.meta.php
+.shogogg
 .zcompdump
 yarn-error.log
+Taskfile.yaml

@@ -30,6 +30,7 @@
   sha = "!f() { git rev-parse "${1-HEAD}"; }; f"
   sm = "!git switch $(git main)"
   st = status
+  undo = reset --soft HEAD~1
   up = !gitup
 
 [color]

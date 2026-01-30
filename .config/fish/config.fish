@@ -89,6 +89,11 @@ set -Ux ENHANCD_FILTER "fzf:fzy:peco"
 set -Ux ENHANCD_ROOT "$fish_home/functions/enhancd"
 
 #
+# exa/eza
+#
+set -Ux EXA_COLOR "Solarized_Dark"
+
+#
 # fzf
 #
 set -Ux FZF_COMPLETE 0

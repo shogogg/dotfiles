@@ -18,6 +18,7 @@
       "Bash(task:*)",
       "Bash(test:*)",
       "Bash(bash ~/.claude/skills/**)",
+      "Edit",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:docs.anthropic.com)",
       "mcp__jetbrains__*",
@@ -26,7 +27,6 @@
     ],
     "deny": []
   },
-  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -55,6 +55,9 @@
     "type": "command",
     "command": "npx -y ccusage statusline",
     "padding": 0
+  },
+  "enabledPlugins": {
+    "serena@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
