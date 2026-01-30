@@ -23,7 +23,8 @@
       "WebFetch(domain:docs.anthropic.com)",
       "mcp__jetbrains__*",
       "mcp__phpstorm__*",
-      "mcp__serena__*"
+      "mcp__serena__*",
+      "mcp__plugin_serena_serena__*"
     ],
     "deny": []
   },
