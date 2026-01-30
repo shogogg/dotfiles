@@ -1,168 +1,168 @@
-# Jira チケット処理カスタムコマンド
+# Jira Ticket Processing Custom Command
 
-## コマンド名
+## Command Name
 `/jira`
 
-## 概要
-Jira チケットの詳細を取得し、ステータスを自動更新して、指定された作業を実行するカスタムコマンドです。
+## Overview
+A custom command that retrieves Jira ticket details, automatically updates status, and executes specified work.
 
-## 使用方法
+## Usage
 ```
-/jira <チケット番号>
+/jira <ticket-number>
 ```
 
-例:
+Example:
 ```
 /jira FRT-1234
 ```
 
-## 動作フロー
-### 1. チケット番号の受け取り
-コマンド引数として Jira のチケット番号（例: FRT-1234）を受け取ります。
+## Workflow
+### 1. Receive Ticket Number
+Receives the Jira ticket number (e.g., FRT-1234) as a command argument.
 
-### 2. チケット詳細の取得
-MCPツールを使用して、指定されたチケットの以下の情報を取得します：
-- タイトル
-- 説明
-- 開発チケットテンプレート用の説明
-- 現在のステータス
-- 担当者
-- その他の関連情報
+### 2. Retrieve Ticket Details
+Uses MCP tools to retrieve the following information for the specified ticket:
+- Title
+- Description
+- Description for development ticket template
+- Current status
+- Assignee
+- Other related information
 
-### 3. ステータスの自動更新
-チケットのステータスが「開始」の場合：
-1. ステータスを「開発中」に自動的に更新
-2. 更新完了をログに記録
+### 3. Automatic Status Update
+If the ticket status is "To Do":
+1. Automatically update status to "In Progress"
+2. Log the update completion
 
-### 4. 作業計画の立案
-チケットの説明を解析し、具体的な作業内容を特定後、その内容を報告し、承認を得ます。
-承認を得られなかった場合は指示に従って計画を修正し、再度承認を求めます。以後、承認が得られるまでこれを繰り返します。
+### 4. Create Work Plan
+Analyze the ticket description to identify specific work items, report the content, and obtain approval.
+If approval is not obtained, revise the plan according to instructions and request approval again. Repeat until approved.
 
-### 5. 作業の実行
-承認を得られたら計画に従って作業を実行します。以下の手順に従います：
-- default branch (e.g., `main`, `master` or `develop`) から新しいブランチを作成
-  - ブランチ名はチケット番号を用いる (e.g., `FRT-1234`）
-- コード変更の実施
-- テストの実行
-- ドキュメントの更新（必要な場合）
-- その他指定されたタスク
+### 5. Execute Work
+Once approved, execute the work according to the plan. Follow these steps:
+- Create a new branch from the default branch (e.g., `main`, `master` or `develop`)
+  - Branch name should use the ticket number (e.g., `FRT-1234`)
+- Make code changes
+- Run tests
+- Update documentation (if needed)
+- Other specified tasks
 
-### 5. 作業レポートの生成
-実行した作業内容を日本語で要約し、以下の形式でレポートを作成します：
+### 6. Generate Work Report
+Summarize the executed work and create a report in the following format:
 
 ```
-## 作業レポート
-### チケット情報
-- チケット番号: [チケット番号]
-- タイトル: [チケットタイトル]
-- ステータス: [更新前] → [更新後]
+## Work Report
+### Ticket Information
+- Ticket Number: [ticket-number]
+- Title: [ticket-title]
+- Status: [before] → [after]
 
-### 実行した作業
-1. [作業内容1]
-2. [作業内容2]
+### Executed Work
+1. [work-item-1]
+2. [work-item-2]
 3. ...
 
-### 変更したファイル
-- [ファイルパス1]
-- [ファイルパス2]
+### Changed Files
+- [file-path-1]
+- [file-path-2]
 - ...
 
-### 備考
-[必要に応じて追加情報]
+### Notes
+[Additional information as needed]
 ```
 
-## エラー処理
-### チケットが見つからない場合
-- エラーメッセージを表示
-- 正しいチケット番号の形式を案内
+## Error Handling
+### Ticket Not Found
+- Display error message
+- Guide correct ticket number format
 
-### MCP接続エラー
-- 接続エラーの詳細を表示
-- リトライオプションの提示
+### MCP Connection Error
+- Display connection error details
+- Offer retry option
 
-### ステータス更新失敗
-- 失敗理由を表示
-- 手動での更新方法を案内
+### Status Update Failure
+- Display failure reason
+- Guide manual update method
 
-## 実装に必要なMCPツール
-### 必要なツール
-1. **Jira MCP Server** - Jiraとの通信を処理
-   - チケット詳細の取得
-   - ステータスの更新
-   - コメントの追加
+## Required MCP Tools
+### Required Tools
+1. **Jira MCP Server** - Handles communication with Jira
+   - Retrieve ticket details
+   - Update status
+   - Add comments
 
-## 使用例
-### 基本的な使用例
+## Usage Examples
+### Basic Usage
 ```
 /jira FRT-1234
 ```
 
-出力例：
+Output example:
 ```
-## 作業レポート
+## Work Report
 
-### チケット情報
-- チケット番号: FRT-1234
-- タイトル: ユーザー登録フォームのバリデーション追加
-- ステータス: 開始 → 開発中
+### Ticket Information
+- Ticket Number: FRT-1234
+- Title: Add validation to user registration form
+- Status: To Do → In Progress
 
-### 実行した作業
-1. メールアドレスのバリデーション関数を追加
-2. パスワード強度チェック機能を実装
-3. ユニットテストを作成
-4. Storybookストーリーを更新
+### Executed Work
+1. Added email address validation function
+2. Implemented password strength check feature
+3. Created unit tests
+4. Updated Storybook stories
 
-### 変更したファイル
+### Changed Files
 - src/components/user-registration/validation.ts
 - src/components/user-registration/index.tsx
 - src/components/user-registration/validation.test.ts
 - src/components/user-registration/user-registration.stories.tsx
 
-### 備考
-- すべてのテストが成功しました
-- TypeScript型チェックに問題はありません
+### Notes
+- All tests passed
+- No issues with TypeScript type checking
 ```
 
-## 注意事項
-1. **権限の確認**
-   - Jiraのチケット更新権限が必要です
-   - プロジェクトへのアクセス権限を事前に確認してください
-2. **ブランチの作成**
-   - チケット番号を含むブランチ名を自動生成することを推奨
-   - 例: `feature/FRT-1234-user-validation`
-3. **コミットメッセージ**
-   - チケット番号を含めることを推奨
-   - 例: `FRT-1234: Add email validation to user registration form`
-4. **セキュリティ**
-   - APIトークンは環境変数で管理
-   - コードにハードコーディングしない
+## Important Notes
+1. **Permission Verification**
+   - Jira ticket update permission is required
+   - Verify project access permissions in advance
+2. **Branch Creation**
+   - Recommended to auto-generate branch names including ticket number
+   - Example: `feature/FRT-1234-user-validation`
+3. **Commit Messages**
+   - Recommended to include ticket number
+   - Example: `FRT-1234: Add email validation to user registration form`
+4. **Security**
+   - Manage API tokens via environment variables
+   - Do not hardcode in source code
 
-## トラブルシューティング
+## Troubleshooting
 
-### よくある問題
+### Common Issues
 
-#### MCPサーバーに接続できない
+#### Cannot Connect to MCP Server
 ```
 Error: Failed to connect to MCP server
 ```
-解決方法：
-1. Claude Desktopを再起動
-2. MCP設定ファイルの構文を確認
-3. 環境変数が正しく設定されているか確認
+Solutions:
+1. Restart Claude Desktop
+2. Verify MCP configuration file syntax
+3. Confirm environment variables are correctly set
 
-#### チケットのステータス更新に失敗
+#### Ticket Status Update Failed
 ```
 Error: Cannot transition issue from current state
 ```
-解決方法：
-1. ワークフローの設定を確認
-2. 現在のステータスから目的のステータスへの遷移が許可されているか確認
-3. 必要な権限があるか確認
+Solutions:
+1. Check workflow settings
+2. Verify that transition from current status to target status is allowed
+3. Confirm necessary permissions are granted
 
-## 今後の拡張機能
+## Future Extensions
 
-- [ ] 複数チケットの一括処理
-- [ ] PR作成との連携
-- [ ] 作業時間の自動記録
-- [ ] Slackへの通知連携
-- [ ] カスタムワークフローのサポート
+- [ ] Batch processing of multiple tickets
+- [ ] Integration with PR creation
+- [ ] Automatic work time logging
+- [ ] Slack notification integration
+- [ ] Custom workflow support

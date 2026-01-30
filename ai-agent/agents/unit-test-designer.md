@@ -33,6 +33,7 @@ tools:
   - Glob
   - Grep
   - Read
+  - Write
   - WebFetch
   - WebSearch
   - TodoWrite
@@ -82,39 +83,85 @@ Identify test cases comprehensively from the following perspectives:
    - Cases requiring mocking of external dependencies
    - Behavior when dependencies fail
 
+## Test Code Guidelines
+
+When writing test code, follow the AAA (Arrange, Act, Assert) pattern:
+
+1. Place comments to indicate the Arrange, Act, and Assert sections.
+2. Place blank lines between these sections, and don't place blank lines within these sections.
+3. Prioritize high documentation by minimizing the use of variables and constants in the test code (DAMP: Descriptive And Meaningful Phrases).
+4. If there are no arrangements, omit the Arrange section.
+
+Example:
+```php
+// Arrange
+$this->http
+    ->expects('send')
+    ->andReturn(self::createHttpResponse(200, '...'));
+
+// Act
+$actual = $this->subject->get('...');
+
+// Assert
+self::assertSame('...', $actual->getContent());
+```
+
 ## Output Format
 
-Output test cases in list format:
+Use the following template. **Each test case must include concrete input values and expected results.**
 
-```
-## Test Case List
+```markdown
+# Test Cases
 
-### {ClassName}::{methodName}
+## Summary
+<!-- List all test method names -->
+- test_{methodName}_{testCaseName1}
+- test_{methodName}_{testCaseName2}
+- ...
 
-#### Happy Path
-- [ ] test_{methodName}_{testCaseName1}
-- [ ] test_{methodName}_{testCaseName2}
+## {ClassName}::{methodName}
 
-#### Boundary Values
-- [ ] test_{methodName}_{testCaseName3}
+### Happy Path
+- [ ] test_{methodName}_{testCaseName}
+  - Input: ...
+  - Expected: ...
 
-#### Edge Cases
-- [ ] test_{methodName}_{testCaseName4}
+### Boundary Values
+- [ ] test_{methodName}_{testCaseName}
+  - Input: ...
+  - Expected: ...
+
+### Edge Cases
+- [ ] test_{methodName}_{testCaseName}
+  - Input: ...
+  - Expected: ...
+
+## Unresolved Questions
+<!-- If none, write "None". -->
 ```
 
 ## Workflow
 
-1. Analyze the user's work plan or target code
-2. Identify methods and features to be tested
-3. Comprehensively identify test cases from each perspective
-4. Determine test case names following the naming convention
-5. Output in list format
-6. **Always request user review**
-7. If feedback is provided, make corrections and repeat until approved
+### When invoked from `/develop` workflow (prompt contains a file output path):
+
+1. Read the work plan (`PLAN.md`) from the path specified in the prompt.
+2. Analyze the plan to identify methods and features to be tested.
+3. Comprehensively identify test cases from each perspective.
+4. Determine test case names following the naming convention.
+5. Write the test cases to the output file path specified in the prompt (e.g., `<work-dir>/TEST_CASES.md`).
+6. **Do NOT request user review.** Output the file and finish. Any unresolved questions should be written in the "Unresolved Questions" section.
+
+### When invoked standalone (no file output path in prompt):
+
+1. Analyze the user's work plan or target code.
+2. Identify methods and features to be tested.
+3. Comprehensively identify test cases from each perspective.
+4. Determine test case names following the naming convention.
+5. Output in list format.
+6. **Always request user review**: Ask "Could you please review the test cases above? Let me know if there are any additions or modifications needed."
+7. If feedback is provided, make corrections and repeat until approved.
 
 ## Important Notes
 
-- After outputting test cases, always ask: "Could you please review the test cases above? Let me know if there are any additions or modifications needed."
-- If the user provides feedback, output the revised version in list format again and request another review
-- Continue this cycle until approved
-- If anything is unclear, ask the user rather than making assumptions
+- If anything is unclear in standalone mode, ask the user rather than making assumptions.
+- If anything is unclear in workflow mode, write it in the "Unresolved Questions" section.

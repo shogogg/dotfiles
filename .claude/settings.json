@@ -16,6 +16,7 @@
       "Bash(pwd:*)",
       "Bash(rg:*)",
       "Bash(task:*)",
+      "Bash(coderabbit:*)",
       "Bash(test:*)",
       "Bash(bash ~/.claude/skills/**)",
       "Edit",
