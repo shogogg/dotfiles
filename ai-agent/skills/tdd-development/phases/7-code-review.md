@@ -1,8 +1,8 @@
-# Phase 6: Code Review
+# Phase 7: Code Review
 
 Read `STATE.json`.
 
-Report: "Phase 6 (cycle N/3): Running CodeRabbit review..."
+Report: "Phase 7 (cycle N/3): Running CodeRabbit review..."
 
 Launch sub-agent:
 ```
@@ -43,16 +43,16 @@ Instruct the sub-agent to follow this structure:
 - **Note**: [description]
 ```
 
-Report: "Phase 6: Must Fix X / Consider Y / Ignorable Z"
+Report: "Phase 7: Must Fix X / Consider Y / Ignorable Z"
 
 ## Next Steps
 
 ### No "Must Fix" items
-Proceed to Phase 7 (User Review) (does not count as a cycle).
+Proceed to Phase 8 (User Review) (does not count as a cycle).
 
 ### "Must Fix" items exist
 
-Update `STATE.json`: increment `cycleCount`, reset `phase5RetryCount` to 0.
+Update `STATE.json`: increment `cycleCount`, reset `phase6RetryCount` to 0.
 
 If `cycleCount > 3`: Report to user and ask for guidance.
 
@@ -69,7 +69,7 @@ For each Must Fix item (1 to N):
    ```
 4. Move to next item.
 
-After all Must Fix items are resolved, go back to Phase 5 (to re-run quality checks).
+After all Must Fix items are resolved, go back to Phase 6 (to re-run quality checks).
 
 ## Recording Learnings
 
@@ -95,7 +95,7 @@ After completing all Must Fix items, analyze the patterns and record learnings:
 
 ## Error Handling
 
-If the CodeRabbit sub-agent fails, report the failure to the user and ask whether to retry the review or skip to Phase 7 (User Review).
+If the CodeRabbit sub-agent fails, report the failure to the user and ask whether to retry the review or skip to Phase 8 (User Review).
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `7`.
+Update `STATE.json`: set `currentPhase` to `8`.

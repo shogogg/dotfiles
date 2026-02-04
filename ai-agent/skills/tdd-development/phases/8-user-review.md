@@ -1,6 +1,6 @@
-# Phase 7: User Review
+# Phase 8: User Review
 
-Report: "Phase 7: ユーザーレビューを開始します..."
+Report: "Phase 8: ユーザーレビューを開始します..."
 
 ## Step 1: Launch difit-based Review
 
@@ -29,7 +29,7 @@ Read `<work-dir>/USER_FEEDBACK.md` and check the status.
 
 ### Status: APPROVED
 
-Proceed to Phase 8 (Final Report).
+Proceed to Phase 9 (Final Report).
 
 ### Status: CHANGES_REQUESTED
 
@@ -47,8 +47,8 @@ For each feedback item (1 to N):
 4. Move to next item.
 
 After all feedback items are resolved:
-1. Reset `phase5RetryCount` to 0 in `STATE.json`.
-2. Return to Phase 5.
+1. Reset `phase6RetryCount` to 0 in `STATE.json`.
+2. Return to Phase 6.
 
 ## Recording Learnings
 
@@ -75,4 +75,4 @@ After processing user feedback, analyze patterns and record learnings:
 **Critical Rule**: Only explicit approval in `USER_FEEDBACK.md` (Status: APPROVED) constitutes approval.
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `8`.
+Update `STATE.json`: set `currentPhase` to `9`.

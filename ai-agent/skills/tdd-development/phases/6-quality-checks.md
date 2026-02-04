@@ -1,4 +1,4 @@
-# Phase 5: Quality Checks
+# Phase 6: Quality Checks
 
 ## Step 1: Propose Test Execution Scope
 
@@ -46,7 +46,7 @@ Report the failure details to the user and use `AskUserQuestion` to determine th
 
 ## Step 4: Commit Changes
 
-After Quality Checks PASS, commit changes before proceeding to Phase 6.
+After Quality Checks PASS, commit changes before proceeding to Phase 7.
 
 Launch the `commit` skill:
 
@@ -74,4 +74,4 @@ mcp__plugin_serena_serena__write_memory("quality-check-learnings.md", content)
 
 ## State Update
 
-Update `STATE.json`: set `currentPhase` to `6`.
+Update `STATE.json`: set `currentPhase` to `7`.

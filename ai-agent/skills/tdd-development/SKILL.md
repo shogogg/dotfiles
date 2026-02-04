@@ -7,7 +7,7 @@ allowed-tools: Task, Skill, Bash, Read, Write, mcp__jetbrains__open_file_in_edit
 
 # /coding Workflow Orchestrator
 
-This skill orchestrates a structured TDD development workflow across 9 phases (Phase 0–8).
+This skill orchestrates a structured TDD development workflow across 10 phases (Phase 0–9).
 
 ## Orchestration Principle
 
@@ -33,14 +33,15 @@ Copy this checklist and track progress:
 ```
 Workflow Progress:
 - [ ] Phase 0: Pre-checks
-- [ ] Phase 1: Planning
-- [ ] Phase 2: Test Design
-- [ ] Phase 3: Approval Gate
-- [ ] Phase 4: TDD Implementation
-- [ ] Phase 5: Quality Checks
-- [ ] Phase 6: Code Review
-- [ ] Phase 7: User Review
-- [ ] Phase 8: Final Report
+- [ ] Phase 1: Exploration
+- [ ] Phase 2: Planning
+- [ ] Phase 3: Test Design
+- [ ] Phase 4: Approval Gate
+- [ ] Phase 5: TDD Implementation
+- [ ] Phase 6: Quality Checks
+- [ ] Phase 7: Code Review
+- [ ] Phase 8: User Review
+- [ ] Phase 9: Final Report
 ```
 
 ## Resume Detection
@@ -62,21 +63,22 @@ Before starting Phase 0, check for an existing workspace:
 Read each phase document **only when you are ready to execute that phase**. Do not read ahead.
 
 1. [Pre-checks](phases/0-pre-checks.md) — Clarify task, create branch, verify tools, initialize workspace
-2. [Planning](phases/1-planning.md) — Explore codebase → create work plan
-3. [Test Design](phases/2-test-design.md) — Design test cases based on work plan
-4. [Approval Gate](phases/3-approval-gate.md) — Present plan & tests to user for approval
-5. [Implementation](phases/4-implementation.md) — Implement code following TDD methodology
-6. [Quality Checks](phases/5-quality-checks.md) — Run tests, lint, formatting (max 3 retries)
-7. [Code Review](phases/6-code-review.md) — CodeRabbit review (max 3 cycles)
-8. [User Review](phases/7-user-review.md) — Present changes to user for approval
-9. [Final Report](phases/8-final-report.md) — Summarize results and present to user
+2. [Exploration](phases/1-exploration.md) — Load past learnings, check profile, explore codebase
+3. [Planning](phases/2-planning.md) — Create work plan based on exploration results
+4. [Test Design](phases/3-test-design.md) — Design test cases based on work plan
+5. [Approval Gate](phases/4-approval-gate.md) — Present plan & tests to user for approval
+6. [Implementation](phases/5-implementation.md) — Implement code following TDD methodology
+7. [Quality Checks](phases/6-quality-checks.md) — Run tests, lint, formatting (max 3 retries)
+8. [Code Review](phases/7-code-review.md) — CodeRabbit review (max 3 cycles)
+9. [User Review](phases/8-user-review.md) — Present changes to user for approval
+10. [Final Report](phases/9-final-report.md) — Summarize results and present to user
 
 ## Loop Control
 
-- Phase 5 retry limit: **3** (report to user on exceed)
-- Phase 5→6 cycle limit: **3** ("Must Fix" → fix → Phase 5 = 1 cycle)
-- Phase 6 "No Must Fix": Does not count as cycle
-- Phase 6→5 return: Reset Phase 5 retry counter
-- Phase 7 user review: If user requests fixes → fix → return to Phase 5
-- Phase 7→5 return: Reset Phase 5 retry counter, does NOT count against cycleCount
+- Phase 6 retry limit: **3** (report to user on exceed)
+- Phase 6→7 cycle limit: **3** ("Must Fix" → fix → Phase 6 = 1 cycle)
+- Phase 7 "No Must Fix": Does not count as cycle
+- Phase 7→6 return: Reset Phase 6 retry counter
+- Phase 8 user review: If user requests fixes → fix → return to Phase 6
+- Phase 8→6 return: Reset Phase 6 retry counter, does NOT count against cycleCount
 - State file: `<work-dir>/STATE.json` (initialize in Phase 0)

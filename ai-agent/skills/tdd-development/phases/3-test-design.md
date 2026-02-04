@@ -1,4 +1,4 @@
-# Phase 2: Test Design (depends on Phase 1)
+# Phase 3: Test Design (depends on Phase 2)
 Skip this phase if `<work-dir>/TEST_CASES.md` is present.
 MUST USE SUB-AGENT "unit-test-designer", max_turns = 30. NEVER WRITE TEST CASES YOURSELF.
 
@@ -31,7 +31,7 @@ Instruct the sub-agent to follow this structure:
 
 If the sub-agent fails or returns no output, report the failure to the user with details and ask whether to retry or abort.
 
-Report: "Phase 2 complete: Test cases written to `<work-dir>/TEST_CASES.md`"
+Report: "Phase 3 complete: Test cases written to `<work-dir>/TEST_CASES.md`"
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `3`.
+Update `STATE.json`: set `currentPhase` to `4`.

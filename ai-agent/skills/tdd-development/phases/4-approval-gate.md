@@ -1,4 +1,4 @@
-# Phase 3: Approval Gate
+# Phase 4: Approval Gate
 
 ## Step 1: Resolve Unresolved Questions
 
@@ -30,7 +30,7 @@ Then open the following files in the IDE using `mcp__jetbrains__open_file_in_edi
 
 Use `AskUserQuestion` to ask the user for explicit approval with two choices:
 
-1. **承認する** — Approve and proceed to Phase 4.
+1. **承認する** — Approve and proceed to Phase 5.
 2. **修正を依頼する** — Request changes.
 
 If the user selects "修正を依頼する":
@@ -39,7 +39,7 @@ If the user selects "修正を依頼する":
    - **Return directive for sub-agents**: "Apply the requested changes to the file. Return ONLY a brief summary (2-3 sentences) of what was changed. Do NOT include the full file content in your final response."
 3. Return to Step 2 to present the updated summary again.
 
-**Critical Rule**: Only an explicit selection of "承認する" constitutes approval. Answering questions, providing comments, or giving feedback does NOT count as approval. The workflow MUST NOT proceed to Phase 4 without the explicit approval selection.
+**Critical Rule**: Only an explicit selection of "承認する" constitutes approval. Answering questions, providing comments, or giving feedback does NOT count as approval. The workflow MUST NOT proceed to Phase 5 without the explicit approval selection.
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `4`.
+Update `STATE.json`: set `currentPhase` to `5`.
