@@ -2,28 +2,45 @@
 
 Report: "Phase 8: ユーザーレビューを開始します..."
 
-## Step 1: Launch difit-based Review
+## Step 1: Read Base Branch from State
 
-Launch the `user-review` skill to provide browser-based diff review:
+Read `STATE.json` from the workspace directory and retrieve the `baseBranch` field.
+
+```json
+{
+  "currentPhase": 8,
+  "baseBranch": "origin/main",  // ← Use this value
+  "featureBranch": "feature/my-feature"
+}
+```
+
+**Fallback**: If `baseBranch` is not present in `STATE.json` (legacy workspace), the `user-review` skill will perform automatic detection.
+
+## Step 2: Launch difit-based Review
+
+Launch the `user-review` skill with the base branch information:
 
 ```
-Skill("user-review", args="<work-dir>")
+Skill("user-review", args="<work-dir> --base-branch=<baseBranch>")
 ```
 
-This will:
-- Calculate merge-base with the main branch
-- Launch difit in browser for visual diff review
-- Collect user feedback and save to `<work-dir>/USER_FEEDBACK.md`
+**Important**: 
+- Wait for skill completion. Do NOT run in background.
+- The skill will launch difit in the browser and wait for user interaction.
+- Timeout is handled within the skill (10 minutes with retry option).
 
-## Step 2: Present Summary
+## Step 3: Present Summary (After Review Completion)
 
-While waiting for difit review, present a concise summary to the user:
+After the `user-review` skill completes, present a concise summary to the user:
+
 - List of all created/modified files with a brief description of each change.
 - Key implementation decisions that were made.
 - Any "Consider" items from the CodeRabbit review that were not addressed.
 - Cycle count and retry statistics from `STATE.json`.
 
-## Step 3: Process Feedback
+**Note**: This summary is presented AFTER difit review completes, not during. This ensures the user can focus on the browser-based review first.
+
+## Step 4: Process Feedback
 
 Read `<work-dir>/USER_FEEDBACK.md` and check the status.
 
