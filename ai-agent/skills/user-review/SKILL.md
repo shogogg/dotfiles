@@ -1,5 +1,6 @@
 ---
-description: Provide browser-based user review UI using difit
+name: user-review
+description: Provides browser-based diff review UI using difit. Use when the user wants to review code changes visually, collect feedback on implementation, or approve/reject changes before finalizing.
 allowed-tools: Bash(npx difit),Bash(git merge-base),Bash(git status),Bash(git rev-parse),Read,Write,AskUserQuestion
 context: fork
 ---
@@ -81,10 +82,10 @@ Run difit based on the selection with **extended timeout** (10 minutes) to allow
 
 ```bash
 # For committed changes only (timeout: 600000ms = 10 minutes)
-npx difit HEAD <base-ref>
+npx difit --clean HEAD <base-ref>
 
 # To include uncommitted changes (timeout: 600000ms = 10 minutes)
-npx difit .
+npx difit --clean .
 ```
 
 **Important**: 
@@ -104,16 +105,18 @@ If the command times out after 10 minutes, use `AskUserQuestion`:
 
 If user selects option 1, re-run difit with another 10-minute timeout.
 
-### Step 4: Collect Feedback
+### Step 4: Determine Review Result from difit Output
 
-After review completion in difit, collect feedback via `AskUserQuestion`:
+Inspect the STDOUT output captured from difit:
 
-1. **Approve (no feedback)** — Create empty `USER_FEEDBACK.md` and finish
-2. **Request changes** — Have user enter specific feedback
+- **If output contains `📝 Comments from review session:`** → User has feedback. Proceed to Step 5 with status `CHANGES_REQUESTED`.
+- **If output does NOT contain `📝 Comments from review session:`** → No feedback. Automatically treat as **APPROVED**. Proceed to Step 5 with status `APPROVED`. Do NOT ask the user for confirmation.
 
 ### Step 5: Save Feedback
 
-Save user feedback to `<work-dir>/USER_FEEDBACK.md`:
+Save review result to `<work-dir>/USER_FEEDBACK.md`:
+
+#### When APPROVED (no comments from difit):
 
 ```markdown
 # User Feedback
@@ -122,16 +125,34 @@ Save user feedback to `<work-dir>/USER_FEEDBACK.md`:
 [timestamp]
 
 ## Status
-APPROVED / CHANGES_REQUESTED
+APPROVED
+```
+
+#### When CHANGES_REQUESTED (comments found in difit output):
+
+Parse the comments section from difit output. Each comment block between the `===` separator lines contains:
+- First line: `<file-path>:<line-reference>`
+- Remaining lines: the comment text
+
+Save as:
+
+```markdown
+# User Feedback
+
+## Date
+[timestamp]
+
+## Status
+CHANGES_REQUESTED
 
 ## Feedback Items
-### 1. [Category]
-- **File**: [target file (if any)]
-- **Issue**: [issue description]
-- **Request**: [change request]
+### 1. [file-path]
+- **File**: [file-path from difit output]
+- **Line**: [line reference from difit output]
+- **Issue**: [comment text from difit output]
 
 ## Raw Feedback
-[user's original comments]
+[full comments section from difit STDOUT]
 ```
 
 ## Output

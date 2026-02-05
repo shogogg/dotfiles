@@ -17,7 +17,7 @@ Prompt must include:
 - Output file path: `<work-dir>/PLAN.md`
 - **Project profile summary** (if available): relevant patterns and conventions
 - **Past learnings summary** (if any were loaded in Phase 1)
-- **Return directive**: "Write the complete plan to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, state the number of implementation units, and note whether there are unresolved questions. Do NOT include the full plan content in your final response."
+- **Return directive**: "Write the complete plan to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, state the number of implementation units, and note whether there are unresolved questions. Do NOT include the full plan content in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 3. Do not read or analyze the plan yourself.`"
 
 ## Output Template (PLAN.md)
 

@@ -1,6 +1,6 @@
 ---
 name: fetch-pr-review-comments
-description: MUST use this skill when user asks to check/review PR comments, address reviewer feedback, fix review issues, or respond to code review. Fetches unresolved review comments from GitHub PR for the current branch.
+description: Fetches unresolved review comments from the GitHub PR for the current branch. Use when checking PR comments, addressing reviewer feedback, fixing review issues, or responding to code review.
 ---
 
 # Fetch PR Review Comments

@@ -1,6 +1,7 @@
 ---
 name: coderabbit-review
-description: Perform code review using CodeRabbit. Must use this skill if instructed to perform a CodeRabbit review.
+description: Performs code review using CodeRabbit CLI and provides actionable feedback. Use when the user requests a CodeRabbit review, wants automated code analysis, or needs pre-merge quality checks.
+context: fork
 allowed-tools: Bash, Read, Edit, Write, Glob, Grep
 ---
 

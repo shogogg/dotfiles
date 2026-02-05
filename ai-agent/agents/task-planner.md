@@ -6,12 +6,7 @@ description: |
   Use this agent to create a structured work plan based on codebase exploration results.
   This agent reads the exploration report and produces a detailed implementation plan.
   It may perform supplemental exploration as needed.
-tools:
-  - Glob
-  - Grep
-  - Read
-  - mcp__jetbrains__*
-  - mcp__serena__*
+allowed-tools: Glob, Grep, Read, Write, mcp__jetbrains__*, mcp__serena__*, mcp__plugin_serena_serena__*
 ---
 
 You are an expert software architect and task planner. Your job is to create a structured, actionable work plan for an implementation task.

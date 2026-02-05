@@ -2,25 +2,6 @@
 
 Report: "Phase 1: Exploring codebase..."
 
-## Step 0: Load Past Learnings
-
-Reference past learnings from Serena Memory to avoid repeating the same issues.
-
-```
-mcp__plugin_serena_serena__list_memories()
-```
-
-Read the following memories if they exist:
-- `coderabbit-learnings.md` — Learnings from CodeRabbit reviews
-- `user-feedback-patterns.md` — User feedback patterns
-- `quality-check-learnings.md` — Learnings from previous quality checks
-
-```
-mcp__plugin_serena_serena__read_memory("<memory-name>")
-```
-
-**Ensure that the referenced learnings are conveyed to subsequent phases.**
-
 ## Step 1: Project Profile Check
 
 Check for an existing project profile at `.ai-workspace/PROJECT_PROFILE.md`.
@@ -52,9 +33,9 @@ Use `Read` tool to check if `.ai-workspace/PROJECT_PROFILE.md` exists.
 Analyze the task description from `$ARGUMENTS` and recommend an exploration level.
 
 **Recommendation Rules:**
-- **Light**: Keywords like "fix", "bug", "typo", "small", "単一ファイル", "修正" → simple fixes
-- **Medium**: Keywords like "add", "feature", "refactor", "追加", "機能", "リファクタ" → feature work
-- **Full**: Keywords like "new module", "architecture", "大規模", "新規モジュール", "設計変更" → major changes
+- **Light**: Keywords like "fix", "bug", "typo", "small", "single file" → simple fixes
+- **Medium**: Keywords like "add", "feature", "refactor" → feature work
+- **Full**: Keywords like "new module", "architecture", "large-scale", "design change" → major changes
 
 **Use AskUserQuestion to confirm the exploration scope:**
 
@@ -89,8 +70,7 @@ MUST USE SUB-AGENT "codebase-explorer", max_turns = 30. NEVER EXPLORE THE CODEBA
 - **Exploration level**: `<selected-level>` (light/medium/full)
 - **Project profile summary** (if available): key patterns, test infrastructure, naming conventions
 - Output file path: `<work-dir>/EXPLORATION_REPORT.md`
-- **Past learnings summary** (if any were loaded in Step 0)
-- **Return directive**: "Write ALL findings to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, list the number of key files found, and note any concerns. Do NOT include the full report content in your final response."
+- **Return directive**: "Write ALL findings to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, list the number of key files found, and note any concerns. Do NOT include the full report content in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 2. Do not explore or analyze code yourself.`"
 
 **If "Skip" was selected:**
 - Create a minimal `EXPLORATION_REPORT.md` from the project profile

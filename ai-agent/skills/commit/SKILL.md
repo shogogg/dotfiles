@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Commit changes to the repository
+description: Commits staged changes to the repository with conventional commit format. Use when the user wants to create a git commit, finalize work, or save changes with a structured commit message.
 context: fork
 allowed-tools: Bash(git status),Bash(git add),Bash(git commit),Bash(git branch),AskUserQuestion
 ---

@@ -59,9 +59,11 @@ After Group A completes:
      "phase5RetryCount": 0,
      "cycleCount": 0,
      "baseBranch": "<BASE_BRANCH>",
-     "featureBranch": "<current-branch-name>"
+     "featureBranch": "<current-branch-name>",
+     "startCommitHash": "<current-HEAD-hash>"
    }
    ```
+   - `startCommitHash`: The HEAD commit hash at session start (obtained via `git rev-parse HEAD`)
    - `baseBranch`: The branch/ref determined in step 4 (e.g., "origin/main", "main", or "HEAD")
    - `featureBranch`: The current branch name after step 4
 

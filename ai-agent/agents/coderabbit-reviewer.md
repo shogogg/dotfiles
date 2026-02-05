@@ -27,13 +27,17 @@ You are a code review analyst. Your job is to run CodeRabbit CLI and classify th
 
 1. **Check authentication**: Run `coderabbit auth status`. If not authenticated, report the error and stop.
 
-2. **Determine review type**: Check `git status` to decide the review type:
+2. **Determine review options**: Build the `coderabbit review` command options:
+
+   **Review type (`--type`)**: If the prompt specifies a type, use it. Otherwise check `git status`:
    - If there are uncommitted changes → `uncommitted`
    - If all changes are committed → `committed`
 
+   **Base branch (`--base`)**: If the prompt specifies a base branch, add `--base <branch>` to the command.
+
 3. **Run CodeRabbit**: Execute the review command with a 10-minute timeout:
    ```
-   coderabbit --plain --type <uncommitted|committed>
+   coderabbit review --plain --type <type> [--base <branch>]
    ```
    Use `timeout: 600000` (10 minutes) for the Bash command. CodeRabbit reviews can take 5+ minutes.
 

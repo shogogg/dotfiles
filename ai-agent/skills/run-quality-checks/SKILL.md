@@ -12,6 +12,7 @@ allowed-tools: Bash, Read, Write, Glob, Grep
 `$ARGUMENTS` may contain:
 
 - **Workspace directory path** (positional, optional): If provided, write the result to `<work-dir>/QUALITY_RESULT.md`. Otherwise, output the result directly.
+- `--target=<paths>` (optional): Target files or directories for all quality checks (lint, analyse, format). When provided, check each task's description for how to pass arguments and prioritize targeted execution over full project scans.
 - `--test-scope=<scope>` (optional): Test execution scope.
   - `changed` — Run only the specified test files (listed in `--test-args`).
   - `directory` — Run tests in the specified directory/namespace (listed in `--test-args`).
@@ -54,13 +55,29 @@ From the task list output, identify tasks by name or description:
 | Static Analysis | analyse, analyze, static, phpstan, psalm | `task analyse`, `task phpstan` |
 | Format | format, prettier, php-cs-fixer, fix | `task format`, `task fix` |
 
+**When `--target` is provided (IMPORTANT):**
+
+1. For each task (lint, analyse, format), examine the task description from `task --list-all` output.
+2. If the description indicates how to pass file/directory arguments (e.g., "Usage: task phpstan [-- <files>]"), use that format:
+   ```bash
+   task <task-name> -- <target-paths>
+   # Example: task phpstan -- src/Services/
+   # Example: task lint -- src/Foo.php src/Bar.php
+   ```
+3. If the description does NOT indicate argument support, run the task without arguments (full project scope) and note this in the output.
+
 **When `--test-scope` is provided:**
 ```bash
 task <test-task> -- <test-args>
 # Example: task test -- tests/Unit/FooTest.php
 ```
 
-Lint, static analysis, and format tasks always run regardless of test scope.
+**Priority order:**
+1. Use `--target` with task-specific argument syntax (if supported by task description)
+2. Use `--test-scope` / `--test-args` for test tasks
+3. Fall back to full project execution only when targeting is not possible
+
+Lint, static analysis, and format tasks run with `--target` arguments when provided, otherwise run on the full project.
 
 Run all applicable tasks even if some fail. Capture stdout and stderr.
 

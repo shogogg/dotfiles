@@ -50,12 +50,36 @@ Proceed to Phase 9 (Final Report).
 
 ### Status: CHANGES_REQUESTED
 
-各フィードバック項目を個別に修正し、それぞれコミットする:
+#### Record Feedback Round
+
+Record feedback in USER_FEEDBACK.md with round number:
+
+```markdown
+## Round N Feedback (2026-02-04T10:30:00Z)
+
+### Item 1: <title>
+- **Issue**: <description>
+- **Category**: naming / style / logic / design
+
+### Item 2: ...
+```
+
+**Note**: tdd-implementer autonomously reads `<work-dir>/USER_FEEDBACK.md` and references past feedback patterns.
+
+#### Apply Fixes
+
+**Fix each feedback item individually and commit each one:**
 
 For each feedback item (1 to N):
 1. Report: "Addressing feedback item M/N: <title>"
-2. Launch `tdd-implementer` to apply the specific change (provide the item details from `USER_FEEDBACK.md` and `PLAN.md`). Include **return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. Do NOT include full file contents in your final response."
-3. **Commit the fix immediately** with message:
+2. Launch `tdd-implementer` to apply the specific change. Provide:
+   - Item details from `USER_FEEDBACK.md`
+   - `<work-dir>/PLAN.md` for context
+   - **Work directory**: `<work-dir>` (for session-specific learnings reference)
+   - **CRITICAL instruction**: "You MUST run `task --list-all` first and use `task` commands for ALL test executions. Do NOT use composer/npm/make if task is available."
+   - **SCOPE RESTRICTION**: "Fix ONLY this specific feedback item. Do NOT address multiple items or make unrelated changes. Each item must be a separate commit."
+   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. State which test command you used (must be `task test` if available). Do NOT include full file contents in your final response."
+3. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
    ```
    fix: <description of the change> [ISSUE-NUMBER]
    
@@ -71,23 +95,23 @@ After all feedback items are resolved:
 
 After processing user feedback, analyze patterns and record learnings:
 
-1. **Serena Memory に記録**:
+1. **Record to Serena Memory**:
    ```
    mcp__plugin_serena_serena__read_memory("user-feedback-patterns.md")
    ```
-   既存の内容を読み取り、新しいパターンを追加:
+   Read existing content and add new patterns:
    ```
    mcp__plugin_serena_serena__edit_memory("user-feedback-patterns.md", ...)
    ```
-   または新規作成:
+   Or create new:
    ```
    mcp__plugin_serena_serena__write_memory("user-feedback-patterns.md", content)
    ```
 
-2. **記録する内容**:
-   - フィードバックの傾向（例: 命名規則、コードスタイル、設計パターン）
-   - ユーザー固有の好み
-   - 再発防止のためのチェックポイント
+2. **Content to record**:
+   - Feedback trends (e.g., naming conventions, code style, design patterns)
+   - User-specific preferences
+   - Checkpoints for preventing recurrence
 
 **Critical Rule**: Only explicit approval in `USER_FEEDBACK.md` (Status: APPROVED) constitutes approval.
 

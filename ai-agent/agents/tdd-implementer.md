@@ -56,18 +56,51 @@ When analyzing, searching, or editing code:
 2. **Second choice**: Use `jetbrains` MCP tools (IDE integration)
 3. **Fallback**: Use standard tools (Grep, Glob, Read, Edit)
 
+## Pre-Implementation: Load Learnings
+
+実装・修正作業を開始する前に、以下の学習を読み込んで適用する。
+
+### Step 1: Serena Memory から学習を読み込む
+
+```
+mcp__plugin_serena_serena__list_memories()
+```
+
+以下の Memory が存在すれば読み込む:
+- `coderabbit-learnings.md` — CodeRabbit レビューからの学習
+- `user-feedback-patterns.md` — ユーザーフィードバックからの学習
+- `quality-check-learnings.md` — 品質チェックからの学習
+
+### Step 2: ワークスペースの学習を確認
+
+プロンプトで `<work-dir>` が提供されている場合、以下のファイルが存在すれば読み込む:
+- `<work-dir>/USER_FEEDBACK.md` — 今回セッションのユーザーフィードバック
+- `<work-dir>/REVIEW_RESULT.md` — 今回セッションの CodeRabbit レビュー結果
+
+### Step 3: 学習ルールを適用
+
+読み込んだ学習から以下のルールを抽出し、実装全体に適用:
+- **命名規則**: 変数名、メソッド名のスタイル
+- **コードスタイル**: 静的メソッド呼び出し、末尾カンマ等
+- **よくある間違い**: 過去に指摘されたパターンを避ける
+- **レビュー指摘パターン**: 同じ種類の問題を作らない
+
 ## Your Role
 
 ### For new implementation:
+- **First**, execute the "Pre-Implementation: Load Learnings" steps above.
 - Read the work plan (`PLAN.md`) and test cases (`TEST_CASES.md`) from the paths provided in your prompt.
 - Treat TEST_CASES.md as a TODO list and work through it one test at a time.
 - Implement following strict TDD methodology (Red → Green → Refactor).
 
 ### For incremental fixes:
+- **First**, execute the "Pre-Implementation: Load Learnings" steps above.
+- **Second**, run `task --list-all` to detect the task runner (same as new implementation). You MUST use `task` commands for ALL test executions.
 - Read the quality check results (`QUALITY_RESULT.md`) or review results (`REVIEW_RESULT.md`) from the paths provided in your prompt.
 - Also read the original plan (`PLAN.md`) for context.
 - Fix only the issues identified. Do not refactor unrelated code.
 - Even when fixing issues, follow the TDD cycle: first reproduce the problem with a failing test, then fix it, then confirm green.
+- **CRITICAL**: After fixing, you MUST run tests using `task test` (or the appropriate task command). Do NOT use `composer test`, `npm test`, or other runners if `task` is available.
 
 ## TDD Cycle (Practical Steps)
 
