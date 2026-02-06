@@ -14,24 +14,68 @@ Read `STATE.json` from the workspace directory and retrieve the `baseBranch` fie
 }
 ```
 
-**Fallback**: If `baseBranch` is not present in `STATE.json` (legacy workspace), the `user-review` skill will perform automatic detection.
+## Step 2: Launch difit Review
 
-## Step 2: Launch difit-based Review
-
-Launch the `user-review` skill with the base branch information:
+Launch the `difit` skill to open a browser-based diff review:
 
 ```
-Skill("user-review", args="<work-dir> --base-branch=<baseBranch>")
+Skill("difit", args="HEAD <baseBranch>")
 ```
 
-**Important**: 
-- Wait for skill completion. Do NOT run in background.
-- The skill will launch difit in the browser and wait for user interaction.
-- Timeout is handled within the skill (10 minutes with retry option).
+- `HEAD` and `<baseBranch>` are passed as-is. The difit skill handles `HEAD` → `@` conversion internally.
+- Timeout (10 minutes) is managed within the difit skill.
 
-## Step 3: Present Summary (After Review Completion)
+**Important**: Wait for skill completion. Do NOT run in background.
 
-After the `user-review` skill completes, present a concise summary to the user:
+## Step 3: Handle Timeout
+
+If the difit skill reports a timeout, present retry options via `AskUserQuestion`:
+
+- 「レビューを継続する」 — Re-run difit (go back to Step 2).
+- 「レビュー完了として続行」 — Treat as APPROVED and proceed to Step 5.
+
+## Step 4: Determine Review Result
+
+Inspect the difit skill's return value:
+
+- **`"No user feedback. It is APPROVED."`** → Status is **APPROVED**.
+- **Starts with `"There is user feedback."`** → Status is **CHANGES_REQUESTED**. The text following this line is the feedback content.
+
+## Step 5: Write USER_FEEDBACK.md
+
+Write `<work-dir>/USER_FEEDBACK.md` based on the review result. This file is consumed by:
+- `tdd-implementer` (reads it autonomously for feedback patterns)
+- `feedback-validator` (receives it as input)
+- Phase 9 learning sub-agent (references it for session learnings)
+
+### When APPROVED
+
+```markdown
+# User Feedback
+
+## Status
+APPROVED
+```
+
+### When CHANGES_REQUESTED
+
+```markdown
+# User Feedback
+
+## Status
+CHANGES_REQUESTED
+
+## Round N Feedback (<timestamp>)
+<difit feedback content as-is>
+```
+
+- **Round number**: If `USER_FEEDBACK.md` already exists, find the highest round number and increment by 1. Otherwise, start at 1.
+- **Timestamp**: Use ISO 8601 format (e.g., `2026-02-06T10:30:00Z`).
+- **Feedback content**: Paste the difit output as-is. Do NOT attempt structured parsing — LLM sub-agents can interpret raw text.
+
+## Step 6: Present Summary (After Review Completion)
+
+Present a concise summary to the user:
 
 - List of all created/modified files with a brief description of each change.
 - Key implementation decisions that were made.
@@ -40,31 +84,13 @@ After the `user-review` skill completes, present a concise summary to the user:
 
 **Note**: This summary is presented AFTER difit review completes, not during. This ensures the user can focus on the browser-based review first.
 
-## Step 4: Process Feedback
-
-Read `<work-dir>/USER_FEEDBACK.md` and check the status.
+## Step 7: Process Feedback
 
 ### Status: APPROVED
 
 Proceed to Phase 9 (Final Report).
 
 ### Status: CHANGES_REQUESTED
-
-#### Record Feedback Round
-
-Record feedback in USER_FEEDBACK.md with round number:
-
-```markdown
-## Round N Feedback (2026-02-04T10:30:00Z)
-
-### Item 1: <title>
-- **Issue**: <description>
-- **Category**: naming / style / logic / design
-
-### Item 2: ...
-```
-
-**Note**: tdd-implementer autonomously reads `<work-dir>/USER_FEEDBACK.md` and references past feedback patterns.
 
 #### Validate Feedback
 
@@ -80,7 +106,7 @@ Before applying fixes, validate the feedback by launching the `feedback-validato
    - **Concern or Needs Discussion exists**: Present the concerns/options to the user via `AskUserQuestion` with choices:
      - 「元のフィードバックで進める」 — Apply the original feedback as-is.
      - 「AIの提案を採用する」 — Use the alternative suggested by the validator.
-     - 「フィードバックを修正する」 — Revise the feedback (return to Step 4 with CHANGES_REQUESTED and updated feedback).
+     - 「フィードバックを修正する」 — Revise the feedback (return to Step 7 with CHANGES_REQUESTED and updated feedback).
 
 #### Apply Fixes
 
@@ -98,7 +124,7 @@ For each feedback item (1 to N):
 3. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
    ```
    fix: <description of the change> [ISSUE-NUMBER]
-   
+
    ユーザーフィードバック対応: <original feedback description>
    ```
 4. Move to next item.
