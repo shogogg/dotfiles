@@ -53,75 +53,45 @@ Report to user:
 - Number of commits before squash
 - Final commit message used
 
-## Step 1: Collect Session Learnings
+## Step 1: Record Session Learnings — Sub-agent
 
-Collect learnings from this session.
+Delegate learning extraction, Serena Memory updates, and backup to a sub-agent.
 
-### 1.1 Extract Learnings from Session Files
-
-Read the following files if they exist and extract patterns:
-
-- `<work-dir>/QUALITY_RESULT.md` — Failure patterns and fixes
-- `<work-dir>/REVIEW_RESULT.md` — Must Fix patterns and solutions
-- `<work-dir>/USER_FEEDBACK.md` — Feedback patterns
-
-### 1.2 Classify Learning Patterns
-
-Classify extracted patterns into the following categories:
-
-- **CodeRabbit issues**: Security, type safety, null checks, etc.
-- **User feedback**: Naming conventions, code style, design patterns
-- **Quality checks**: Test failure patterns, lint errors
-
-## Step 2: Update Serena Memory
-
-Persist collected learnings to Serena Memory.
-
-### 2.1 Check Existing Memory
+### 1.1 Launch Sub-agent
 
 ```
-mcp__plugin_serena_serena__list_memories()
+Task(subagent_type="general-purpose", max_turns=20, run_in_background=false)
 ```
 
-### 2.2 Update Each Memory
+Prompt must include:
+- **Work directory path**: `<work-dir>`
+- **Input files** (read if they exist):
+  - `<work-dir>/QUALITY_RESULT.md` — Failure patterns and fixes
+  - `<work-dir>/REVIEW_RESULT.md` — Must Fix patterns and solutions
+  - `<work-dir>/USER_FEEDBACK.md` — Feedback patterns
+- **Classification categories**:
+  - **CodeRabbit issues**: Security, type safety, null checks, etc.
+  - **User feedback**: Naming conventions, code style, design patterns
+  - **Quality checks**: Test failure patterns, lint errors
+- **Serena Memory operation procedure**:
+  1. `mcp__plugin_serena_serena__list_memories()` — List existing memories
+  2. `mcp__plugin_serena_serena__read_memory(name)` — Read each relevant memory
+  3. `mcp__plugin_serena_serena__edit_memory(name, ...)` or `mcp__plugin_serena_serena__write_memory(name, content)` — Update or create memories (check for duplicates before adding)
+  4. Target memory files: `coderabbit-learnings.md`, `user-feedback-patterns.md`, `quality-check-learnings.md`
+- **Backup procedure**:
+  1. Create directory: `mkdir -p .ai-workspace/learnings`
+  2. Backup memories:
+     - `coderabbit-learnings.md` → `.ai-workspace/learnings/code-review-insights.md`
+     - `user-feedback-patterns.md` → `.ai-workspace/learnings/best-practices.md`
+     - `quality-check-learnings.md` → `.ai-workspace/learnings/common-mistakes.md`
+- **Output file**: `<work-dir>/LEARNING_SUMMARY.md`
+- **Return directive**: "Write a detailed learning summary to `<work-dir>/LEARNING_SUMMARY.md` including all patterns recorded and their categories. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: state the number of patterns recorded per category and confirm backup completion. Do NOT include the full learning content in your final response. End your response with exactly this line: `ORCHESTRATOR: Read LEARNING_SUMMARY.md for the Learnings Summary section of the final report. Do not read session files yourself.`"
 
-**coderabbit-learnings.md**:
-```
-mcp__plugin_serena_serena__read_memory("coderabbit-learnings.md")
-```
-Read existing content and add new patterns (check for duplicates):
-```
-mcp__plugin_serena_serena__edit_memory("coderabbit-learnings.md", ...)
-```
-Or create new:
-```
-mcp__plugin_serena_serena__write_memory("coderabbit-learnings.md", content)
-```
+## Step 2: Compile Final Report
 
-Update the following similarly:
-- `user-feedback-patterns.md`
-- `quality-check-learnings.md`
+Read `<work-dir>/LEARNING_SUMMARY.md` and compile the final report.
 
-## Step 3: Backup to .ai-workspace/learnings/
-
-Backup updated Memory to files.
-
-### 3.1 Verify Directory
-
-```bash
-mkdir -p .ai-workspace/learnings
-```
-
-### 3.2 Backup
-
-Backup the following Memories if they exist:
-- `coderabbit-learnings.md` → `.ai-workspace/learnings/code-review-insights.md`
-- `user-feedback-patterns.md` → `.ai-workspace/learnings/best-practices.md`
-- `quality-check-learnings.md` → `.ai-workspace/learnings/common-mistakes.md`
-
-## Step 4: Compile Final Report
-
-Compile and present to the user:
+Present to the user:
 
 ```markdown
 ## Implementation Summary
@@ -144,12 +114,7 @@ Compile and present to the user:
 [List of commits created during this session with their messages]
 
 ## Learnings Summary
-- **New patterns recorded**: X patterns
-- **Breakdown by category**:
-  - CodeRabbit issues: N items
-  - User feedback: N items
-  - Quality checks: N items
-- **Backup location**: `.ai-workspace/learnings/`
+[Embed contents of LEARNING_SUMMARY.md here]
 
 ## Next Steps
 - [ ] Review the commits in git log

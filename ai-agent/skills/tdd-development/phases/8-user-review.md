@@ -66,6 +66,22 @@ Record feedback in USER_FEEDBACK.md with round number:
 
 **Note**: tdd-implementer autonomously reads `<work-dir>/USER_FEEDBACK.md` and references past feedback patterns.
 
+#### Validate Feedback
+
+Before applying fixes, validate the feedback by launching the `feedback-validator` sub-agent:
+
+1. **Launch validator**:
+   - **Input**: Feedback items from `USER_FEEDBACK.md`, `<work-dir>/PLAN.md`, `<work-dir>/REVIEW_RESULT.md` (if exists), and source files referenced in the feedback.
+   - **Output file**: `<work-dir>/FEEDBACK_VALIDATION.md`
+   - **Return directive**: "Write validation results to the output file. Return ONLY a brief summary (2-3 sentences) stating the count of Valid/Concern/Needs Discussion items."
+
+2. **Read validation results** from `<work-dir>/FEEDBACK_VALIDATION.md`:
+   - **All Valid**: Proceed to "Apply Fixes" below.
+   - **Concern or Needs Discussion exists**: Present the concerns/options to the user via `AskUserQuestion` with choices:
+     - 「元のフィードバックで進める」 — Apply the original feedback as-is.
+     - 「AIの提案を採用する」 — Use the alternative suggested by the validator.
+     - 「フィードバックを修正する」 — Revise the feedback (return to Step 4 with CHANGES_REQUESTED and updated feedback).
+
 #### Apply Fixes
 
 **Fix each feedback item individually and commit each one:**
@@ -90,28 +106,6 @@ For each feedback item (1 to N):
 After all feedback items are resolved:
 1. Reset `phase6RetryCount` to 0 in `STATE.json`.
 2. Return to Phase 6.
-
-## Recording Learnings
-
-After processing user feedback, analyze patterns and record learnings:
-
-1. **Record to Serena Memory**:
-   ```
-   mcp__plugin_serena_serena__read_memory("user-feedback-patterns.md")
-   ```
-   Read existing content and add new patterns:
-   ```
-   mcp__plugin_serena_serena__edit_memory("user-feedback-patterns.md", ...)
-   ```
-   Or create new:
-   ```
-   mcp__plugin_serena_serena__write_memory("user-feedback-patterns.md", content)
-   ```
-
-2. **Content to record**:
-   - Feedback trends (e.g., naming conventions, code style, design patterns)
-   - User-specific preferences
-   - Checkpoints for preventing recurrence
 
 **Critical Rule**: Only explicit approval in `USER_FEEDBACK.md` (Status: APPROVED) constitutes approval.
 

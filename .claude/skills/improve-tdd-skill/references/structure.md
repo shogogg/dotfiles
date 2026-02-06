@@ -52,12 +52,13 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 ph
 - **Key Sections**: Test cases per unit, Unresolved Questions
 
 ### Phase 4: Approval Gate
-- **Executor**: Main agent
+- **Executor**: Main agent + Sub-agent (feedback-validator)
 - **Key Actions**:
   - Resolve unresolved questions
   - Present summary to user
   - Open files in IDE
   - Get explicit approval
+  - **Feedback validation**: When user requests changes, validate feedback via feedback-validator before applying
 
 ### Phase 5: Implementation
 - **Executor**: Sub-agent (tdd-implementer)
@@ -75,28 +76,31 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 ph
 - **Control**: `retryCount` in STATE.json
 
 ### Phase 7: Code Review
-- **Executor**: Sub-agent (coderabbit-reviewer)
+- **Executor**: Sub-agent (coderabbit-reviewer, **background execution**)
 - **Output**: `<work-dir>/REVIEW_RESULT.md`
 - **Key Actions**:
-  - Run CodeRabbit review
+  - Launch CodeRabbit review in background (`run_in_background: true`)
+  - Poll output_file every ~30 seconds for completion
+  - Every 5 minutes, ask user to continue waiting or abort
   - Classify findings (Must Fix, Consider, Ignorable)
   - Fix Must Fix items and return to Phase 6
 - **Control**: `cycleCount` (max 3 cycles)
 
 ### Phase 8: User Review
-- **Executor**: Skill (user-review)
+- **Executor**: Skill (user-review) + Sub-agent (feedback-validator)
 - **Key Actions**:
   - Launch difit for visual diff review
   - Handle user feedback
+  - **Feedback validation**: When user requests changes, validate feedback via feedback-validator before applying
   - Return to Phase 6 if fixes needed
 
 ### Phase 9: Final Report
-- **Executor**: Main agent + Sub-agent
+- **Executor**: Main agent + Sub-agent (general-purpose)
 - **Key Actions**:
   - Squash commits (optional)
-  - Generate summary
-  - Capture learnings to Serena memory
-  - Record what worked/didn't work
+  - Delegate learning capture to sub-agent (extract patterns, update Serena Memory, backup)
+  - Sub-agent writes `LEARNING_SUMMARY.md`
+  - Main agent compiles final report using `LEARNING_SUMMARY.md`
 
 ## State Management
 
@@ -143,6 +147,11 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 ph
 - **Section**: Learning capture steps
 - **Considerations**: What to record, storage location, application timing
 
+### Feedback Validation
+- **Files**: `phases/4-approval-gate.md`, `phases/8-user-review.md`
+- **Agent**: `ai-agent/agents/feedback-validator.md`
+- **Parameters**: Evaluation criteria, classification thresholds, output format
+
 ### Profile Management
 - **File**: `phases/1-exploration.md`
 - **Section**: Step 1 (Project Profile Check)
@@ -164,5 +173,7 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 ph
     ├── PLAN.md
     ├── TEST_CASES.md
     ├── QUALITY_RESULT.md
-    └── REVIEW_RESULT.md
+    ├── REVIEW_RESULT.md
+    ├── FEEDBACK_VALIDATION.md
+    └── LEARNING_SUMMARY.md
 ```

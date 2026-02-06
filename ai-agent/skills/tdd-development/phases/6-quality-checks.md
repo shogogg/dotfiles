@@ -118,17 +118,6 @@ After successful commit, if `firstCommitHash` is not yet set in `STATE.json`:
 
 2. Update `STATE.json` to add `firstCommitHash` field (only if not already present).
 
-## Step 5: Record Learnings (Optional)
-
-If learnings were gained during Quality Checks, record them in Serena Memory:
-
-- Test failure patterns and their solutions
-- Project-specific notes
-
-```
-mcp__plugin_serena_serena__write_memory("quality-check-learnings.md", content)
-```
-
 ## State Update
 
 Update `STATE.json`: set `currentPhase` to `7`.

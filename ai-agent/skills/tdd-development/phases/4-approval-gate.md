@@ -35,9 +35,19 @@ Use `AskUserQuestion` to ask the user for explicit approval with two choices:
 
 If the user selects "修正を依頼する":
 1. Collect the requested changes from the user.
-2. Launch the appropriate sub-agent (`task-planner` / `unit-test-designer`) to apply the changes.
+2. **Validate feedback** by launching the `feedback-validator` sub-agent:
+   - **Input**: User's change requests, `<work-dir>/PLAN.md`, `<work-dir>/TEST_CASES.md`, `<work-dir>/EXPLORATION_REPORT.md`, and any source files referenced in the feedback.
+   - **Output file**: `<work-dir>/FEEDBACK_VALIDATION.md`
+   - **Return directive**: "Write validation results to the output file. Return ONLY a brief summary (2-3 sentences) stating the count of Valid/Concern/Needs Discussion items."
+3. Read `<work-dir>/FEEDBACK_VALIDATION.md` and check for "Concern" or "Needs Discussion" items:
+   - **All Valid**: Proceed to step 4.
+   - **Concern or Needs Discussion exists**: Present the concerns/options to the user via `AskUserQuestion` with choices:
+     - 「元のフィードバックで進める」 — Apply the original feedback as-is.
+     - 「AIの提案を採用する」 — Use the alternative suggested by the validator.
+     - 「フィードバックを修正する」 — Revise the feedback (returns to step 1).
+4. Launch the appropriate sub-agent (`task-planner` / `unit-test-designer`) to apply the (possibly revised) changes.
    - **Return directive for sub-agents**: "Apply the requested changes to the file. Return ONLY a brief summary (2-3 sentences) of what was changed. Do NOT include the full file content in your final response."
-3. Return to Step 2 to present the updated summary again.
+5. Return to Step 2 to present the updated summary again.
 
 **Critical Rule**: Only an explicit selection of "承認する" constitutes approval. Answering questions, providing comments, or giving feedback does NOT count as approval. The workflow MUST NOT proceed to Phase 5 without the explicit approval selection.
 

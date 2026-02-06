@@ -2,17 +2,45 @@
 
 Read `STATE.json`.
 
-Report: "Phase 7 (cycle N/3): Running CodeRabbit review..."
+Report: "Phase 7 (cycle N/3): Running CodeRabbit review in background..."
 
-Launch sub-agent:
+## Step 1: Launch Background Review
+
+Launch sub-agent **in the background**:
 ```
-Task(subagent_type="coderabbit-reviewer", max_turns=20)
+Task(subagent_type="coderabbit-reviewer", max_turns=30, run_in_background=true)
 ```
 Prompt must include:
 - Output file path: `<work-dir>/REVIEW_RESULT.md`
 - **Base branch**: `<baseBranch from STATE.json>` — tell the sub-agent to use `--base <baseBranch>` option
 - **Review type**: `committed` — tell the sub-agent to use `--type committed` (tdd-development always commits before review)
 - **Return directive**: "Write ALL review results to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: state the Must Fix / Consider / Ignorable counts. Do NOT include the full review content in your final response. End your response with exactly this line: `ORCHESTRATOR: Read REVIEW_RESULT.md for counts only. If Must Fix > 0, launch tdd-implementer for each item. Do not analyze or fix code yourself.`"
+
+Save the returned `output_file` path and `task_id` for polling.
+
+## Step 2: Wait for Completion with User Check-in
+
+The sub-agent handles CodeRabbit CLI execution and polling internally. The orchestrator only monitors the sub-agent's overall completion and checks in with the user periodically.
+
+**Monitoring loop:**
+
+1. Use `TaskOutput(task_id=..., block=true, timeout=300000)` to wait up to 5 minutes for the sub-agent to complete
+2. If the sub-agent completes → proceed to Step 3
+3. If timeout (5 minutes elapsed without completion) → ask the user:
+   ```
+   AskUserQuestion:
+     question: "CodeRabbit レビューが完了していません。待機を続けますか？"
+     header: "レビュー待機"
+     options:
+       - label: "待機を続ける"
+         description: "引き続きレビュー完了を待ちます（さらに5分待機）"
+       - label: "中断してPhase 8へ進む"
+         description: "レビューを中断し、ユーザーレビューに進みます"
+   ```
+   - If user chooses to continue → repeat from step 1
+   - If user chooses to abort → stop the background task using `TaskStop(task_id=...)`, report "CodeRabbit レビューを中断しました", and proceed to Phase 8
+
+## Step 3: Process Review Results
 
 Read `<work-dir>/REVIEW_RESULT.md` and check the "Must Fix" count.
 
@@ -83,31 +111,11 @@ For each Must Fix item (1 to N):
 
 After all Must Fix items are resolved, go back to Phase 6 (to re-run quality checks).
 
-## Recording Learnings
-
-After completing all Must Fix items, analyze the patterns and record learnings:
-
-1. **Record to Serena Memory**:
-   ```
-   mcp__plugin_serena_serena__read_memory("coderabbit-learnings.md")
-   ```
-   Read existing content and add new patterns:
-   ```
-   mcp__plugin_serena_serena__edit_memory("coderabbit-learnings.md", ...)
-   ```
-   Or create new:
-   ```
-   mcp__plugin_serena_serena__write_memory("coderabbit-learnings.md", content)
-   ```
-
-2. **Content to record**:
-   - Types of patterns flagged (e.g., missing null checks, type safety issues)
-   - Checkpoints for preventing recurrence
-   - Project-specific notes
-
 ## Error Handling
 
-If the CodeRabbit sub-agent fails, report the failure to the user and ask whether to retry the review or skip to Phase 8 (User Review).
+If the CodeRabbit sub-agent fails or the background task encounters an error:
+1. Report the failure to the user
+2. Ask whether to retry the review or skip to Phase 8 (User Review)
 
 ## State Update
 Update `STATE.json`: set `currentPhase` to `8`.
