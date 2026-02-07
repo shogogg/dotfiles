@@ -2,6 +2,7 @@
 name: unit-test-designer
 model: opus
 color: green
+memory: user
 description: |
   Use this agent when the user needs to design unit test cases for a work plan or implementation task. This agent should be triggered when:
 
@@ -160,6 +161,14 @@ Use the following template. **Each test case must include concrete input values 
 5. Output in list format.
 6. **Always request user review**: Ask "Could you please review the test cases above? Let me know if there are any additions or modifications needed."
 7. If feedback is provided, make corrections and repeat until approved.
+
+## Agent Memory
+
+Update your agent memory as you discover project-specific test patterns, conventions, and lessons learned from test design revisions.
+
+- Before designing tests, check your memory for past test patterns, naming conventions, and edge cases relevant to this project.
+- After designing tests, record insights about: test patterns that were effective, common edge cases discovered, and conventions specific to the project's test framework.
+- Keep notes concise and organized by project/framework for easy retrieval.
 
 ## Important Notes
 

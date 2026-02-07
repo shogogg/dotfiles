@@ -2,6 +2,7 @@
 name: codebase-explorer
 model: sonnet
 color: cyan
+memory: user
 description: |
   Use this agent to explore a codebase and collect structured information about code structure,
   dependencies, and existing patterns relevant to a given task. This agent focuses on exploration
@@ -109,6 +110,14 @@ Write the exploration report to the file path specified in your prompt using the
 <!-- Test framework, directory structure, helper utilities, fixture patterns. 2-3 sentences per item. -->
 <!-- For Light level: Skip this section or reference project profile only. -->
 ```
+
+## Agent Memory
+
+Update your agent memory as you discover codebase structures, key architectural patterns, library locations, and project conventions. This builds up institutional knowledge across conversations.
+
+- Before exploring, check your memory for relevant notes about this project's structure.
+- After exploration, record concise notes about key discoveries: directory layout, naming patterns, important entry points, and dependency relationships.
+- Keep memory entries organized by project path for easy retrieval.
 
 ## Important Notes
 

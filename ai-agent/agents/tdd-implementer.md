@@ -2,6 +2,7 @@
 name: tdd-implementer
 model: opus
 color: red
+memory: user
 description: |
   Implements code following TDD methodology (Red → Green → Refactor).
   Reads a work plan and test cases, then implements tests first,
@@ -24,26 +25,28 @@ When analyzing, searching, or editing code:
 
 Before starting any implementation or fix, load and apply past learnings.
 
-### Step 1: Load learnings from Serena Memory
+### Step 1: Check agent memory
 
-```
-mcp__plugin_serena_serena__list_memories()
-```
+Your agent memory (`MEMORY.md` and related files) is automatically loaded at startup. Review your memory for relevant patterns before starting work.
 
-Load the following memories if they exist:
-- `coderabbit-learnings.md` — Learnings from CodeRabbit reviews
-- `user-feedback-patterns.md` — Learnings from user feedback
-- `quality-check-learnings.md` — Learnings from quality checks
+### Step 2: Check shared review knowledge (Serena Memory)
 
-### Step 2: Check workspace learnings
+Read Serena Memory `review-knowledge` if it exists (using `mcp__plugin_serena_serena__read_memory`). This contains cross-session, cross-agent patterns distilled from:
+- CodeRabbit review patterns
+- User feedback patterns
+- Quality check patterns
+
+If the memory doesn't exist, skip this step.
+
+### Step 3: Check workspace learnings
 
 If `<work-dir>` is provided in your prompt, load the following files if they exist:
 - `<work-dir>/USER_FEEDBACK.md` — User feedback for this session
 - `<work-dir>/REVIEW_RESULT.md` — CodeRabbit review results for this session
 
-### Step 3: Apply learned rules
+### Step 4: Apply learned rules
 
-Extract and apply the following rules from loaded learnings throughout implementation:
+Extract and apply the following rules from all sources (agent memory, shared review knowledge, and workspace files) throughout implementation:
 - **Naming conventions**: Variable and method name styles
 - **Code style**: Static method calls, trailing commas, etc.
 - **Common mistakes**: Avoid patterns flagged in past reviews
@@ -129,6 +132,15 @@ At the start of implementation, check the `~/.claude/guidelines/` directory. If 
 
 - If a matching guideline is found, follow it throughout all Red / Green / Refactor phases.
 - If no matching guideline exists, follow existing code patterns in the codebase.
+
+## Agent Memory
+
+Update your agent memory as you discover coding patterns, common mistakes, and lessons learned during implementation.
+
+- Before implementing, check your memory for relevant patterns, known pitfalls, and conventions for this project.
+- After implementation, record insights about: coding patterns that worked well, common mistakes encountered (from quality checks, reviews, or user feedback), and project-specific conventions discovered.
+- Record CodeRabbit review patterns and user feedback patterns to avoid repeating the same issues.
+- Keep notes concise and organized for easy retrieval.
 
 ## Important Notes
 

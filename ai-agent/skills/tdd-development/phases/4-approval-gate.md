@@ -51,5 +51,20 @@ If the user selects "修正を依頼する":
 
 **Critical Rule**: Only an explicit selection of "承認する" constitutes approval. Answering questions, providing comments, or giving feedback does NOT count as approval. The workflow MUST NOT proceed to Phase 5 without the explicit approval selection.
 
+## Step 4: Create Tasks from Implementation Units
+
+After "承認する" is selected, create Tasks to track implementation progress.
+
+1. Read `<work-dir>/PLAN.md` and extract all Implementation Units.
+2. For each Implementation Unit, call `TaskCreate`:
+   - `subject`: `"Implement Unit N: <unit-name>"`
+   - `description`: Include the unit's Files, Changes, and Dependencies from PLAN.md
+   - `activeForm`: `"Implementing Unit N: <unit-name>"`
+3. If there are no Implementation Units (single-plan without units), create a single Task:
+   - `subject`: `"Implement: <task-title>"`
+   - `description`: Include the plan's Affected Files and key changes
+   - `activeForm`: `"Implementing: <task-title>"`
+4. Call `TaskList` to confirm all Tasks were created successfully.
+
 ## State Update
 Update `STATE.json`: set `currentPhase` to `5`.

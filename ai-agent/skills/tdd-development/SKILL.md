@@ -2,7 +2,7 @@
 name: tdd-development
 description: Orchestrates a structured TDD development workflow including codebase exploration, work planning, test design, implementation, quality checks (tests/lint/format), and CodeRabbit code review. Triggers when the user wants to implement a feature, fix a bug, refactor code, or requests TDD-based development. Also triggers on keywords like "develop", "implement", "build", "code this".
 context: inherit
-allowed-tools: Task, Skill, Bash, Read, Write, mcp__jetbrains__open_file_in_editor
+allowed-tools: Task, Skill, Bash, Read, Write, TaskCreate, TaskUpdate, TaskList, mcp__jetbrains__open_file_in_editor
 ---
 
 # /coding Workflow Orchestrator
@@ -19,6 +19,7 @@ The main agent is **strictly an orchestrator** — it delegates all substantive 
 - Use `Read` **only** for workspace files: `STATE.json`, `PLAN.md`, `TEST_CASES.md`, `QUALITY_RESULT.md`, `REVIEW_RESULT.md`
 - Use `Write` **only** for `STATE.json`
 - Use `Bash` **only** for git operations and workspace directory management
+- Use `TaskCreate`/`TaskUpdate`/`TaskList` to track Implementation Units and fix items (NOT for phase tracking)
 
 ### MUST NOT
 - Read, search, or explore source code files directly — delegate to sub-agents
@@ -82,3 +83,21 @@ Read each phase document **only when you are ready to execute that phase**. Do n
 - Phase 8 user review: If user requests fixes → fix → return to Phase 6
 - Phase 8→6 return: Reset Phase 6 retry counter, does NOT count against cycleCount
 - State file: `<work-dir>/STATE.json` (initialize in Phase 0)
+
+## Tasks Usage
+
+Use Claude Code's `TaskCreate`/`TaskUpdate`/`TaskList` tools for **work-item-level** progress tracking, NOT phase-level tracking (that is STATE.json's role).
+
+### Principles
+- **Do NOT use Tasks for phase tracking** — STATE.json handles phase transitions
+- **Create Tasks after Phase 4 approval** — from Implementation Units in PLAN.md
+- **Create Tasks for fix items** — in Phase 7 (Must Fix) and Phase 8 (User Feedback)
+- **Only the orchestrator manages Tasks** — sub-agents must NOT call TaskCreate/TaskUpdate/TaskList
+
+### Naming Convention
+
+| Type | Subject Format | Example |
+|------|---------------|---------|
+| Implementation Unit | `Implement Unit N: <name>` | `Implement Unit 1: UserService CRUD` |
+| Code Review Fix | `Fix CR-<cycle>-<M>: <title>` | `Fix CR-1-2: Missing null check` |
+| User Feedback Fix | `Fix UF-<round>-<M>: <title>` | `Fix UF-1-1: Error message in Japanese` |

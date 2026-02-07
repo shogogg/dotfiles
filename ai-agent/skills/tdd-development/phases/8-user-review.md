@@ -2,27 +2,29 @@
 
 Report: "Phase 8: ユーザーレビューを開始します..."
 
-## Step 1: Read Base Branch from State
+## Step 1: Read Start Commit Hash from State
 
-Read `STATE.json` from the workspace directory and retrieve the `baseBranch` field.
+Read `STATE.json` from the workspace directory and retrieve the `startCommitHash` field.
 
 ```json
 {
   "currentPhase": 8,
-  "baseBranch": "origin/main",  // ← Use this value
+  "startCommitHash": "abc1234",  // ← Use this value
   "featureBranch": "feature/my-feature"
 }
 ```
+
+`startCommitHash` is the HEAD at the beginning of the session. Using this ensures only commits made during this session are included in the diff.
 
 ## Step 2: Launch difit Review
 
 Launch the `difit` skill to open a browser-based diff review:
 
 ```
-Skill("difit", args="HEAD <baseBranch>")
+Skill("difit", args="HEAD <startCommitHash>")
 ```
 
-- `HEAD` and `<baseBranch>` are passed as-is. The difit skill handles `HEAD` → `@` conversion internally.
+- `HEAD` and `<startCommitHash>` are passed as-is. The difit skill handles `HEAD` → `@` conversion internally.
 - Timeout (10 minutes) is managed within the difit skill.
 
 **Important**: Wait for skill completion. Do NOT run in background.
@@ -110,24 +112,43 @@ Before applying fixes, validate the feedback by launching the `feedback-validato
 
 #### Apply Fixes
 
+**Launch knowledge distillation in background (parallel with fixes):**
+
+```
+Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
+  prompt="files: <work-dir>/USER_FEEDBACK.md\nmemory: x-coding-best-practices")
+```
+
+This runs in parallel with the fix loop below. Distilled patterns will be available to subsequent fix items via Serena Memory.
+
+**Create Tasks for feedback items:**
+
+Before starting the fix loop, create a Task for each feedback item:
+- For each feedback item (1 to N), call `TaskCreate`:
+  - `subject`: `"Fix UF-<round>-<M>: <title>"` (where `<round>` is the current feedback round number and `<M>` is the item number)
+  - `description`: Include the feedback content from USER_FEEDBACK.md
+  - `activeForm`: `"Fixing UF-<round>-<M>: <title>"`
+
 **Fix each feedback item individually and commit each one:**
 
 For each feedback item (1 to N):
-1. Report: "Addressing feedback item M/N: <title>"
-2. Launch `tdd-implementer` to apply the specific change. Provide:
+1. Call `TaskUpdate(taskId=..., status="in_progress")` for the corresponding Task.
+2. Report: "Addressing feedback item M/N: <title>"
+3. Launch `tdd-implementer` to apply the specific change. Provide:
    - Item details from `USER_FEEDBACK.md`
    - `<work-dir>/PLAN.md` for context
    - **Work directory**: `<work-dir>` (for session-specific learnings reference)
    - **CRITICAL instruction**: "You MUST run `task --list-all` first and use `task` commands for ALL test executions. Do NOT use composer/npm/make if task is available."
    - **SCOPE RESTRICTION**: "Fix ONLY this specific feedback item. Do NOT address multiple items or make unrelated changes. Each item must be a separate commit."
    - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. State which test command you used (must be `task test` if available). Do NOT include full file contents in your final response."
-3. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
+4. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
    ```
    fix: <description of the change> [ISSUE-NUMBER]
 
    ユーザーフィードバック対応: <original feedback description>
    ```
-4. Move to next item.
+5. Call `TaskUpdate(taskId=..., status="completed")` for the corresponding Task.
+6. Move to next item.
 
 After all feedback items are resolved:
 1. Reset `phase6RetryCount` to 0 in `STATE.json`.

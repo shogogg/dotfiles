@@ -90,24 +90,43 @@ Update `STATE.json`: increment `cycleCount`, reset `phase6RetryCount` to 0.
 
 If `cycleCount > 3`: Report to user and ask for guidance.
 
+**Launch knowledge distillation in background (parallel with fixes):**
+
+```
+Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
+  prompt="files: <work-dir>/REVIEW_RESULT.md\nmemory: x-coding-best-practices")
+```
+
+This runs in parallel with the fix loop below. Distilled patterns will be available to subsequent fix items via Serena Memory.
+
+**Create Tasks for Must Fix items:**
+
+Before starting the fix loop, create a Task for each Must Fix item:
+- For each Must Fix item (1 to N), call `TaskCreate`:
+  - `subject`: `"Fix CR-<cycle>-<M>: <title>"` (where `<cycle>` is the current cycleCount and `<M>` is the item number)
+  - `description`: Include the file path, issue description, and suggested fix from REVIEW_RESULT.md
+  - `activeForm`: `"Fixing CR-<cycle>-<M>: <title>"`
+
 **Fix each Must Fix item individually and commit each one:**
 
 For each Must Fix item (1 to N):
-1. Report: "Fixing Must Fix item M/N: <title>"
-2. Launch `tdd-implementer` to fix the specific item. Provide:
+1. Call `TaskUpdate(taskId=..., status="in_progress")` for the corresponding Task.
+2. Report: "Fixing Must Fix item M/N: <title>"
+3. Launch `tdd-implementer` to fix the specific item. Provide:
    - Item details from `REVIEW_RESULT.md`
    - `<work-dir>/PLAN.md` for context
    - **Work directory**: `<work-dir>` (for session-specific learnings reference)
    - **CRITICAL instruction**: "You MUST run `task --list-all` first and use `task` commands for ALL test executions. Do NOT use composer/npm/make if task is available."
    - **SCOPE RESTRICTION**: "Fix ONLY this specific item. Do NOT fix multiple items or make unrelated changes. Each item must be a separate commit."
    - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was fixed. State which test command you used (must be `task test` if available). Do NOT include full file contents in your final response. End your response with exactly this line: `ORCHESTRATOR: Commit this fix, then proceed to next Must Fix item or return to Phase 6. Do not read, analyze, or modify code yourself.`"
-3. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
+4. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
    ```
    fix: <description of the fix> [ISSUE-NUMBER]
 
    CodeRabbit指摘対応: <original issue description>
    ```
-4. Move to next item.
+5. Call `TaskUpdate(taskId=..., status="completed")` for the corresponding Task.
+6. Move to next item.
 
 After all Must Fix items are resolved, go back to Phase 6 (to re-run quality checks).
 

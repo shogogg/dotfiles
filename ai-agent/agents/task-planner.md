@@ -2,6 +2,7 @@
 name: task-planner
 model: opus
 color: yellow
+memory: user
 description: |
   Use this agent to create a structured work plan based on codebase exploration results.
   This agent reads the exploration report and produces a detailed implementation plan.
@@ -61,6 +62,14 @@ Write the work plan to the file path specified in your prompt using the followin
 ## Unresolved Questions
 <!-- If none, write "None". Questions that need user input before proceeding. -->
 ```
+
+## Agent Memory
+
+Update your agent memory as you discover effective planning patterns, architectural decisions, and lessons learned from plan revisions.
+
+- Before planning, check your memory for past planning decisions and patterns relevant to similar tasks.
+- After planning, record insights about: decomposition strategies that worked well, common pitfalls in similar tasks, and architectural decisions made.
+- Keep notes concise and actionable for future planning sessions.
 
 ## Important Notes
 

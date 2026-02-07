@@ -28,3 +28,11 @@ When executing orchestrator-type skills or multi-phase workflows:
 2. **Do not explore, read, or modify source code directly** from the orchestrator. Use sub-agents for codebase exploration, code analysis, implementation, and review.
 3. **Use `Read`/`Write` only for workflow management files** (state files, plan documents, result summaries) — never for source code.
 4. **Sub-agent return directives**: When launching sub-agents, always instruct them to write detailed results to output files and return only a brief completion summary (2-3 sentences) to minimize context consumption.
+
+## Parallel Execution
+
+Aggressively parallelize independent tasks and tool calls to maximize efficiency.
+
+- **Parallel sub-agent launches**: When multiple `Task` tool calls have no dependencies on each other, issue them all in a single message rather than sequentially.
+- **Parallel tool calls**: Similarly, batch independent `Read`, `Glob`, `Grep`, and other tool calls together in one message.
+- **Serialize only when necessary**: Execute sequentially only when a subsequent call depends on the result of a previous one.

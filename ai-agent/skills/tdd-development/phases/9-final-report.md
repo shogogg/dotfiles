@@ -53,43 +53,47 @@ Report to user:
 - Number of commits before squash
 - Final commit message used
 
-## Step 1: Record Session Learnings — Sub-agent
+## Step 1: Comprehensive Knowledge Distillation (Background)
 
-Delegate learning extraction, Serena Memory updates, and backup to a sub-agent.
+Launch the `knowledge-distiller` sub-agent **in background** to distill all session learnings into Serena Memory (`x-coding-best-practices`) while compiling the final report in parallel.
 
-### 1.1 Launch Sub-agent
+### 1.1 Invoke Sub-Agent
 
 ```
-Task(subagent_type="general-purpose", max_turns=20, run_in_background=false)
+Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
+  prompt="files: <work-dir>/QUALITY_RESULT.md <work-dir>/REVIEW_RESULT.md <work-dir>/USER_FEEDBACK.md\nmemory: x-coding-best-practices\noutput: <work-dir>/LEARNING_SUMMARY.md")
 ```
 
-Prompt must include:
-- **Work directory path**: `<work-dir>`
-- **Input files** (read if they exist):
-  - `<work-dir>/QUALITY_RESULT.md` — Failure patterns and fixes
-  - `<work-dir>/REVIEW_RESULT.md` — Must Fix patterns and solutions
-  - `<work-dir>/USER_FEEDBACK.md` — Feedback patterns
-- **Classification categories**:
-  - **CodeRabbit issues**: Security, type safety, null checks, etc.
-  - **User feedback**: Naming conventions, code style, design patterns
-  - **Quality checks**: Test failure patterns, lint errors
-- **Serena Memory operation procedure**:
-  1. `mcp__plugin_serena_serena__list_memories()` — List existing memories
-  2. `mcp__plugin_serena_serena__read_memory(name)` — Read each relevant memory
-  3. `mcp__plugin_serena_serena__edit_memory(name, ...)` or `mcp__plugin_serena_serena__write_memory(name, content)` — Update or create memories (check for duplicates before adding)
-  4. Target memory files: `coderabbit-learnings.md`, `user-feedback-patterns.md`, `quality-check-learnings.md`
-- **Backup procedure**:
-  1. Create directory: `mkdir -p .ai-workspace/learnings`
-  2. Backup memories:
-     - `coderabbit-learnings.md` → `.ai-workspace/learnings/code-review-insights.md`
-     - `user-feedback-patterns.md` → `.ai-workspace/learnings/best-practices.md`
-     - `quality-check-learnings.md` → `.ai-workspace/learnings/common-mistakes.md`
-- **Output file**: `<work-dir>/LEARNING_SUMMARY.md`
-- **Return directive**: "Write a detailed learning summary to `<work-dir>/LEARNING_SUMMARY.md` including all patterns recorded and their categories. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: state the number of patterns recorded per category and confirm backup completion. Do NOT include the full learning content in your final response. End your response with exactly this line: `ORCHESTRATOR: Read LEARNING_SUMMARY.md for the Learnings Summary section of the final report. Do not read session files yourself.`"
+Save the returned `task_id` for later retrieval.
 
-## Step 2: Compile Final Report
+The sub-agent will:
+- Read all available session files (skips any that do not exist)
+- Merge with any patterns already added during Phase 6/7/8 distillation cycles
+- Write consolidated patterns to Serena Memory `x-coding-best-practices`
+- Write `<work-dir>/LEARNING_SUMMARY.md`
 
-Read `<work-dir>/LEARNING_SUMMARY.md` and compile the final report.
+## Step 2: Compile Final Report (Parallel with Step 1)
+
+Begin compiling the final report immediately — do NOT wait for the knowledge distiller to finish.
+
+### 2.0 Gather Tasks Summary
+
+Call `TaskList` to retrieve all Tasks. Group them by naming prefix to populate the "Work Items (Tasks)" section:
+- **Implementation Units**: Tasks with subject starting with `"Implement Unit"` or `"Implement:"`
+- **Code Review Fixes**: Tasks with subject starting with `"Fix CR-"`
+- **User Feedback Fixes**: Tasks with subject starting with `"Fix UF-"`
+
+Count completed vs total for each group.
+
+### 2.1 Wait for Knowledge Distiller
+
+After assembling all other sections of the report, wait for the background distiller to complete:
+
+```
+TaskOutput(task_id=..., block=true, timeout=120000)
+```
+
+Then read `<work-dir>/LEARNING_SUMMARY.md` and embed it in the report.
 
 Present to the user:
 
@@ -109,6 +113,11 @@ Present to the user:
 - **Ignorable**: [count]
 - **User Review**: Approved / Approved after N revision(s)
 - **Cycles used**: N/3
+
+## Work Items (Tasks)
+- **Implementation Units**: <completed>/<total>
+- **Code Review Fixes**: <completed>/<total>
+- **User Feedback Fixes**: <completed>/<total>
 
 ## Commits Created
 [List of commits created during this session with their messages]

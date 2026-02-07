@@ -78,7 +78,16 @@ Proceed to Step 4.
 
 Report the failure details to the user and use `AskUserQuestion` to determine the next action:
 
-1. **AI auto-fix** — Launch `tdd-implementer` sub-agent to fix the issues. Provide:
+1. **AI auto-fix** — Launch knowledge distillation in background (parallel with fixes), then fix:
+
+   **Background distillation:**
+   ```
+   Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
+     prompt="files: <work-dir>/QUALITY_RESULT.md\nmemory: x-coding-best-practices")
+   ```
+   This captures static analysis errors, test failure patterns, and lint issues into Serena Memory for future sessions.
+
+   **Launch `tdd-implementer`** sub-agent to fix the issues. Provide:
    - `<work-dir>/QUALITY_RESULT.md`
    - `<work-dir>/PLAN.md`
    - **Work directory**: `<work-dir>` (for session-specific learnings reference)

@@ -2,6 +2,7 @@
 name: feedback-validator
 model: sonnet
 color: cyan
+memory: user
 description: |
   Use this agent to validate user feedback before applying changes.
   Analyzes whether feedback is technically sound, consistent with the plan,
@@ -73,6 +74,14 @@ Your prompt will provide:
 ```
 
 6. **Return summary**: After writing the file, output a brief summary (2-3 sentences) of the validation results. State the count of each category and highlight any items categorized as "Concern" or "Needs Discussion".
+
+## Agent Memory
+
+Update your agent memory as you discover patterns in user feedback and validation outcomes.
+
+- Before validating, check your memory for recurring feedback patterns and known concerns for this project.
+- After validation, record insights about: common feedback types and their validity, recurring architectural concerns, and user preferences that influenced decisions.
+- Keep notes concise and organized for easy retrieval.
 
 ## Important Notes
 
