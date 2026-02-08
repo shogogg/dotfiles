@@ -9,7 +9,7 @@ Report: "Phase 2: Creating work plan..."
 ## Step 1: Work Plan Creation
 
 Skip this step if `<work-dir>/PLAN.md` is present.
-MUST USE SUB-AGENT "task-planner", max_turns = 20. NEVER WRITE THE PLAN YOURSELF.
+MUST USE SUB-AGENT "task-planner", max_turns = 25. NEVER WRITE THE PLAN YOURSELF.
 
 Prompt must include:
 - The task description from `$ARGUMENTS`
@@ -17,7 +17,7 @@ Prompt must include:
 - Output file path: `<work-dir>/PLAN.md`
 - **Project profile summary** (if available): relevant patterns and conventions
 - **Past learnings summary** (if any were loaded in Phase 1)
-- **Return directive**: "Write the complete plan to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, state the number of implementation units, and note whether there are unresolved questions. Do NOT include the full plan content in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 3. Do not read or analyze the plan yourself.`"
+- **Return directive**: "Write the complete plan (including Test Plan) to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, state the number of implementation units, and note whether there are unresolved questions. Do NOT include the full plan content in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 4. Do not read or analyze the plan yourself.`"
 
 ## Output Template (PLAN.md)
 
@@ -37,6 +37,23 @@ Instruct the sub-agent to follow this structure:
 - **Files**: [affected files]
 - **Changes**: [what to change]
 - **Dependencies**: [other units this depends on, if any]
+- **Dependency Type**: [none / contract / implementation]
+  - `none` — No dependencies; can run in parallel with any unit
+  - `contract` — Depends only on interfaces/types from another unit (can run in parallel once interfaces are defined)
+  - `implementation` — Depends on the full implementation of another unit (must run after that unit completes)
+
+## Test Plan
+
+### <ClassName>::<methodName>
+
+#### Happy Path
+- test_{methodName}_{testCaseName} — <purpose>
+
+#### Boundary / Edge Cases
+- test_{methodName}_{testCaseName} — <purpose>
+
+#### Notes
+- <Test strategy notes: data provider usage, mock targets, special setup, etc.>
 
 ## Unresolved Questions
 - [Any questions for the user, or "None"]
@@ -52,4 +69,4 @@ If the sub-agent fails or returns no output, report the failure to the user with
 Report: "Phase 2 complete: Work plan written to `<work-dir>/PLAN.md`"
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `3`.
+Update `STATE.json`: set `currentPhase` to `4`.

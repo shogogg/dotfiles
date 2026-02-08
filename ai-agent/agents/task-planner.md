@@ -32,7 +32,9 @@ When analyzing or searching code:
 2. **Respect existing patterns**: Follow the codebase's conventions and architecture.
 3. **Testability**: Ensure the plan supports TDD (tests first, then implementation).
 4. **Risk awareness**: Identify potential risks and breaking changes.
-5. **Large task decomposition**: If the task is large, break it into implementation units that can be done sequentially.
+5. **Large task decomposition**: If the task is large, break it into implementation units. Units without dependencies on each other will be implemented in parallel, so classify dependencies accurately.
+6. **Maximize parallelism**: When decomposing into units, explicitly classify each dependency as `contract` (only needs interfaces/types) or `implementation` (needs full implementation). Units with only `contract` dependencies can run in parallel once their interface stubs are created. Prefer designing units to depend on interfaces rather than implementations whenever possible.
+7. **Test plan inclusion**: The work plan MUST include a Test Plan section listing test method names with their purposes.
 
 ## Output
 
@@ -54,7 +56,26 @@ Write the work plan to the file path specified in your prompt using the followin
 <!-- Step-by-step description of how to implement the changes. Be specific about what code to write/modify. -->
 
 ## Implementation Units
-<!-- For large tasks only. Omit if not needed. Each unit should be independently implementable and testable. -->
+<!-- For large tasks only. Omit if not needed. Each unit should be independently implementable and testable.
+     Units without dependencies will be implemented IN PARALLEL. Classify dependencies accurately:
+     - "none": No dependencies, fully independent
+     - "contract (Unit N)": Depends only on interfaces/types from Unit N (parallel after interface stub creation)
+     - "implementation (Unit N)": Depends on full implementation of Unit N (must wait)
+     Design units to maximize parallelism — prefer contract dependencies over implementation dependencies. -->
+
+## Test Plan
+<!-- REQUIRED: List all test methods with their purposes. Group by class and method, categorize by Happy Path / Boundary / Edge Cases. -->
+
+### <ClassName>::<methodName>
+
+#### Happy Path
+- test_{methodName}_{testCaseName} — <purpose>
+
+#### Boundary / Edge Cases
+- test_{methodName}_{testCaseName} — <purpose>
+
+#### Notes
+- <Test strategy notes: data provider usage, mock targets, special setup, etc.>
 
 ## Risks and Notes
 <!-- Potential breaking changes, performance concerns, migration needs, etc. -->

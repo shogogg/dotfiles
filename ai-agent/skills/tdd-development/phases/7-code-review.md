@@ -116,9 +116,9 @@ For each Must Fix item (1 to N):
    - Item details from `REVIEW_RESULT.md`
    - `<work-dir>/PLAN.md` for context
    - **Work directory**: `<work-dir>` (for session-specific learnings reference)
-   - **CRITICAL instruction**: "You MUST run `task --list-all` first and use `task` commands for ALL test executions. Do NOT use composer/npm/make if task is available."
+   - **CRITICAL instruction**: "You MUST run `task --list-all` (go-task CLI, https://taskfile.dev) via the Bash tool first, and use go-task `task` CLI commands for ALL test executions. Do NOT use composer/npm/phpunit/jest/make directly. Note: go-task `task` is a CLI command run via Bash — it is NOT Claude Code's Task tool."
    - **SCOPE RESTRICTION**: "Fix ONLY this specific item. Do NOT fix multiple items or make unrelated changes. Each item must be a separate commit."
-   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was fixed. State which test command you used (must be `task test` if available). Do NOT include full file contents in your final response. End your response with exactly this line: `ORCHESTRATOR: Commit this fix, then proceed to next Must Fix item or return to Phase 6. Do not read, analyze, or modify code yourself.`"
+   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was fixed. State which test command you used (must be go-task `task test` via Bash). Do NOT include full file contents in your final response. End your response with exactly this line: `ORCHESTRATOR: Commit this fix, then proceed to next Must Fix item or return to Phase 6. Do not read, analyze, or modify code yourself.`"
 4. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
    ```
    fix: <description of the fix> [ISSUE-NUMBER]

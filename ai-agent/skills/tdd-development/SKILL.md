@@ -1,13 +1,13 @@
 ---
 name: tdd-development
-description: Orchestrates a structured TDD development workflow including codebase exploration, work planning, test design, implementation, quality checks (tests/lint/format), and CodeRabbit code review. Triggers when the user wants to implement a feature, fix a bug, refactor code, or requests TDD-based development. Also triggers on keywords like "develop", "implement", "build", "code this".
+description: Orchestrates a structured TDD development workflow including codebase exploration, work planning (with test plan), implementation, quality checks (tests/lint/format), and CodeRabbit code review. Triggers when the user wants to implement a feature, fix a bug, refactor code, or requests TDD-based development. Also triggers on keywords like "develop", "implement", "build", "code this".
 context: inherit
 allowed-tools: Task, Skill, Bash, Read, Write, TaskCreate, TaskUpdate, TaskList, mcp__jetbrains__open_file_in_editor
 ---
 
 # /coding Workflow Orchestrator
 
-This skill orchestrates a structured TDD development workflow across 10 phases (Phase 0–9).
+This skill orchestrates a structured TDD development workflow across 9 phases (Phase 0–2, 4–9). Phase 3 (Test Design) has been merged into Phase 2 (Planning).
 
 ## Orchestration Principle
 
@@ -16,7 +16,7 @@ The main agent is **strictly an orchestrator** — it delegates all substantive 
 ### MUST DO
 - Use `Task` tool to launch sub-agents for all exploration, planning, test design, implementation, and review work
 - Use `Skill` tool to invoke other skills (e.g., `run-quality-checks`)
-- Use `Read` **only** for workspace files: `STATE.json`, `PLAN.md`, `TEST_CASES.md`, `QUALITY_RESULT.md`, `REVIEW_RESULT.md`
+- Use `Read` **only** for workspace files: `STATE.json`, `PLAN.md`, `QUALITY_RESULT.md`, `REVIEW_RESULT.md`
 - Use `Write` **only** for `STATE.json`
 - Use `Bash` **only** for git operations and workspace directory management
 - Use `TaskCreate`/`TaskUpdate`/`TaskList` to track Implementation Units and fix items (NOT for phase tracking)
@@ -35,8 +35,7 @@ Copy this checklist and track progress:
 Workflow Progress:
 - [ ] Phase 0: Pre-checks
 - [ ] Phase 1: Exploration
-- [ ] Phase 2: Planning
-- [ ] Phase 3: Test Design
+- [ ] Phase 2: Planning (includes Test Plan)
 - [ ] Phase 4: Approval Gate
 - [ ] Phase 5: TDD Implementation
 - [ ] Phase 6: Quality Checks
@@ -65,14 +64,13 @@ Read each phase document **only when you are ready to execute that phase**. Do n
 
 1. [Pre-checks](phases/0-pre-checks.md) — Clarify task, create branch, verify tools, initialize workspace
 2. [Exploration](phases/1-exploration.md) — Load past learnings, check profile, explore codebase
-3. [Planning](phases/2-planning.md) — Create work plan based on exploration results
-4. [Test Design](phases/3-test-design.md) — Design test cases based on work plan
-5. [Approval Gate](phases/4-approval-gate.md) — Present plan & tests to user for approval
-6. [Implementation](phases/5-implementation.md) — Implement code following TDD methodology
-7. [Quality Checks](phases/6-quality-checks.md) — Run tests, lint, formatting (max 3 retries)
-8. [Code Review](phases/7-code-review.md) — CodeRabbit review (max 3 cycles)
-9. [User Review](phases/8-user-review.md) — Present changes to user for approval
-10. [Final Report](phases/9-final-report.md) — Summarize results and present to user
+3. [Planning](phases/2-planning.md) — Create work plan and test plan based on exploration results
+4. [Approval Gate](phases/4-approval-gate.md) — Present plan (including test plan) to user for approval
+5. [Implementation](phases/5-implementation.md) — Implement code following TDD methodology
+6. [Quality Checks](phases/6-quality-checks.md) — Run tests, lint, formatting (max 3 retries)
+7. [Code Review](phases/7-code-review.md) — CodeRabbit review (max 3 cycles)
+8. [User Review](phases/8-user-review.md) — Present changes to user for approval
+9. [Final Report](phases/9-final-report.md) — Summarize results and present to user
 
 ## Loop Control
 

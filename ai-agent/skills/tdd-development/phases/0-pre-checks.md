@@ -8,7 +8,7 @@ Some checks can run in parallel for efficiency. Group steps as follows:
 
 Execute these two checks **in parallel** using parallel Bash tool calls:
 
-1. **Verify task runner**: Check if `Taskfile.yaml` or `Taskfile.dist.yaml` exists at the project root. If found, confirm `task` command is available. If not found, warn the user but continue.
+1. **Verify go-task runner**: Check if `Taskfile.yaml` or `Taskfile.dist.yaml` exists at the project root. If found, confirm the go-task `task` CLI command is available (run `task --version` via Bash). If not found, warn the user but continue.
 
 2. **CodeRabbit auth**: Run `coderabbit auth status`. If not authenticated, **abort the workflow** and inform the user.
 

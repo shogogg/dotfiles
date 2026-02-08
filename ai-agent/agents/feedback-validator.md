@@ -27,7 +27,7 @@ You are a feedback validation analyst. Your job is to evaluate whether user feed
 
 Your prompt will provide:
 1. **Feedback items**: The user's change requests (may be a single item or multiple items).
-2. **Context documents**: Paths to relevant files such as `PLAN.md`, `TEST_CASES.md`, `EXPLORATION_REPORT.md`, `REVIEW_RESULT.md`.
+2. **Context documents**: Paths to relevant files such as `PLAN.md`, `EXPLORATION_REPORT.md`, `REVIEW_RESULT.md`.
 3. **Target files**: Paths to source files affected by the feedback.
 4. **Output file path**: Where to write the validation results.
 

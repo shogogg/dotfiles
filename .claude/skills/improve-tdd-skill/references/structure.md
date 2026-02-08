@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `tdd-development` skill is a structured TDD workflow orchestrator with 10 phases (0-9). It follows a strict delegation principle where the main agent only manages phase transitions and state, while sub-agents perform all substantive work.
+The `tdd-development` skill is a structured TDD workflow orchestrator with 9 phases (0-2, 4-9). Phase 3 (Test Design) has been merged into Phase 2 (Planning). It follows a strict delegation principle where the main agent only manages phase transitions and state, while sub-agents perform all substantive work.
 
 ## File Locations
 
@@ -13,9 +13,8 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 ph
 | `SKILL.md` | Main skill definition, orchestration rules, loop control |
 | `phases/0-pre-checks.md` | Environment validation, task clarification, branch creation |
 | `phases/1-exploration.md` | Project profile, codebase exploration, scope decisions |
-| `phases/2-planning.md` | Work plan creation via task-planner sub-agent |
-| `phases/3-test-design.md` | Test case design via unit-test-designer sub-agent |
-| `phases/4-approval-gate.md` | User approval for plan and tests |
+| `phases/2-planning.md` | Work plan and test plan creation via task-planner sub-agent |
+| `phases/4-approval-gate.md` | User approval for plan (including test plan) |
 | `phases/5-implementation.md` | TDD implementation via tdd-implementer sub-agent |
 | `phases/6-quality-checks.md` | Tests, lint, formatting via run-quality-checks skill |
 | `phases/7-code-review.md` | CodeRabbit review via coderabbit-reviewer sub-agent |
@@ -51,31 +50,32 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 ph
     - Agent C: Patterns & conventions → `EXPLORATION_PATTERNS.md` (Full only)
   - **Integration** (Step 1.5): Agent D merges results → `EXPLORATION_REPORT.md` + `PROJECT_PROFILE.md`
 
-### Phase 2: Planning
+### Phase 2: Planning (includes Test Plan)
 - **Executor**: Sub-agent (task-planner)
 - **Output**: `<work-dir>/PLAN.md`
-- **Key Sections**: Overview, Affected Files, Implementation Units
+- **Key Sections**: Overview, Target Files, Implementation Approach, Implementation Units, **Test Plan**, Risks and Notes, Unresolved Questions
+- **Test Plan format**: Test method names grouped by class/method, categorized by Happy Path / Boundary / Edge Cases, with notes on test strategy (data providers, mocks, etc.)
 
-### Phase 3: Test Design
-- **Executor**: Sub-agent (unit-test-designer)
-- **Output**: `<work-dir>/TEST_CASES.md`
-- **Key Sections**: Test cases per unit, Unresolved Questions
+### Phase 3: (Removed — merged into Phase 2)
 
 ### Phase 4: Approval Gate
 - **Executor**: Main agent + Sub-agent (feedback-validator)
 - **Key Actions**:
   - Resolve unresolved questions
-  - Present summary to user
+  - Present summary to user (including Test Plan)
   - Open files in IDE
   - Get explicit approval
   - **Feedback validation**: When user requests changes, validate feedback via feedback-validator before applying
 
 ### Phase 5: Implementation
-- **Executor**: Sub-agent (tdd-implementer)
+- **Executor**: Multiple sub-agents (tdd-implementer, parallel when possible)
 - **Key Actions**:
-  - Read plan and test cases
-  - Implement following TDD (Red-Green-Refactor)
-  - Handle multi-unit sequential implementation
+  - Read plan and analyze dependency graph (independent, contract, implementation dependencies)
+  - **Interface stub creation**: If contract dependencies exist, create interface/type stubs first to unblock parallel units
+  - **Parallel batch execution**: Launch independent and contract-unblocked units in parallel
+  - Implementation-dependent units wait for their dependencies to complete
+  - Each unit follows TDD (Red-Green-Refactor)
+  - Error handling: failed units don't block parallel siblings
 
 ### Phase 6: Quality Checks
 - **Executor**: Skill (run-quality-checks)
@@ -98,12 +98,13 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 ph
 - **Control**: `cycleCount` (max 3 cycles)
 
 ### Phase 8: User Review
-- **Executor**: Skill (user-review) + Sub-agent (feedback-validator) + knowledge distillation
+- **Executor**: Skill (difit) + Sub-agent (feedback-validator) + knowledge distillation
 - **Key Actions**:
-  - Launch difit for visual diff review
+  - Launch difit for visual diff review (timeout handling is within difit skill via background execution + polling)
   - Handle user feedback
+  - **USER_FEEDBACK.md uses append mode**: Each round is appended, never overwritten, to preserve full feedback history
+  - **Immediate knowledge distillation (Step 4.5)**: Launch distill-knowledge in background immediately after writing feedback (before fixes)
   - **Feedback validation**: When user requests changes, validate feedback via feedback-validator before applying
-  - **Launch distill-knowledge in background (parallel with fixes)**
   - Return to Phase 6 if fixes needed
 
 ### Phase 9: Final Report
@@ -164,6 +165,19 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
 
 ## Common Improvement Areas
 
+### Test Execution Enforcement
+- **File**: `ai-agent/agents/tdd-implementer.md`
+- **Section**: "Test Execution (CRITICAL — Read Before Writing Any Code)"
+- **Key design**: Test Execution section is placed BEFORE TDD Cycle to ensure it's read first
+- **Fallback policy**: If `task` command not found, agent must ask user (no silent fallback)
+- **Reinforcement**: TDD Cycle steps include inline reminders to use the detected `task` command
+- **Disambiguation**: Terminology note distinguishes go-task `task` CLI from Claude Code's `Task` tool
+
+### go-task vs Claude Code Task Disambiguation
+- **Files affected**: All files referencing `task` CLI — `tdd-implementer.md`, `run-quality-checks/SKILL.md`, phases 0, 5, 6, 7, 8
+- **Convention**: First mention in each file includes terminology note; CRITICAL instructions explicitly say "go-task `task` CLI" and "via the Bash tool"
+- **Rationale**: LLMs can confuse go-task CLI `task` with Claude Code's `Task` tool (sub-agent launcher) or `TaskCreate`/`TaskUpdate` (task list management)
+
 ### Exploration Level Adjustment
 - **File**: `phases/1-exploration.md`
 - **Section**: Step 1.3 (Exploration Scope Decision)
@@ -213,8 +227,7 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
     ├── EXPLORATION_TEST.md     # Agent B output (test infrastructure, Medium/Full)
     ├── EXPLORATION_PATTERNS.md # Agent C output (patterns/conventions, Full)
     ├── EXPLORATION_REPORT.md   # Integrated exploration report (Agent D)
-    ├── PLAN.md
-    ├── TEST_CASES.md
+    ├── PLAN.md                 # Work plan + Test Plan (merged)
     ├── QUALITY_RESULT.md
     ├── REVIEW_RESULT.md
     ├── FEEDBACK_VALIDATION.md

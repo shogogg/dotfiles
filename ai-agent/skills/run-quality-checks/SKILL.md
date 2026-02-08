@@ -27,7 +27,9 @@ allowed-tools: Bash, Read, Write, Glob, Grep
 
 ### Step 1: Detect Task Runner (CRITICAL — DO THIS FIRST)
 
-**MANDATORY**: Run `task --list-all` as your FIRST action.
+> **Terminology**: In this document, "`task`" (in backticks) refers to the **go-task CLI** (https://taskfile.dev), NOT Claude Code's `Task` tool for launching sub-agents. They are completely different things. When running quality checks, you execute go-task commands via the **Bash** tool.
+
+**MANDATORY**: Run `task --list-all` via the **Bash** tool as your FIRST action.
 
 ```bash
 task --list-all
@@ -38,8 +40,8 @@ task --list-all
 - ❌ Command fails with "command not found" or similar → Proceed to Step 2b.
 
 **CRITICAL RULES:**
-1. If `task --list-all` succeeds, you MUST use `task` commands for ALL quality checks.
-2. Do NOT fall back to `composer`, `npm`, or `make` when `task` is available.
+1. If `task --list-all` succeeds, you MUST use go-task `task` CLI commands (via Bash) for ALL quality checks.
+2. Do NOT fall back to `composer`, `npm`, or `make` when go-task `task` is available.
 3. If a specific task category (e.g., lint) is not found in the task list, mark that category as SKIPPED. Do NOT use fallback commands for missing categories.
 
 ### Step 2a: Execute via Taskfile (PRIMARY PATH)
@@ -81,7 +83,7 @@ Lint, static analysis, and format tasks run with `--target` arguments when provi
 
 Run all applicable tasks even if some fail. Capture stdout and stderr.
 
-### Step 2b: Fallback Execution (ONLY IF `task` UNAVAILABLE)
+### Step 2b: Fallback Execution (ONLY IF go-task `task` CLI UNAVAILABLE)
 
 **ONLY use this step if `task --list-all` failed with "command not found".**
 

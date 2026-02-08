@@ -33,7 +33,7 @@ Launch the `run-quality-checks` skill with the selected scopes:
 Skill("run-quality-checks", args="<work-dir> --test-scope=<scope> --test-args=<args> --target=<paths>")
 ```
 
-**CRITICAL**: The `run-quality-checks` skill MUST use `task` commands if a Taskfile is available. Verify this in the skill's output — if you see `composer`, `npm`, or `make` commands when a Taskfile exists, the skill is not working correctly.
+**CRITICAL**: The `run-quality-checks` skill MUST use go-task `task` CLI commands (via Bash) if a Taskfile is available. Verify this in the skill's output — if you see `composer`, `npm`, or `make` commands when a Taskfile exists, the skill is not working correctly.
 
 Test scope argument examples:
 - `--test-scope=changed --test-args=tests/Unit/FooTest.php tests/Unit/BarTest.php`
@@ -50,7 +50,7 @@ Target argument examples (for lint/analysis/format):
 
 Read `<work-dir>/QUALITY_RESULT.md` and evaluate the results.
 
-**Verify task usage**: Check that the executed commands in QUALITY_RESULT.md use `task` (e.g., `task test`, `task lint`). If fallback commands were used despite a Taskfile being present, report this as an issue.
+**Verify go-task usage**: Check that the executed commands in QUALITY_RESULT.md use go-task `task` CLI (e.g., `task test`, `task lint`). If fallback commands were used despite a Taskfile being present, report this as an issue.
 
 ### Error Classification
 
@@ -91,8 +91,8 @@ Report the failure details to the user and use `AskUserQuestion` to determine th
    - `<work-dir>/QUALITY_RESULT.md`
    - `<work-dir>/PLAN.md`
    - **Work directory**: `<work-dir>` (for session-specific learnings reference)
-   - **CRITICAL instruction**: "You MUST run `task --list-all` first and use `task` commands for ALL test executions. Do NOT use composer/npm/make if task is available."
-   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was fixed. State which test command you used (must be `task test` if available). Do NOT include full file contents in your final response. End your response with exactly this line: `ORCHESTRATOR: Return to Phase 6 Step 2 to re-run quality checks. Do not read, analyze, or modify code yourself.`"
+   - **CRITICAL instruction**: "You MUST run `task --list-all` (go-task CLI, https://taskfile.dev) via the Bash tool first, and use go-task `task` CLI commands for ALL test executions. Do NOT use composer/npm/phpunit/jest/make directly. Note: go-task `task` is a CLI command run via Bash — it is NOT Claude Code's Task tool."
+   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was fixed. State which test command you used (must be go-task `task test` via Bash). Do NOT include full file contents in your final response. End your response with exactly this line: `ORCHESTRATOR: Return to Phase 6 Step 2 to re-run quality checks. Do not read, analyze, or modify code yourself.`"
 
    After the fix, return to Step 2 to re-run quality checks. Maximum 3 automatic retry attempts **for code quality errors only**. Infrastructure errors do not count toward the retry limit. If the limit is reached, present the remaining options to the user.
 2. **Analyze errors and confirm approach** — Perform detailed analysis of the failure causes, present a proposed fix strategy, and ask the user to confirm the approach before proceeding.
