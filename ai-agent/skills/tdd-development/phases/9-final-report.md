@@ -108,10 +108,11 @@ Present to the user:
 - **Details**: [pass/fail counts from last quality check]
 
 ## Review Record
-- **Must Fix**: [count and resolution status]
-- **Consider**: [count and brief notes]
-- **Ignorable**: [count]
 - **User Review**: Approved / Approved after N revision(s)
+- **Code Review (CodeRabbit)**:
+  - **Must Fix**: [count and resolution status]
+  - **Consider**: [count and brief notes]
+  - **Ignorable**: [count]
 - **Cycles used**: N/3
 
 ## Work Items (Tasks)
@@ -129,6 +130,7 @@ Present to the user:
 - [ ] Review the commits in git log
 - [ ] Push to remote when ready
 - [ ] Create PR if needed
+- [ ] After PR review, run Phase 10 (`/coding` → Resume → Phase 10) to address review comments
 ```
 
 ## State Update

@@ -101,7 +101,7 @@ Report the failure details to the user and use `AskUserQuestion` to determine th
 
 ## Step 4: Commit Changes
 
-After Quality Checks PASS, commit changes before proceeding to Phase 7.
+After Quality Checks PASS, commit changes before proceeding to Phase 7 (User Review).
 
 Launch the `commit` skill:
 

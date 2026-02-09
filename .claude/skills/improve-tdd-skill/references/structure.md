@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `tdd-development` skill is a structured TDD workflow orchestrator with 9 phases (0-2, 4-9). Phase 3 (Test Design) has been merged into Phase 2 (Planning). It follows a strict delegation principle where the main agent only manages phase transitions and state, while sub-agents perform all substantive work.
+The `tdd-development` skill is a structured TDD workflow orchestrator with 10 phases (0-2, 4-10). Phase 3 (Test Design) has been merged into Phase 2 (Planning). Phase 10 (PR Review Comments) is optional and user-initiated. It follows a strict delegation principle where the main agent only manages phase transitions and state, while sub-agents perform all substantive work.
 
 ## File Locations
 
@@ -17,9 +17,10 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 9 pha
 | `phases/4-approval-gate.md` | User approval for plan (including test plan) |
 | `phases/5-implementation.md` | TDD implementation via tdd-implementer sub-agent |
 | `phases/6-quality-checks.md` | Tests, lint, formatting via run-quality-checks skill |
-| `phases/7-code-review.md` | CodeRabbit review via coderabbit-reviewer sub-agent |
-| `phases/8-user-review.md` | User review via user-review skill (difit) |
+| `phases/7-user-review.md` | User review via difit skill |
+| `phases/8-code-review.md` | CodeRabbit review via coderabbit-reviewer sub-agent |
 | `phases/9-final-report.md` | Summary, squash commits, learning capture |
+| `phases/10-pr-review.md` | PR review comments response (optional, user-initiated) |
 
 **Related Skills:**
 
@@ -85,19 +86,7 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 9 pha
   - Handle failures (max 3 retries)
 - **Control**: `retryCount` in STATE.json
 
-### Phase 7: Code Review
-- **Executor**: Sub-agent (coderabbit-reviewer, **background execution**) + knowledge distillation
-- **Output**: `<work-dir>/REVIEW_RESULT.md`
-- **Key Actions**:
-  - Launch CodeRabbit review in background (`run_in_background: true`)
-  - Poll output_file every ~30 seconds for completion
-  - Every 5 minutes, ask user to continue waiting or abort
-  - Classify findings (Must Fix, Consider, Ignorable)
-  - **Launch distill-knowledge in background (parallel with fixes)**
-  - Fix Must Fix items and return to Phase 6
-- **Control**: `cycleCount` (max 3 cycles)
-
-### Phase 8: User Review
+### Phase 7: User Review
 - **Executor**: Skill (difit) + Sub-agent (feedback-validator) + knowledge distillation
 - **Key Actions**:
   - Launch difit for visual diff review (timeout handling is within difit skill via background execution + polling)
@@ -107,6 +96,18 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 9 pha
   - **Feedback validation**: When user requests changes, validate feedback via feedback-validator before applying
   - Return to Phase 6 if fixes needed
 
+### Phase 8: Code Review
+- **Executor**: Sub-agent (coderabbit-reviewer, **background execution**) + knowledge distillation
+- **Output**: `<work-dir>/REVIEW_RESULT.md`
+- **Key Actions**:
+  - Launch CodeRabbit review in background (`run_in_background: true`)
+  - Poll output_file every ~30 seconds for completion
+  - Every 5 minutes, ask user to continue waiting or abort
+  - Classify findings (Must Fix, Consider, Ignorable)
+  - **Launch distill-knowledge in background (parallel with fixes)**
+  - Fix Must Fix items and return to Phase 6 (flow goes 6→7→8, user reviews CodeRabbit fixes)
+- **Control**: `cycleCount` (max 3 cycles)
+
 ### Phase 9: Final Report
 - **Executor**: Main agent + Sub-agent (general-purpose via distill-knowledge)
 - **Key Actions**:
@@ -114,6 +115,19 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 9 pha
   - Comprehensive knowledge distillation via `distill-knowledge` skill (consolidates all session learnings into Serena Memory `review-knowledge`)
   - Sub-agent writes `LEARNING_SUMMARY.md`
   - Main agent compiles final report using `LEARNING_SUMMARY.md`
+
+### Phase 10: PR Review Comments (Optional)
+- **Executor**: Main agent + Skills (fetch-pr-review-comments) + Sub-agents (feedback-validator, tdd-implementer, knowledge-distiller)
+- **Key Actions**:
+  - Obtain review comments via two methods: auto-fetch from PR or manual user input
+  - Write `PR_REVIEW_FEEDBACK.md` (append mode, like USER_FEEDBACK.md)
+  - Background knowledge distillation
+  - Present comments to user, ask which to address
+  - Validate feedback via feedback-validator
+  - Fix each item individually with tdd-implementer, commit each one
+  - Push changes and return to Phase 6 (full loop: 6→7→8→10)
+  - No explicit round limit (each round requires user initiation)
+- **Control**: Does NOT count against `cycleCount`
 
 ## State Management
 
@@ -135,10 +149,11 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 9 pha
 ## Loop Control Rules
 
 1. **Phase 6 retries**: Max 3 per cycle
-2. **Phase 6-7 cycles**: Max 3 (Must Fix → fix → Phase 6 = 1 cycle)
-3. **Phase 7 "No Must Fix"**: Does not count as cycle
-4. **Return from Phase 7/8**: Resets Phase 6 retry counter
-5. **Return from Phase 8**: Does NOT count against cycleCount
+2. **Return from Phase 7**: Resets Phase 6 retry counter, does NOT count against cycleCount
+3. **Phase 6-8 cycles**: Max 3 (Must Fix → fix → Phase 6 = 1 cycle)
+4. **Phase 8 "No Must Fix"**: Does not count as cycle
+5. **Return from Phase 8**: Resets Phase 6 retry counter (flow goes 6→7→8, user reviews CodeRabbit fixes)
+6. **Return from Phase 10**: Resets Phase 6 retry counter, does NOT count against cycleCount
 
 ## Knowledge & Memory Architecture
 
@@ -186,7 +201,7 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
 - **Parameters**: Agent configuration per level (which agents to launch, max_turns per agent)
 
 ### Retry/Cycle Limits
-- **Files**: `SKILL.md`, `phases/6-quality-checks.md`, `phases/7-code-review.md`
+- **Files**: `SKILL.md`, `phases/6-quality-checks.md`, `phases/8-code-review.md`
 - **Parameters**: Max retry counts, cycle limits, escalation behavior
 
 ### Sub-agent Prompts
@@ -201,7 +216,7 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
 - **Considerations**: Pattern quality, deduplication, pruning old entries
 
 ### Feedback Validation
-- **Files**: `phases/4-approval-gate.md`, `phases/8-user-review.md`
+- **Files**: `phases/4-approval-gate.md`, `phases/7-user-review.md`
 - **Agent**: `ai-agent/agents/feedback-validator.md`
 - **Parameters**: Evaluation criteria, classification thresholds, output format
 
@@ -231,5 +246,6 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
     ├── QUALITY_RESULT.md
     ├── REVIEW_RESULT.md
     ├── FEEDBACK_VALIDATION.md
-    └── LEARNING_SUMMARY.md
+    ├── LEARNING_SUMMARY.md
+    └── PR_REVIEW_FEEDBACK.md  # PR review comments (Phase 10, append mode)
 ```

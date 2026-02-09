@@ -80,8 +80,8 @@ Present a summary of changes made:
 - Options: quick, focused, full, custom
 - Consider: profile freshness thresholds, scope decision logic
 
-### Retry Control (Phase 6/7)
-- Target: `phases/6-quality-checks.md`, `phases/7-code-review.md`, `SKILL.md`
+### Retry Control (Phase 6/8)
+- Target: `phases/6-quality-checks.md`, `phases/8-code-review.md`, `SKILL.md`
 - Parameters: max retries, cycle limits, reset conditions
 
 ### Learning Record Improvements
@@ -110,8 +110,8 @@ ai-agent/skills/tdd-development/
     ├── 4-approval-gate.md
     ├── 5-implementation.md
     ├── 6-quality-checks.md
-    ├── 7-code-review.md
-    ├── 8-user-review.md
+    ├── 7-user-review.md
+    ├── 8-code-review.md
     └── 9-final-report.md
 ```
 

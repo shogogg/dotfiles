@@ -1,6 +1,6 @@
-# Phase 8: User Review
+# Phase 7: User Review
 
-Report: "Phase 8: ユーザーレビューを開始します..."
+Report: "Phase 7: ユーザーレビューを開始します..."
 
 ## Step 1: Read Start Commit Hash from State
 
@@ -8,7 +8,7 @@ Read `STATE.json` from the workspace directory and retrieve the `startCommitHash
 
 ```json
 {
-  "currentPhase": 8,
+  "currentPhase": 7,
   "startCommitHash": "abc1234",  // ← Use this value
   "featureBranch": "feature/my-feature"
 }
@@ -115,7 +115,6 @@ Present a concise summary to the user:
 
 - List of all created/modified files with a brief description of each change.
 - Key implementation decisions that were made.
-- Any "Consider" items from the CodeRabbit review that were not addressed.
 - Cycle count and retry statistics from `STATE.json`.
 
 **Note**: This summary is presented AFTER difit review completes, not during. This ensures the user can focus on the browser-based review first.
@@ -124,7 +123,7 @@ Present a concise summary to the user:
 
 ### Status: APPROVED
 
-Proceed to Phase 9 (Final Report).
+Proceed to Phase 8 (Code Review).
 
 ### Status: CHANGES_REQUESTED
 
@@ -133,7 +132,7 @@ Proceed to Phase 9 (Final Report).
 Before applying fixes, validate the feedback by launching the `feedback-validator` sub-agent:
 
 1. **Launch validator**:
-   - **Input**: Feedback items from `USER_FEEDBACK.md`, `<work-dir>/PLAN.md`, `<work-dir>/REVIEW_RESULT.md` (if exists), and source files referenced in the feedback.
+   - **Input**: Feedback items from `USER_FEEDBACK.md`, `<work-dir>/PLAN.md`, and source files referenced in the feedback.
    - **Output file**: `<work-dir>/FEEDBACK_VALIDATION.md`
    - **Return directive**: "Write validation results to the output file. Return ONLY a brief summary (2-3 sentences) stating the count of Valid/Concern/Needs Discussion items."
 
@@ -184,4 +183,4 @@ After all feedback items are resolved:
 **Critical Rule**: Only explicit approval in `USER_FEEDBACK.md` (Status: APPROVED) constitutes approval.
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `9`.
+Update `STATE.json`: set `currentPhase` to `8`.

@@ -1,8 +1,8 @@
-# Phase 7: Code Review
+# Phase 8: Code Review
 
 Read `STATE.json`.
 
-Report: "Phase 7 (cycle N/3): Running CodeRabbit review in background..."
+Report: "Phase 8 (cycle N/3): Running CodeRabbit review in background..."
 
 ## Step 1: Launch Background Review
 
@@ -34,11 +34,11 @@ The sub-agent handles CodeRabbit CLI execution and polling internally. The orche
      options:
        - label: "待機を続ける"
          description: "引き続きレビュー完了を待ちます（さらに5分待機）"
-       - label: "中断してPhase 8へ進む"
-         description: "レビューを中断し、ユーザーレビューに進みます"
+       - label: "中断してPhase 9へ進む"
+         description: "レビューを中断し、最終レポートに進みます"
    ```
    - If user chooses to continue → repeat from step 1
-   - If user chooses to abort → stop the background task using `TaskStop(task_id=...)`, report "CodeRabbit レビューを中断しました", and proceed to Phase 8
+   - If user chooses to abort → stop the background task using `TaskStop(task_id=...)`, report "CodeRabbit レビューを中断しました", and proceed to Phase 9
 
 ## Step 3: Process Review Results
 
@@ -77,12 +77,12 @@ Instruct the sub-agent to follow this structure:
 - **Note**: [description]
 ```
 
-Report: "Phase 7: Must Fix X / Consider Y / Ignorable Z"
+Report: "Phase 8: Must Fix X / Consider Y / Ignorable Z"
 
 ## Next Steps
 
 ### No "Must Fix" items
-Proceed to Phase 8 (User Review) (does not count as a cycle).
+Proceed to Phase 9 (Final Report) (does not count as a cycle).
 
 ### "Must Fix" items exist
 
@@ -130,11 +130,13 @@ For each Must Fix item (1 to N):
 
 After all Must Fix items are resolved, go back to Phase 6 (to re-run quality checks).
 
+**Important**: After Phase 6 passes, the flow returns to Phase 7 (User Review) to ensure CodeRabbit fixes are reviewed by the user before proceeding.
+
 ## Error Handling
 
 If the CodeRabbit sub-agent fails or the background task encounters an error:
 1. Report the failure to the user
-2. Ask whether to retry the review or skip to Phase 8 (User Review)
+2. Ask whether to retry the review or skip to Phase 9 (Final Report)
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `8`.
+Update `STATE.json`: set `currentPhase` to `9`.

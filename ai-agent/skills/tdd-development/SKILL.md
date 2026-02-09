@@ -7,7 +7,7 @@ allowed-tools: Task, Skill, Bash, Read, Write, TaskCreate, TaskUpdate, TaskList,
 
 # /coding Workflow Orchestrator
 
-This skill orchestrates a structured TDD development workflow across 9 phases (Phase 0–2, 4–9). Phase 3 (Test Design) has been merged into Phase 2 (Planning).
+This skill orchestrates a structured TDD development workflow across 10 phases (Phase 0–2, 4–10). Phase 3 (Test Design) has been merged into Phase 2 (Planning). Phase 10 (PR Review Comments) is optional and user-initiated.
 
 ## Orchestration Principle
 
@@ -39,9 +39,10 @@ Workflow Progress:
 - [ ] Phase 4: Approval Gate
 - [ ] Phase 5: TDD Implementation
 - [ ] Phase 6: Quality Checks
-- [ ] Phase 7: Code Review
-- [ ] Phase 8: User Review
+- [ ] Phase 7: User Review
+- [ ] Phase 8: Code Review
 - [ ] Phase 9: Final Report
+- [ ] Phase 10: PR Review Comments (optional)
 ```
 
 ## Resume Detection
@@ -68,18 +69,21 @@ Read each phase document **only when you are ready to execute that phase**. Do n
 4. [Approval Gate](phases/4-approval-gate.md) — Present plan (including test plan) to user for approval
 5. [Implementation](phases/5-implementation.md) — Implement code following TDD methodology
 6. [Quality Checks](phases/6-quality-checks.md) — Run tests, lint, formatting (max 3 retries)
-7. [Code Review](phases/7-code-review.md) — CodeRabbit review (max 3 cycles)
-8. [User Review](phases/8-user-review.md) — Present changes to user for approval
+7. [User Review](phases/7-user-review.md) — Present changes to user for approval
+8. [Code Review](phases/8-code-review.md) — CodeRabbit review (max 3 cycles)
 9. [Final Report](phases/9-final-report.md) — Summarize results and present to user
+10. [PR Review Comments](phases/10-pr-review.md) — Address PR review comments (optional, user-initiated)
 
 ## Loop Control
 
 - Phase 6 retry limit: **3** (report to user on exceed)
-- Phase 6→7 cycle limit: **3** ("Must Fix" → fix → Phase 6 = 1 cycle)
-- Phase 7 "No Must Fix": Does not count as cycle
-- Phase 7→6 return: Reset Phase 6 retry counter
-- Phase 8 user review: If user requests fixes → fix → return to Phase 6
-- Phase 8→6 return: Reset Phase 6 retry counter, does NOT count against cycleCount
+- Phase 7 user review: If user requests fixes → fix → return to Phase 6
+- Phase 7→6 return: Reset Phase 6 retry counter, does NOT count against cycleCount
+- Phase 6→8 cycle limit: **3** ("Must Fix" → fix → Phase 6 = 1 cycle)
+- Phase 8 "No Must Fix": Does not count as cycle
+- Phase 8→6 return: Reset Phase 6 retry counter (flow goes 6→7→8, user reviews CodeRabbit fixes)
+- Phase 10 PR review: If fixes needed → fix → push → return to Phase 6
+- Phase 10→6 return: Reset Phase 6 retry counter, does NOT count against cycleCount
 - State file: `<work-dir>/STATE.json` (initialize in Phase 0)
 
 ## Tasks Usage
@@ -99,3 +103,4 @@ Use Claude Code's `TaskCreate`/`TaskUpdate`/`TaskList` tools for **work-item-lev
 | Implementation Unit | `Implement Unit N: <name>` | `Implement Unit 1: UserService CRUD` |
 | Code Review Fix | `Fix CR-<cycle>-<M>: <title>` | `Fix CR-1-2: Missing null check` |
 | User Feedback Fix | `Fix UF-<round>-<M>: <title>` | `Fix UF-1-1: Error message in Japanese` |
+| PR Review Fix | `Fix PR-<round>-<M>: <title>` | `Fix PR-1-1: Missing validation` |
