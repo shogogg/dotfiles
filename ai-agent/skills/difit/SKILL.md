@@ -18,18 +18,15 @@ Launches difit for browser-based diff review and reports the result.
 
 ## Workflow
 
-### Step 1: Convert Arguments
+### Step 1: Parse Arguments
 
-Replace `HEAD` with `@` in both `<target>` and `<base>` arguments.
+Split `$ARGUMENTS` by whitespace. The **first token** is `<target>`, the **second token** is `<base>`.
 
-Examples:
-- `HEAD main` → `@ main`
-- `. HEAD` → `. @`
-- `HEAD~3 HEAD` → `@~3 @`
+Example: `$ARGUMENTS` = `"HEAD GROO-794_branch"` → `<target>` = `HEAD`, `<base>` = `GROO-794_branch`
+
+**Do NOT modify or convert the arguments** (e.g., do NOT replace `HEAD` with `@`). The shell script handles conversion automatically.
 
 ### Step 2: Validate Arguments
-
-Before running difit, validate the arguments:
 
 1. **Both `<target>` and `<base>` must be present**. If either is missing, output an error and stop:
    ```
@@ -42,7 +39,7 @@ Before running difit, validate the arguments:
 
 ### Step 3: Run difit in Background
 
-Execute the following command with `run_in_background: true`:
+Execute the following command with `run_in_background: true`. Pass `<target>` and `<base>` as separate arguments:
 
 ```bash
 Bash(command="$SKILL_DIR/run-difit.sh --clean <target> <base>", run_in_background=true)
@@ -55,43 +52,80 @@ Save the returned `task_id` for polling.
 - Do NOT pipe diff to stdin. Always pass arguments directly.
 - Always include the `--clean` flag.
 
-### Step 4: Wait for Completion with User Check-in
+### Step 4: Ask User for Review Result
 
-Poll for completion using `TaskOutput` with a 30-second interval. Check in with the user every 15 minutes (30 polls).
+After launching difit in Step 3, immediately present a question to the user (do NOT poll for completion first):
 
-**Polling loop:**
+```
+AskUserQuestion:
+  question: "difit でのレビュー結果を教えてください。"
+  header: "レビュー結果"
+  options:
+    - label: "承認"
+      description: "変更内容に問題なし"
+    - label: "コメントあり"
+      description: "difit 上でコメントを残しました"
+```
 
-1. Set `poll_count = 0`
-2. Call `TaskOutput(task_id=..., block=true, timeout=30000)`
-3. If the task completes → save the output and proceed to Step 5
-4. If timeout (30 seconds elapsed without completion):
-   - Increment `poll_count`
-   - If `poll_count` is a multiple of 30 (every 15 minutes) → ask the user:
-     ```
-     AskUserQuestion:
-       question: "difit でのレビューが継続中です。待機を続けますか？"
-       header: "レビュー待機"
-       options:
-         - label: "待機を続ける"
-           description: "引き続きレビュー完了を待ちます"
-         - label: "レビュー完了として続行"
-           description: "レビューを終了し、承認済みとして次に進みます"
-     ```
-     - If user chooses to continue → go to step 2
-     - If user chooses to finish → stop the background task using `TaskStop(task_id=...)`, treat as APPROVED, and proceed to Step 5 with no feedback
-   - Otherwise → go to step 2
+Store the user's answer as `<userChoice>` (`approved` or `has_comments`).
+
+### Step 4.5: Verify difit Process Completion
+
+After the user responds, verify that the difit process has finished:
+
+1. Call `TaskOutput(task_id=..., block=true, timeout=5000)` to check completion.
+2. **If the task has completed** → save the output and proceed to Step 5.
+3. **If the task is still running** (timeout without completion) → inform the user:
+   ```
+   AskUserQuestion:
+     question: "difit プロセスがまだ実行中です。対応を選択してください。"
+     header: "プロセス未終了"
+     options:
+       - label: "待機する"
+         description: "difit の終了を待ちます（5秒間隔でチェック）"
+       - label: "中止して続行"
+         description: "difit を停止し、ユーザーの回答に基づいて続行"
+   ```
+   - **「待機する」**: Poll with `TaskOutput(task_id=..., block=true, timeout=5000)` in a loop until the task completes.
+   - **「中止して続行」**: Stop the background task using `TaskStop(task_id=...)`. Skip output parsing (Step 5) and determine result solely from `<userChoice>`:
+     - `approved` → APPROVED, proceed to Step 6 with no feedback.
+     - `has_comments` → treat as contradiction (see Step 5 contradiction handling below). Ask user to confirm.
 
 ### Step 5: Determine Result
+
+**Note**: This step is skipped if difit was aborted in Step 4.5.
 
 First, verify that difit ran successfully:
 
 1. **Startup check**: If the output does NOT contain `difit server started on` → The launch failed. Retry once (go back to Step 3). If the retry also lacks this marker, report an error and stop.
 2. **Premature exit check**: If stderr contains `Warning: difit exited in` → The session ended too quickly for the user to review. Retry once (go back to Step 3). If the retry also exits prematurely, report an error and stop.
 
-Then, inspect the output for user feedback:
+Then, determine the final result using **both** difit output and `<userChoice>`. **difit output takes priority**:
 
-- **If output contains `📝 Comments from review session:`** → User has feedback.
-- **Otherwise** → No feedback (APPROVED).
+| difit output | `<userChoice>` | Final result |
+|-------------|----------------|--------------|
+| `📝 Comments` present | approved | **CHANGES_REQUESTED** (output takes priority) |
+| `📝 Comments` present | has_comments | **CHANGES_REQUESTED** |
+| No `📝 Comments` | approved | **APPROVED** |
+| No `📝 Comments` | has_comments | **Contradiction** (see below) |
+
+**Contradiction handling** (user chose "コメントあり" but difit output has no comments):
+
+```
+AskUserQuestion:
+  question: "difit の出力にコメントが見つかりません。どうしますか？"
+  header: "コメント不検出"
+  options:
+    - label: "承認として続行"
+      description: "コメントなしとして承認扱いにする"
+    - label: "difit を再起動"
+      description: "再度 difit を起動してレビューし直す"
+```
+
+- **「承認として続行」** → APPROVED, proceed to Step 6.
+- **「difit を再起動」** → Go back to Step 3.
+
+When the result is CHANGES_REQUESTED, extract the feedback content following the `📝 Comments from review session:` marker from the difit output.
 
 ### Step 6: Report Result
 

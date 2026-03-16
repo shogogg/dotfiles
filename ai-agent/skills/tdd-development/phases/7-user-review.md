@@ -2,41 +2,128 @@
 
 Report: "Phase 7: ユーザーレビューを開始します..."
 
-## Step 1: Read Start Commit Hash from State
+## Step 1: Read State and Show Commit History
 
-Read `STATE.json` from the workspace directory and retrieve the `startCommitHash` field.
+Read `STATE.json` from the workspace directory to retrieve `startCommitHash`, `baseBranch`, `lastReviewCommit`, and `featureBranch`.
 
-```json
-{
-  "currentPhase": 7,
-  "startCommitHash": "abc1234",  // ← Use this value
-  "featureBranch": "feature/my-feature"
-}
+Then display the recent commit history for context:
+
+```bash
+git log --oneline <startCommitHash>..HEAD
 ```
 
-`startCommitHash` is the HEAD at the beginning of the session. Using this ensures only commits made during this session are included in the diff.
+This helps the user understand which commits are available as diff base options.
 
-## Step 2: Launch difit Review
+## Step 2: Ask User for Diff Base
+
+Use `AskUserQuestion` to let the user choose the diff base:
+
+```
+AskUserQuestion:
+  question: "レビューの差分起点を選択してください。"
+  header: "差分起点"
+  options:
+    - label: "セッション開始時点から (推奨)"
+      description: "startCommitHash (<first 7 chars>) 以降の全変更を対象"
+    - label: "ベースブランチから"
+      description: "<baseBranch> からの全変更を対象"
+    - label: "前回レビュー時点から"                          # ← Only include this option if lastReviewCommit is not null
+      description: "lastReviewCommit (<first 7 chars>) 以降の変更のみ対象"
+```
+
+**Notes:**
+- The "前回レビュー時点から" option is **only shown when `lastReviewCommit` is not null** (i.e., a previous review cycle has occurred).
+- If the user selects "Other", treat their input as a commit hash or ref to use as the diff base.
+- Store the selected base as `<selectedBase>` for the next step.
+
+## Step 2.5: Choose Review Unit
+
+Ask the user how they want to review the changes:
+
+```
+AskUserQuestion:
+  question: "レビュー単位を選択してください。"
+  header: "レビュー単位"
+  options:
+    - label: "変更全体 (推奨)"
+      description: "選択した差分起点からHEADまでの全変更を一括レビュー"
+    - label: "コミットごと"
+      description: "各コミットを個別にレビュー"
+```
+
+Store the selection as `<reviewUnit>` (`all` or `per-commit`).
+
+## Step 3: Launch difit Review
+
+**Important**: Wait for each skill completion. Do NOT run in background.
+
+### 3-A. When `<reviewUnit>` is `all` (default)
 
 Launch the `difit` skill to open a browser-based diff review:
 
 ```
-Skill("difit", args="HEAD <startCommitHash>")
+Skill("difit", args="HEAD <selectedBase>")
 ```
 
-- `HEAD` and `<startCommitHash>` are passed as-is. The difit skill handles `HEAD` → `@` conversion internally.
+- `HEAD` and `<selectedBase>` are passed as-is. The difit skill handles `HEAD` → `@` conversion internally.
 - Timeout handling (background polling with user check-in) is managed within the difit skill.
 
-**Important**: Wait for skill completion. Do NOT run in background.
+### 3-B. When `<reviewUnit>` is `per-commit`
 
-## Step 3: Determine Review Result
+Review each commit individually:
+
+1. **Get commit list** (oldest first):
+   ```bash
+   git log --reverse --format="%H %s" <selectedBase>..HEAD
+   ```
+
+2. **Resolve parent hashes and launch difit for each commit**:
+
+   For each commit, resolve the parent hash first, then launch difit:
+   ```bash
+   git rev-parse <commitHash>~1
+   # → <parentHash>
+   ```
+   ```
+   Skill("difit", args="<commitHash> <parentHash>")
+   ```
+
+   **Example** (3 commits, `<selectedBase>` = `abc1234`):
+
+   | Order | Commit | difit args | Diff shown |
+   |-------|--------|-----------|------------|
+   | 1 | `def5678` (feat: add user model) | `Skill("difit", args="def5678 abc1234")` | abc1234 → def5678 |
+   | 2 | `ghi9012` (feat: add user repo) | `Skill("difit", args="ghi9012 def5678")` | def5678 → ghi9012 |
+   | 3 | `jkl3456` (test: add tests) | `Skill("difit", args="jkl3456 ghi9012")` | ghi9012 → jkl3456 |
+
+3. **Collect feedback per commit**:
+   - If difit returns `"No user feedback. It is APPROVED."` → skip (no feedback for this commit).
+   - If difit returns feedback → store with commit info: `(<commitHash first 7 chars>) <subject>: <feedback>`.
+
+4. **After all commits are reviewed**:
+   - If ANY commit has feedback → status is **CHANGES_REQUESTED**. Aggregate all feedback.
+   - If ALL commits are approved → status is **APPROVED**.
+   - Proceed to Step 4 with the aggregated result.
+
+**Per-commit USER_FEEDBACK.md format** (when CHANGES_REQUESTED):
+```markdown
+## Round 1 Feedback (<timestamp>)
+### Commit def5678: feat: add user model
+<feedback content from difit>
+
+### Commit ghi9012: feat: add user repo
+<feedback content from difit>
+```
+Commits with no feedback are omitted from the record.
+
+## Step 4: Determine Review Result
 
 Inspect the difit skill's return value:
 
 - **`"No user feedback. It is APPROVED."`** → Status is **APPROVED**.
 - **Starts with `"There is user feedback."`** → Status is **CHANGES_REQUESTED**. The text following this line is the feedback content.
 
-## Step 4: Write USER_FEEDBACK.md (Append Mode)
+## Step 5: Write USER_FEEDBACK.md (Append Mode)
 
 **CRITICAL: This file uses append mode.** Never overwrite existing content — always append new rounds to preserve the full feedback history for learning and traceability.
 
@@ -96,7 +183,7 @@ Also update the `## Status` line to `CHANGES_REQUESTED` if it is not already set
 - **Feedback content**: Paste the difit output as-is. Do NOT attempt structured parsing — LLM sub-agents can interpret raw text.
 - **Append method**: Use `Bash` to append (e.g., `cat >> file`) or `Read` + `Write` preserving existing content. NEVER use `Write` alone as it overwrites.
 
-## Step 4.5: Immediate Knowledge Distillation (Background)
+## Step 5.5: Immediate Knowledge Distillation (Background)
 
 When status is **CHANGES_REQUESTED**, launch knowledge distillation **immediately after writing the feedback** (before presenting summary or applying fixes). This ensures the feedback is captured for learning even if subsequent steps modify the file.
 
@@ -107,9 +194,9 @@ Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
 
 Save the returned `task_id`. This distillation runs in parallel with all subsequent steps and does NOT need to be awaited.
 
-**Note**: This replaces the distillation that was previously in "Apply Fixes" (Step 6). Do NOT launch distillation again in Step 6.
+**Note**: This replaces the distillation that was previously in "Apply Fixes" (Step 7). Do NOT launch distillation again in Step 7.
 
-## Step 5: Present Summary (After Review Completion)
+## Step 6: Present Summary (After Review Completion)
 
 Present a concise summary to the user:
 
@@ -119,7 +206,7 @@ Present a concise summary to the user:
 
 **Note**: This summary is presented AFTER difit review completes, not during. This ensures the user can focus on the browser-based review first.
 
-## Step 6: Process Feedback
+## Step 7: Process Feedback
 
 ### Status: APPROVED
 
@@ -145,7 +232,7 @@ Before applying fixes, validate the feedback by launching the `feedback-validato
 
 #### Apply Fixes
 
-**Note**: Knowledge distillation was already launched in Step 4.5 (immediately after writing feedback). Do NOT launch it again here.
+**Note**: Knowledge distillation was already launched in Step 5.5 (immediately after writing feedback). Do NOT launch it again here.
 
 **Create Tasks for feedback items:**
 
@@ -160,21 +247,53 @@ Before starting the fix loop, create a Task for each feedback item:
 For each feedback item (1 to N):
 1. Call `TaskUpdate(taskId=..., status="in_progress")` for the corresponding Task.
 2. Report: "Addressing feedback item M/N: <title>"
-3. Launch `tdd-implementer` to apply the specific change. Provide:
+3. **Determine difficulty level and select model**:
+   
+   Analyze the feedback item content and classify complexity:
+   
+   - **haiku**: Simple changes requiring minimal logic adjustment
+     - Typo fixes, comment additions/modifications
+     - Code formatting, variable/method renaming
+     - Constant value changes
+     - Simple conditional logic fixes (1-2 lines)
+     - **Method/function reordering**
+   
+   - **sonnet** (default): Moderate changes requiring logic understanding
+     - Adding new methods/functions
+     - Modifying existing logic (5-20 lines)
+     - Changes spanning multiple files
+     - Adding test cases
+   
+   - **opus**: Complex changes requiring architectural understanding
+     - Architectural changes
+     - Large-scale refactoring (20+ lines or 3+ files)
+     - Complex algorithm implementation
+     - Performance optimization
+   
+   Set `<selectedModel>` to the determined value (haiku/sonnet/opus). When in doubt, default to sonnet.
+
+4. Launch `tdd-implementer` with the selected model:
+   
+   ```
+   Task(subagent_type="tdd-implementer", max_turns=50, model="<selectedModel>")
+   ```
+   
+   Provide:
    - Item details from `USER_FEEDBACK.md`
    - `<work-dir>/PLAN.md` for context
    - **Work directory**: `<work-dir>` (for session-specific learnings reference)
    - **CRITICAL instruction**: "You MUST run `task --list-all` (go-task CLI, https://taskfile.dev) via the Bash tool first, and use go-task `task` CLI commands for ALL test executions. Do NOT use composer/npm/phpunit/jest/make directly. Note: go-task `task` is a CLI command run via Bash — it is NOT Claude Code's Task tool."
    - **SCOPE RESTRICTION**: "Fix ONLY this specific feedback item. Do NOT address multiple items or make unrelated changes. Each item must be a separate commit."
    - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. State which test command you used (must be go-task `task test` via Bash). Do NOT include full file contents in your final response."
-4. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
+
+5. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
    ```
    fix: <description of the change> [ISSUE-NUMBER]
 
    ユーザーフィードバック対応: <original feedback description>
    ```
-5. Call `TaskUpdate(taskId=..., status="completed")` for the corresponding Task.
-6. Move to next item.
+6. Call `TaskUpdate(taskId=..., status="completed")` for the corresponding Task.
+7. Move to next item.
 
 After all feedback items are resolved:
 1. Reset `phase6RetryCount` to 0 in `STATE.json`.
@@ -183,4 +302,6 @@ After all feedback items are resolved:
 **Critical Rule**: Only explicit approval in `USER_FEEDBACK.md` (Status: APPROVED) constitutes approval.
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `8`.
+Update `STATE.json`:
+- Set `currentPhase` to `8`.
+- Set `lastReviewCommit` to the current HEAD commit hash (`git rev-parse HEAD`). This records the state at review time for use as a "since last review" option in future review cycles.

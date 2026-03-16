@@ -82,9 +82,17 @@ Read each phase document **only when you are ready to execute that phase**. Do n
 - Phase 6→8 cycle limit: **3** ("Must Fix" → fix → Phase 6 = 1 cycle)
 - Phase 8 "No Must Fix": Does not count as cycle
 - Phase 8→6 return: Reset Phase 6 retry counter (flow goes 6→7→8, user reviews CodeRabbit fixes)
-- Phase 10 PR review: If fixes needed → fix → push → return to Phase 6
+- Phase 10 PR review: If fixes needed → fix → return to Phase 6 (no push until quality checks pass)
 - Phase 10→6 return: Reset Phase 6 retry counter, does NOT count against cycleCount
 - State file: `<work-dir>/STATE.json` (initialize in Phase 0)
+
+### CRITICAL: Phase File Re-read on Loop Return
+
+When returning to Phase 6 from Phase 7, 8, or 10, you MUST re-read the phase documents before executing them. This is because earlier phase instructions may have drifted out of your active attention due to intervening conversation.
+
+**Rule**: Before executing Phase 6, re-read `phases/6-quality-checks.md`. Before executing Phase 7, re-read `phases/7-user-review.md`. Before executing Phase 8, re-read `phases/8-code-review.md`.
+
+This applies every time you enter these phases, not just the first time. Treat each phase entry as if you are reading the instructions for the first time.
 
 ## Tasks Usage
 

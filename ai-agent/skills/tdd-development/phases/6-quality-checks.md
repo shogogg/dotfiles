@@ -46,6 +46,29 @@ Target argument examples (for lint/analysis/format):
 - `--target=src/Services/`
 - (omitted for full project scope)
 
+## Step 2.5: Commit Auto-fix Changes (if applicable)
+
+After quality checks complete, read `<work-dir>/QUALITY_RESULT.md` and check the `Auto-fix Applied` field in the Summary section.
+
+**If `Auto-fix Applied: YES`:**
+
+1. Check for uncommitted changes:
+   ```bash
+   git diff --stat
+   ```
+
+2. If there are changes, commit them automatically using the `commit` skill:
+   ```
+   Skill("commit")
+   ```
+   The commit message should indicate these are auto-fix changes (e.g., `style: apply auto-fix (lint/format)`).
+
+3. Record `firstCommitHash` if not yet set (same logic as Step 4.1).
+
+**If `Auto-fix Applied: NO`:** Skip this step.
+
+**Note**: This commit is separate from the Step 4 commit. Auto-fix changes are committed immediately so that subsequent quality check results reflect the fixed state.
+
 ## Step 3: Handle Results
 
 Read `<work-dir>/QUALITY_RESULT.md` and evaluate the results.

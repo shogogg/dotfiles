@@ -60,12 +60,14 @@ After Group A completes:
      "cycleCount": 0,
      "baseBranch": "<BASE_BRANCH>",
      "featureBranch": "<current-branch-name>",
-     "startCommitHash": "<current-HEAD-hash>"
+     "startCommitHash": "<current-HEAD-hash>",
+     "lastReviewCommit": null
    }
    ```
    - `startCommitHash`: The HEAD commit hash at session start (obtained via `git rev-parse HEAD`)
    - `baseBranch`: The branch/ref determined in step 4 (e.g., "origin/main", "main", or "HEAD")
    - `featureBranch`: The current branch name after step 4
+   - `lastReviewCommit`: Updated after each review cycle (Phase 7/8) with the HEAD commit hash at review time. Used as a "since last review" diff base option.
 
 ## State Update
 Update `STATE.json`: set `currentPhase` to `1`.

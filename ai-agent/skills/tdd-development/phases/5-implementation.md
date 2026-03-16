@@ -6,8 +6,14 @@ Report: "Phase 5: Implementing with TDD..."
 
 All `tdd-implementer` launches use:
 ```
-Task(subagent_type="tdd-implementer", max_turns=50)
+Task(subagent_type="tdd-implementer", max_turns=50, model="<model>")
 ```
+
+Where `<model>` is determined by reading the unit's `Model` field from PLAN.md:
+- If `Model: haiku` → `model="haiku"`
+- If `Model: sonnet` → `model="sonnet"`
+- If `Model: opus` → `model="opus"`
+- If Model field is missing → `model="sonnet"` (fallback default)
 
 Prompt must include:
 - Input file: `<work-dir>/PLAN.md` (includes both implementation plan and test plan)
@@ -34,7 +40,7 @@ If any units have `contract` dependencies:
 
 1. Identify which interfaces/types need to be created first (the "contract stubs").
 2. Group the contract stubs by their source unit. For example, if Unit 2 and Unit 3 both have `contract` dependency on Unit 1, collect the interfaces/types that Unit 1 must define.
-3. **Launch a dedicated `tdd-implementer` sub-agent** to create ONLY the interface/type stubs (not full implementations). Prompt must include:
+3. **Launch a dedicated `tdd-implementer` sub-agent** to create ONLY the interface/type stubs (not full implementations). Use `model="haiku"` since interface stub creation is typically straightforward. Prompt must include:
    - The specific interfaces and types to create (extracted from the plan)
    - **Explicit instruction**: "Create ONLY the interface/type definitions (with method signatures, PHPDoc, etc.). Do NOT implement concrete classes. This is a stub-creation step to unblock parallel implementation."
    - Standard return directive
@@ -61,7 +67,7 @@ After all units are complete, proceed to Phase 6.
 
 ## Single-Unit Shortcut
 
-If the plan has only one Implementation Unit (or no Implementation Units section), skip the dependency analysis and launch a single `tdd-implementer` directly. This also applies when all units are implementation-dependent in a strict chain (A → B → C) — execute them sequentially without parallel overhead.
+If the plan has only one Implementation Unit (or no Implementation Units section), skip the dependency analysis and launch a single `tdd-implementer` directly. Read the unit's `Model` field and use it for the launch (fallback to `sonnet` if missing). This also applies when all units are implementation-dependent in a strict chain (A → B → C) — execute them sequentially without parallel overhead.
 
 ## Error Handling
 

@@ -93,7 +93,34 @@ You are a code review analyst. Your job is to run CodeRabbit CLI and classify th
 - **Note**: {Brief explanation of why this is ignorable}
 ```
 
-7. **Return summary**: After writing the file, output a brief summary of the classification counts.
+7. **Write statistics**: Append a Statistics section to the review result file:
+
+```markdown
+---
+
+## Statistics
+
+- **Agent/Skill**: coderabbit-reviewer
+- **Start Time**: {ISO 8601 timestamp}
+- **End Time**: {ISO 8601 timestamp}
+- **Duration**: {seconds} seconds ({human-readable format})
+- **Model Used**: {model name from agent config}
+- **Review Type**: {committed/uncommitted}
+```
+
+**Implementation**: Record start time at the beginning (step 1), then calculate duration before writing the output file:
+```bash
+START_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+START_EPOCH=$(date +%s)
+# ... run review ...
+END_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+END_EPOCH=$(date +%s)
+DURATION=$((END_EPOCH - START_EPOCH))
+MINUTES=$((DURATION / 60))
+SECONDS=$((DURATION % 60))
+```
+
+8. **Return summary**: After writing the file, output a brief summary of the classification counts.
 
 ## Agent Memory
 

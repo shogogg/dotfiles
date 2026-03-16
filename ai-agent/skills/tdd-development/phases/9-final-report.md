@@ -76,7 +76,32 @@ The sub-agent will:
 
 Begin compiling the final report immediately — do NOT wait for the knowledge distiller to finish.
 
-### 2.0 Gather Tasks Summary
+### 2.0 Gather Statistics
+
+Read Statistics sections from all available output files:
+
+**Required files** (read if they exist):
+- `<work-dir>/EXPLORATION_REPORT.md` — Exploration statistics
+- `<work-dir>/PLAN.md` — Planning statistics
+- `<work-dir>/IMPLEMENTATION_STATS.md` — Implementation statistics (may have multiple entries)
+- `<work-dir>/QUALITY_RESULT.md` — Quality check statistics
+- `<work-dir>/REVIEW_RESULT.md` — Code review statistics
+
+**Parse each Statistics section** to extract:
+- Start Time (ISO 8601)
+- End Time (ISO 8601)
+- Duration (seconds and human-readable)
+- Agent/Skill name
+- Additional metadata (e.g., Model Used, Exploration Level, Planning Method)
+
+**Calculate total session duration**:
+- Session start = earliest Start Time across all phases
+- Session end = latest End Time across all phases
+- Total duration = (Session end epoch) - (Session start epoch)
+
+**Note**: If any file is missing or has no Statistics section, mark that phase as "N/A" in the statistics table.
+
+### 2.1 Gather Tasks Summary
 
 Call `TaskList` to retrieve all Tasks. Group them by naming prefix to populate the "Work Items (Tasks)" section:
 - **Implementation Units**: Tasks with subject starting with `"Implement Unit"` or `"Implement:"`
@@ -85,7 +110,7 @@ Call `TaskList` to retrieve all Tasks. Group them by naming prefix to populate t
 
 Count completed vs total for each group.
 
-### 2.1 Wait for Knowledge Distiller
+### 2.2 Wait for Knowledge Distiller
 
 After assembling all other sections of the report, wait for the background distiller to complete:
 
@@ -95,11 +120,16 @@ TaskOutput(task_id=..., block=true, timeout=120000)
 
 Then read `<work-dir>/LEARNING_SUMMARY.md` and embed it in the report.
 
-Present to the user:
+### 2.3 Write Final Report to File
+
+Write the complete final report to `<work-dir>/FINAL_REPORT.md` using the following template:
 
 ```markdown
+# TDD Development Session Report
+
 ## Implementation Summary
 - **Task**: [original task description]
+- **Planning Method**: [codex or self — read from PLAN.md Metadata section]
 - **Files changed**: [list of created/modified files]
 - **Key changes**: [brief summary of what was implemented]
 
@@ -120,6 +150,24 @@ Present to the user:
 - **Code Review Fixes**: <completed>/<total>
 - **User Feedback Fixes**: <completed>/<total>
 
+## Execution Time Statistics
+
+### Summary
+| Phase | Duration | Start Time | End Time |
+|-------|----------|------------|----------|
+| Exploration | <N>分<N>秒 | HH:MM | HH:MM |
+| Planning | <N>分<N>秒 | HH:MM | HH:MM |
+| Implementation | <N>分<N>秒 | HH:MM | HH:MM |
+| Quality Checks | <N>分<N>秒 | HH:MM | HH:MM |
+| Code Review | <N>分<N>秒 | HH:MM | HH:MM |
+| **Total Session** | **<N>分<N>秒** | HH:MM | HH:MM |
+
+### Notes
+- Times shown are based on Statistics sections in output files
+- Implementation time includes all units (serial and parallel)
+- Multiple quality check or review rounds are summed
+- N/A indicates the phase was skipped or statistics unavailable
+
 ## Commits Created
 [List of commits created during this session with their messages]
 
@@ -131,6 +179,30 @@ Present to the user:
 - [ ] Push to remote when ready
 - [ ] Create PR if needed
 - [ ] After PR review, run Phase 10 (`/coding` → Resume → Phase 10) to address review comments
+```
+
+### 2.4 Present Summary to User
+
+After writing `FINAL_REPORT.md`, present a brief summary to the user:
+
+```markdown
+## 🎉 TDD Development セッション完了
+
+### 概要
+- **タスク**: [original task description]
+- **実装ファイル**: [count] files
+- **テスト結果**: PASS / FAIL
+- **CodeRabbit レビュー**: Must Fix [count] 件（すべて修正済み）
+- **合計所要時間**: [N]分
+
+### 詳細レポート
+完全なレポートは以下のファイルに出力されました:
+- `<work-dir>/FINAL_REPORT.md`
+
+### 次のステップ
+1. 変更内容を確認: `git log <startCommitHash>..HEAD`
+2. リモートにプッシュ: `git push`
+3. PR作成後、Phase 10 でレビューコメントに対応可能
 ```
 
 ## State Update

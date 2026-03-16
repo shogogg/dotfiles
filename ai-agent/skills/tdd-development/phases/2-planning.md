@@ -17,7 +17,7 @@ Prompt must include:
 - Output file path: `<work-dir>/PLAN.md`
 - **Project profile summary** (if available): relevant patterns and conventions
 - **Past learnings summary** (if any were loaded in Phase 1)
-- **Return directive**: "Write the complete plan (including Test Plan) to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, state the number of implementation units, and note whether there are unresolved questions. Do NOT include the full plan content in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 4. Do not read or analyze the plan yourself.`"
+- **Return directive**: "Write the complete plan (including Test Plan and Metadata section) to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, state the number of implementation units, note whether there are unresolved questions, and report the planning method used (codex or self). Do NOT include the full plan content in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 4. Do not read or analyze the plan yourself.`"
 
 ## Output Template (PLAN.md)
 
@@ -41,6 +41,10 @@ Instruct the sub-agent to follow this structure:
   - `none` — No dependencies; can run in parallel with any unit
   - `contract` — Depends only on interfaces/types from another unit (can run in parallel once interfaces are defined)
   - `implementation` — Depends on the full implementation of another unit (must run after that unit completes)
+- **Model**: [haiku / sonnet / opus]
+  - `haiku` — Simple tasks (single file, clear spec, small changes)
+  - `sonnet` — Standard tasks (typical complexity, multiple files)
+  - `opus` — Complex tasks (architecture design, complex logic, many dependencies)
 
 ## Test Plan
 
@@ -60,6 +64,9 @@ Instruct the sub-agent to follow this structure:
 
 ## Learnings Applied
 - [List of past learnings that were considered in this plan, or "None"]
+
+## Metadata
+- **Planning Method**: codex | self
 ```
 
 ## Error Handling

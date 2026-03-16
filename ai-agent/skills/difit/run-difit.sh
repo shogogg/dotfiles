@@ -3,23 +3,37 @@
 
 set -euo pipefail
 
-# Validate arguments: require at least 2 positional args (target and base).
-# Strip known flags (--clean, etc.) before counting.
+# Separate flags and positional arguments.
+flags=()
 positional_args=()
 for arg in "$@"; do
   case "$arg" in
-    --*) ;;  # skip flags
+    --*) flags+=("$arg") ;;
     *) positional_args+=("$arg") ;;
   esac
 done
 
+# Validate: require exactly 2 positional args (target and base).
 if [[ ${#positional_args[@]} -lt 2 ]]; then
   echo "Error: difit requires both <target> and <base> arguments." >&2
   echo "Usage: run-difit.sh [--clean] <target> <base>" >&2
   exit 1
 fi
 
-MIN_EXPECTED_SECONDS=10
+# Convert HEAD to @ (difit convention) in positional arguments.
+converted_args=()
+for arg in "${positional_args[@]}"; do
+  if [[ "$arg" == "HEAD" ]]; then
+    converted_args+=("@")
+  else
+    converted_args+=("$arg")
+  fi
+done
+
+# Rebuild full argument list: flags + converted positional args.
+set -- "${flags[@]+"${flags[@]}"}" "${converted_args[@]}"
+
+MIN_EXPECTED_SECONDS=3
 start_time=$(date +%s)
 
 if [[ "$(uname)" == "Darwin" ]]; then

@@ -129,6 +129,49 @@ $actual = $this->subject->get('...');
 self::assertSame('...', $actual->getContent());
 ```
 
+## Statistics Reporting
+
+**REQUIRED**: Record execution statistics and include them in your output.
+
+### Recording Start Time
+
+At the very beginning of your work (after loading learnings), record the start time:
+
+```bash
+START_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+START_EPOCH=$(date +%s)
+```
+
+### Writing Statistics
+
+After completing implementation or fixes, create or update an `IMPLEMENTATION_STATS.md` file in the work directory:
+
+```markdown
+---
+
+## Statistics
+
+- **Agent/Skill**: tdd-implementer
+- **Unit/Task**: {unit name or fix description}
+- **Start Time**: {ISO 8601 timestamp from START_TIME}
+- **End Time**: {ISO 8601 timestamp at completion}
+- **Duration**: {seconds} seconds ({human-readable format})
+- **Model Used**: {model name from agent config or Task tool parameter}
+```
+
+**Implementation**:
+```bash
+END_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+END_EPOCH=$(date +%s)
+DURATION=$((END_EPOCH - START_EPOCH))
+MINUTES=$((DURATION / 60))
+SECONDS=$((DURATION % 60))
+```
+
+**For new implementations**: Write statistics to `<work-dir>/IMPLEMENTATION_STATS.md`, appending if the file already exists (multiple units will have multiple Statistics sections).
+
+**For incremental fixes**: Append statistics to the same file with a clear heading indicating the fix round.
+
 ## Language-Specific Guidelines
 
 At the start of implementation, check the `~/.claude/guidelines/` directory. If a guideline file exists for the file extensions found in the "Affected Files" section of `PLAN.md`, read it.

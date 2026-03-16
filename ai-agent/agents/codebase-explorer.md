@@ -83,6 +83,47 @@ If a project profile summary is provided in your prompt:
 - **Focus on** task-specific files and relationships not covered by the profile
 - **Reference** the profile patterns when documenting discoveries
 
+## Statistics Reporting
+
+**REQUIRED**: Record execution statistics and include them in your output.
+
+### Recording Start Time
+
+At the very beginning of your work, record the start time:
+
+```bash
+START_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+START_EPOCH=$(date +%s)
+```
+
+### Writing Statistics
+
+After writing the exploration report, append a Statistics section to the output file:
+
+```markdown
+---
+
+## Statistics
+
+- **Agent/Skill**: codebase-explorer
+- **Start Time**: {ISO 8601 timestamp from START_TIME}
+- **End Time**: {ISO 8601 timestamp at completion}
+- **Duration**: {seconds} seconds ({human-readable format})
+- **Model Used**: {model name from agent config}
+- **Exploration Level**: {light/medium/full}
+```
+
+**Implementation**:
+```bash
+END_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+END_EPOCH=$(date +%s)
+DURATION=$((END_EPOCH - START_EPOCH))
+MINUTES=$((DURATION / 60))
+SECONDS=$((DURATION % 60))
+```
+
+Write the Statistics section to the output file after the main exploration report content.
+
 ## Output
 
 Write the exploration report to the file path specified in your prompt using the following template:

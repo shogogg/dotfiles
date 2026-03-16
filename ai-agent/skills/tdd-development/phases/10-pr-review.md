@@ -143,26 +143,58 @@ For each feedback item (1 to N), call `TaskCreate`:
 For each feedback item (1 to N):
 1. Call `TaskUpdate(taskId=..., status="in_progress")` for the corresponding Task.
 2. Report: "Addressing PR review item M/N: <title>"
-3. Launch `tdd-implementer` to apply the specific change. Provide:
+3. **Determine difficulty level and select model**:
+   
+   Analyze the PR review item content and classify complexity:
+   
+   - **haiku**: Simple changes requiring minimal logic adjustment
+     - Typo fixes, comment additions/modifications
+     - Code formatting, variable/method renaming
+     - Constant value changes
+     - Simple conditional logic fixes (1-2 lines)
+     - **Method/function reordering**
+   
+   - **sonnet** (default): Moderate changes requiring logic understanding
+     - Adding new methods/functions
+     - Modifying existing logic (5-20 lines)
+     - Changes spanning multiple files
+     - Adding test cases
+   
+   - **opus**: Complex changes requiring architectural understanding
+     - Architectural changes
+     - Large-scale refactoring (20+ lines or 3+ files)
+     - Complex algorithm implementation
+     - Performance optimization
+   
+   Set `<selectedModel>` to the determined value (haiku/sonnet/opus). When in doubt, default to sonnet.
+
+4. Launch `tdd-implementer` with the selected model:
+   
+   ```
+   Task(subagent_type="tdd-implementer", max_turns=50, model="<selectedModel>")
+   ```
+   
+   Provide:
    - Item details from `PR_REVIEW_FEEDBACK.md`
    - `<work-dir>/PLAN.md` for context
    - **Work directory**: `<work-dir>` (for session-specific learnings reference)
    - **CRITICAL instruction**: "You MUST run `task --list-all` (go-task CLI, https://taskfile.dev) via the Bash tool first, and use go-task `task` CLI commands for ALL test executions. Do NOT use composer/npm/phpunit/jest/make directly. Note: go-task `task` is a CLI command run via Bash — it is NOT Claude Code's Task tool."
    - **SCOPE RESTRICTION**: "Fix ONLY this specific feedback item. Do NOT address multiple items or make unrelated changes. Each item must be a separate commit."
    - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. State which test command you used (must be go-task `task test` via Bash). Do NOT include full file contents in your final response."
-4. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
+
+5. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
    ```
    fix: <description of the change> [ISSUE-NUMBER]
 
    PRレビューコメント対応: <original review comment summary>
    ```
-5. Call `TaskUpdate(taskId=..., status="completed")` for the corresponding Task.
-6. Move to next item.
+6. Call `TaskUpdate(taskId=..., status="completed")` for the corresponding Task.
+7. Move to next item.
 
 After all feedback items are resolved:
 1. Reset `phase6RetryCount` to 0 in `STATE.json`.
-2. Push changes to remote: `git push`
-3. Return to Phase 6 (Quality Checks → User Review → Code Review → Phase 10).
+2. Return to Phase 6 (Quality Checks → User Review → Code Review).
+   - **IMPORTANT**: Do NOT push to remote at this point. Changes must pass quality checks (Phase 6) and user review (Phase 7) first.
 
 ## Step 5: Completion
 

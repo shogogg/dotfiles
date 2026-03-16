@@ -6,8 +6,10 @@ Read `<work-dir>/PLAN.md`. Check if it contains an "Unresolved Questions" sectio
 
 If unresolved questions exist:
 1. Use `AskUserQuestion` to relay each question to the user.
-2. After receiving answers, launch the `task-planner` sub-agent to update `PLAN.md`:
-   - **Return directive**: "Apply the requested changes to the file. Return ONLY a brief summary (2-3 sentences) of what was changed. Do NOT include the full file content in your final response."
+2. After receiving answers, launch a `general-purpose` sub-agent (model: sonnet, max_turns: 10) to update `PLAN.md`:
+   - **Prompt must include**: The user's answers, the path to `<work-dir>/PLAN.md`, and the specific unresolved questions being answered.
+   - **Key instruction**: "You are editing an EXISTING plan file. Read the file, apply ONLY the minimal changes needed to incorporate the user's answers, and remove the resolved questions from the Unresolved Questions section. Do NOT rewrite or restructure the plan."
+   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. Do NOT include the full file content in your final response."
 3. Re-read the updated document and check for any new unresolved questions. If new questions emerged, repeat from step 1.
 
 If no unresolved questions exist, proceed to Step 2.
@@ -42,8 +44,10 @@ If the user selects "修正を依頼する":
      - 「元のフィードバックで進める」 — Apply the original feedback as-is.
      - 「AIの提案を採用する」 — Use the alternative suggested by the validator.
      - 「フィードバックを修正する」 — Revise the feedback (returns to step 1).
-4. Launch the `task-planner` sub-agent to apply the (possibly revised) changes to `PLAN.md`.
-   - **Return directive**: "Apply the requested changes to the file. Return ONLY a brief summary (2-3 sentences) of what was changed. Do NOT include the full file content in your final response."
+4. Launch a `general-purpose` sub-agent (model: sonnet, max_turns: 10) to apply the (possibly revised) changes to `PLAN.md`.
+   - **Prompt must include**: The validated feedback, the path to `<work-dir>/PLAN.md`, and (if applicable) the validator's alternative suggestions.
+   - **Key instruction**: "You are editing an EXISTING plan file. Read the file, then apply ONLY the changes specified in the feedback. Preserve the overall structure and all sections not affected by the feedback. Do NOT rewrite or restructure the plan."
+   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. Do NOT include the full file content in your final response."
 5. Return to Step 2 to present the updated summary again.
 
 **Critical Rule**: Only an explicit selection of "承認する" constitutes approval. Answering questions, providing comments, or giving feedback does NOT count as approval. The workflow MUST NOT proceed to Phase 5 without the explicit approval selection.
