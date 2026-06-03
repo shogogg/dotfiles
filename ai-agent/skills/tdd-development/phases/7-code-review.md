@@ -119,7 +119,7 @@ Before transitioning to Phase 8, kick off the comprehensive distillation so that
 
 ```
 Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
-  prompt="files: <work-dir>/QUALITY_RESULT.md <work-dir>/REVIEW_RESULT.md <work-dir>/USER_FEEDBACK.md\nmemory: x-coding-best-practices\noutput: <work-dir>/LEARNING_SUMMARY.md")
+  prompt="files: <work-dir>/QC_SUMMARY.md <work-dir>/QC_TEST.raw <work-dir>/QC_LINT.raw <work-dir>/QC_ANALYSE.raw <work-dir>/QC_FORMAT.raw <work-dir>/REVIEW_RESULT.md <work-dir>/USER_FEEDBACK.md\nmemory: x-coding-best-practices\noutput: <work-dir>/LEARNING_SUMMARY.md")
 ```
 
 Save the returned `task_id` to `STATE.json` as `learningDistillTaskId`. Phase 8 will read this field and skip re-launching the distiller. Do NOT wait for the task to complete — it runs fire-and-forget.

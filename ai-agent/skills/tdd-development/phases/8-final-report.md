@@ -66,7 +66,7 @@ Read `STATE.json.learningDistillTaskId`:
 
   ```
   Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
-    prompt="files: <work-dir>/QUALITY_RESULT.md <work-dir>/REVIEW_RESULT.md <work-dir>/USER_FEEDBACK.md\nmemory: x-coding-best-practices\noutput: <work-dir>/LEARNING_SUMMARY.md")
+    prompt="files: <work-dir>/QC_SUMMARY.md <work-dir>/QC_TEST.raw <work-dir>/QC_LINT.raw <work-dir>/QC_ANALYSE.raw <work-dir>/QC_FORMAT.raw <work-dir>/REVIEW_RESULT.md <work-dir>/USER_FEEDBACK.md\nmemory: x-coding-best-practices\noutput: <work-dir>/LEARNING_SUMMARY.md")
   ```
 
 The sub-agent will (independently of Phase 8):
@@ -102,7 +102,7 @@ Steps:
    - EXPLORATION_REPORT.md (Exploration)
    - PLAN.md (Planning, including Metadata.Planning Method)
    - IMPLEMENTATION_STATS.md (Implementation — may contain multiple entries)
-   - QUALITY_RESULT.md (Quality Checks)
+   - QC_SUMMARY.md (Quality Checks summary; per-category details in QC_<CATEGORY>.raw files)
    - REVIEW_RESULT.md (Code Review)
    - USER_FEEDBACK.md (if exists — for user review record)
 3. Each Statistics section reports Start Time (ISO 8601), End Time (ISO 8601), Duration. Parse these and compute total session duration (earliest start to latest end).
@@ -126,7 +126,7 @@ Template:
 
 ## Test Results
 - **Status**: PASS / FAIL
-- **Details**: <pass/fail counts from last QUALITY_RESULT.md>
+- **Details**: <per-category PASS/FAIL counts from QC_SUMMARY.md>
 
 ## Review Record
 - **User Review**: Approved / Approved after N revision(s)

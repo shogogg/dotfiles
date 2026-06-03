@@ -16,7 +16,7 @@ The main agent is **strictly an orchestrator** — it delegates all substantive 
 ### MUST DO
 - Use `Task` tool to launch sub-agents for all exploration, planning, test design, implementation, and review work
 - Use `Skill` tool to invoke other skills (e.g., `run-quality-checks`)
-- Use `Read` **only** for workspace files: `STATE.json`, `PLAN.md`, `QUALITY_RESULT.md`, `REVIEW_RESULT.md`
+- Use `Read` **only** for workspace files: `STATE.json`, `PLAN.md`, `QC_SUMMARY.md`, `QC_<CATEGORY>.raw`, `QC_<CATEGORY>.exitcode`, `QC_AUTOFIX.md`, `TASK_LIST.txt`, `REVIEW_RESULT.md`
 - Use `Write` **only** for `STATE.json`
 - Use `Bash` **only** for git operations and workspace directory management
 - Use `TaskCreate`/`TaskUpdate`/`TaskList` to track Implementation Units and fix items (NOT for phase tracking)

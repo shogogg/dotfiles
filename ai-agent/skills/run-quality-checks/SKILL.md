@@ -30,7 +30,7 @@ allowed-tools: Bash, Read, Write, Glob, Grep, TaskCreate, TaskUpdate, TaskList
 
 `$ARGUMENTS` may contain:
 
-- **Workspace directory path** (positional, optional): If provided, write individual results to `<work-dir>/QC_*.md` files (one per category + summary). Otherwise, output the result directly.
+- **Workspace directory path** (positional, optional): If provided, write per-category outputs to `<work-dir>/QC_<CATEGORY>.raw` and `<work-dir>/QC_<CATEGORY>.exitcode`, plus a `<work-dir>/QC_SUMMARY.md`. Otherwise, output the result directly to the response.
 - `--target=<paths>` (optional): Target files or directories for all quality checks (lint, analyse, format). When provided, check each task's description for how to pass arguments and prioritize targeted execution over full project scans.
 - `--test-scope=<scope>` (optional): Test execution scope.
   - `changed` — Run only the specified test files (listed in `--test-args`).
@@ -41,6 +41,8 @@ allowed-tools: Bash, Read, Write, Glob, Grep, TaskCreate, TaskUpdate, TaskList
   - `--test-scope=changed --test-args=tests/Unit/FooTest.php tests/Unit/BarTest.php`
   - `--test-scope=directory --test-args=tests/Unit/Services/`
   - `--test-scope=custom --test-args=--filter=testMethodName`
+- `--categories=<list>` (optional): Comma-separated list of categories to run. Valid values: `test`, `lint`, `analyse`, `format`. When omitted, ALL detected categories are executed (default behavior). When provided, ONLY the listed categories run; others are skipped and their existing `QC_<CATEGORY>.raw` / `.exitcode` files are left untouched so the orchestrator retains prior state.
+  - Example: `--categories=test,lint` (re-run only failed test and lint after a fix attempt)
 
 ## Workflow
 
@@ -59,27 +61,34 @@ Store these values for use in Step 4 (statistics reporting).
 
 > **Terminology**: In this document, "`task`" (in backticks) refers to the **go-task CLI** (https://taskfile.dev), NOT Claude Code's `Task` tool for launching sub-agents. They are completely different things. When running quality checks, you execute go-task commands via the **Bash** tool.
 
-**MANDATORY**: Run `task --list-all` via the **Bash** tool as your FIRST action (after recording start time).
+**Cache strategy (REQUIRED)**: If a workspace directory was provided and `<work-dir>/TASK_LIST.txt` exists, **read it** instead of running `task --list-all` again. Record `TASK_LIST_CACHE=HIT` for the summary.
+
+If the cache file does not exist (or no workspace was provided), run `task --list-all` via the **Bash** tool:
 
 ```bash
 task --list-all
 ```
 
+When a workspace was provided, immediately persist the captured output to `<work-dir>/TASK_LIST.txt` so subsequent invocations (and `tdd-implementer` sub-agents) can reuse it. Record `TASK_LIST_CACHE=MISS`.
+
 **Decision tree:**
-- ✅ Command succeeds → **MUST use Step 2a**. Proceed immediately. Do NOT check for other runners.
+- ✅ Command succeeds (or cache loaded) → **MUST use Step 2a**. Proceed immediately. Do NOT check for other runners.
 - ❌ Command fails → **Report the failure and stop.** Do NOT proceed to find alternative runners. Report the exact error message and let the caller/user decide.
 
 **CRITICAL RULES:**
-1. If `task --list-all` succeeds, you MUST use go-task `task` CLI commands (via Bash) for ALL quality checks.
+1. If `task --list-all` succeeds (or the cache is valid), you MUST use go-task `task` CLI commands (via Bash) for ALL quality checks.
 2. Do NOT fall back to `composer`, `npm`, or `make` when go-task `task` is available.
 3. If a specific task category (e.g., lint) is not found in the task list, mark that category as SKIPPED. Do NOT use fallback commands for missing categories.
 4. If any `task` command fails with an execution error (not a code quality error), report the exact command and error output and stop. Do NOT retry with different arguments or investigate the cause.
 
-### Step 1.5: Create Progress Tasks (MANDATORY)
+### Step 1.5: Filter Categories and Create Progress Tasks (MANDATORY)
 
-After identifying available quality check categories from `task --list-all`, create a task for each detected category using `TaskCreate`. This makes progress visible to the user.
+After identifying available quality check categories from the task list, apply the `--categories` filter (if provided):
 
-**Create tasks for each detected category:**
+- If `--categories` is omitted → run all detected categories.
+- If `--categories=<list>` is provided → keep ONLY the categories present in BOTH the detected list AND the requested list.
+
+Then create a `TaskCreate` entry for each category that will actually run:
 
 ```
 TaskCreate: subject="テストを実行する", activeForm="テストを実行しています"
@@ -88,12 +97,12 @@ TaskCreate: subject="静的解析を実行する", activeForm="静的解析を�
 TaskCreate: subject="フォーマットを確認する", activeForm="フォーマットを確認しています"
 ```
 
-- Only create tasks for categories that were actually found in `task --list-all` output.
 - Create all tasks in a single parallel call.
+- Do NOT create tasks for filtered-out categories.
 
 ### Step 2a: Execute via Taskfile (PRIMARY PATH)
 
-**You MUST be here if `task --list-all` succeeded.**
+**You MUST be here if `task --list-all` succeeded (or cache loaded).**
 
 From the task list output, identify tasks by name or description:
 
@@ -117,6 +126,8 @@ Detection heuristics:
 
 Record detected fix tasks for use in the auto-fix step below.
 
+**Category filtering applies here too**: If `--categories` was provided, only run auto-fix and checks for the listed categories. For example, `--categories=test` skips Sub-step A entirely (no format/lint to auto-fix) and only runs `task test` in Sub-step B.
+
 **Progress tracking (MANDATORY):**
 - Before running each category: `TaskUpdate` → `status: "in_progress"`
 - After each category completes: `TaskUpdate` → `status: "completed"`
@@ -127,59 +138,43 @@ The execution is split into 3 sub-steps to maximize parallelism while ensuring f
 
 #### Sub-step A: Auto-fix (Sequential — file-modifying operations)
 
-For categories where a "fix" variant was detected, run auto-fix tasks **sequentially** to avoid file conflicts:
+For categories where a "fix" variant was detected AND the category is in scope (per `--categories` filter), run auto-fix tasks **sequentially** to avoid file conflicts:
 
-1. **Format fix** (if detected): Execute `task format` (or detected fix variant)
+1. **Format fix** (if detected and `format` in scope): Execute `task format` (or detected fix variant)
    - Check for diffs: `git diff --stat`
    - Record diff summary
-2. **Lint fix** (if detected): Execute `task lint:fix` (or detected fix variant)
+2. **Lint fix** (if detected and `lint` in scope): Execute `task lint:fix` (or detected fix variant)
    - Check for diffs: `git diff --stat`
    - Record diff summary
 
-Record all auto-fix results (commands executed, files changed, diff summary) for the Auto-fix section in the output.
+Record all auto-fix results (commands executed, files changed, diff summary) for later writing to `QC_AUTOFIX.md`.
 
-#### Sub-step B: All Checks (Parallel — self-reporting)
+#### Sub-step B: All Checks (Parallel — raw output)
 
-Launch ALL check tasks simultaneously using **parallel Bash tool calls**. Each check runs in its own Bash call, and **each Bash call writes its own formatted report file directly** — no post-processing by the agent is needed.
+Launch all in-scope check tasks simultaneously using **parallel Bash tool calls**. Each Bash call writes raw output and exit code directly to its category files — no markdown wrapping, no post-processing:
 
-| Category | Command (example) | Report file |
-|---|---|---|
-| Test | `task test` | `<work-dir>/QC_TEST.md` |
-| Lint | `task lint` | `<work-dir>/QC_LINT.md` |
-| Static Analysis | `task analyse` | `<work-dir>/QC_ANALYSE.md` |
-| Format | `task format:check` | `<work-dir>/QC_FORMAT.md` |
+| Category | Command (example) | Raw file | Exit code file |
+|---|---|---|---|
+| Test | `task test` | `<work-dir>/QC_TEST.raw` | `<work-dir>/QC_TEST.exitcode` |
+| Lint | `task lint` | `<work-dir>/QC_LINT.raw` | `<work-dir>/QC_LINT.exitcode` |
+| Static Analysis | `task analyse` | `<work-dir>/QC_ANALYSE.raw` | `<work-dir>/QC_ANALYSE.exitcode` |
+| Format | `task format:check` | `<work-dir>/QC_FORMAT.raw` | `<work-dir>/QC_FORMAT.exitcode` |
 
-**Each parallel Bash call pattern:**
+**Each parallel Bash call pattern (minimal):**
 ```bash
-CMD="task <command>"
-$CMD > <work-dir>/.qc_<category>_raw.txt 2>&1
-EXIT=$?
-{
-  echo "# <Category> Result"
-  echo ""
-  echo "- **Command**: \`$CMD\`"
-  echo "- **Exit code**: $EXIT"
-  echo "- **Status**: $([ $EXIT -eq 0 ] && echo PASS || echo FAIL)"
-  echo ""
-  echo "## Output"
-  echo '```'
-  if [ $EXIT -eq 0 ]; then
-    tail -20 <work-dir>/.qc_<category>_raw.txt
-  else
-    tail -100 <work-dir>/.qc_<category>_raw.txt
-  fi
-  echo '```'
-} > <work-dir>/QC_<CATEGORY>.md
-echo "EXIT:$EXIT"
+task <command> > <work-dir>/QC_<CATEGORY>.raw 2>&1
+echo $? > <work-dir>/QC_<CATEGORY>.exitcode
 ```
 
-**CRITICAL**: All available category checks MUST be issued as parallel Bash tool calls in a single message, not sequentially.
+That's it — no `echo` blocks, no `tail`, no markdown headers. The raw output is preserved unmodified in `.raw`, and the single-line exit code in `.exitcode` is what the orchestrator reads for PASS/FAIL decisions.
+
+**CRITICAL**: All in-scope category checks MUST be issued as parallel Bash tool calls in a single message, not sequentially.
 
 **Progress tracking**: After each parallel Bash call returns, `TaskUpdate` that category → `status: "completed"`.
 
 #### Sub-step C: Write Summary (Trivial)
 
-After all parallel checks complete, write `<work-dir>/QC_SUMMARY.md` from the collected exit codes. This requires **no content processing** — just map exit codes to PASS/FAIL:
+After all parallel checks complete, write `<work-dir>/QC_SUMMARY.md`. This is a small file derived from the `.exitcode` files plus auto-fix state:
 
 ```markdown
 # Quality Check Summary
@@ -190,24 +185,38 @@ After all parallel checks complete, write `<work-dir>/QC_SUMMARY.md` from the co
 - Static Analysis: PASS / FAIL / SKIPPED
 - Format: PASS / FAIL / SKIPPED
 - Auto-fix Applied: YES / NO
+- Categories Executed: <comma-separated list>
+
+## Statistics
+- Start Time: {ISO 8601}
+- End Time: {ISO 8601}
+- Duration: {seconds} seconds
+- Commands Executed: {number}
+- Test Scope: {full/changed/directory/custom}
+- Task List Cache: HIT / MISS
 ```
 
-Also append statistics (start time, end time, duration, command count) to `QC_SUMMARY.md`.
+**SKIPPED rules:**
+- Category not detected in `task --list-all` → SKIPPED
+- Category detected but excluded by `--categories` filter → SKIPPED (and prior `.exitcode` file, if any, is NOT consulted by this skill — the orchestrator decides what to do with prior state)
+
+**Overall = PASS** iff all non-SKIPPED categories in this invocation have exit code 0.
 
 **When `--target` is provided (IMPORTANT):**
 
-> **Note**: The `--target` handling below applies **within each category's Bash call** in Sub-step B. Each category's final output (including merged results from multiple paths) must be redirected to its `QC_<CATEGORY>_RAW.txt` file.
+> **Note**: The `--target` handling below applies **within each category's Bash call** in Sub-step B. Each category's final output must be merged into the single `QC_<CATEGORY>.raw` file.
 
-1. For each task (lint, analyse, format), examine the task description from `task --list-all` output.
+1. For each task (lint, analyse, format), examine the task description from the task list output.
 2. If the description indicates how to pass file/directory arguments:
-   
+
    **Multiple paths provided (2 or more):**
    - Split paths into batches of 5 (max 5 concurrent executions per batch)
    - For each batch, execute tasks in parallel using Bash job control (`&` and `wait`)
    - Each path runs as: `task <task-name> -- <single-path>`
    - Capture individual outputs to temporary files (e.g., `result1.txt`, `result2.txt`, ...)
-   - Collect and merge all results after all batches complete
-   
+   - Concatenate all results into the category's `.raw` file
+   - Compute combined exit code: 0 only if all sub-runs succeeded, non-zero otherwise
+
    **Example parallel execution:**
    ```bash
    # Batch 1 (5 parallel)
@@ -217,27 +226,23 @@ Also append statistics (start time, end time, duration, command count) to `QC_SU
    task phpstan -- src/Qux.php > result4.txt 2>&1 &
    task phpstan -- src/Quux.php > result5.txt 2>&1 &
    wait
-   
-   # Batch 2 (remaining)
-   task phpstan -- src/Other.php > result6.txt 2>&1 &
-   wait
-   
+
    # Collect results
-   cat result*.txt
-   ```
-   
-   **Single path provided:**
-   ```bash
-   task <task-name> -- <single-path>
-   # Example: task phpstan -- src/Services/
+   cat result*.txt > <work-dir>/QC_ANALYSE.raw
    ```
 
-3. If the description does NOT indicate argument support, run the task without arguments (full project scope) and note this in the output.
+   **Single path provided:**
+   ```bash
+   task <task-name> -- <single-path> > <work-dir>/QC_<CATEGORY>.raw 2>&1
+   echo $? > <work-dir>/QC_<CATEGORY>.exitcode
+   ```
+
+3. If the description does NOT indicate argument support, run the task without arguments (full project scope) and note this in the summary.
 
 **When `--test-scope` is provided:**
 ```bash
-task <test-task> -- <test-args>
-# Example: task test -- tests/Unit/FooTest.php
+task <test-task> -- <test-args> > <work-dir>/QC_TEST.raw 2>&1
+echo $? > <work-dir>/QC_TEST.exitcode
 ```
 
 **Priority order:**
@@ -253,14 +258,14 @@ Run all applicable tasks even if some fail. Capture stdout and stderr.
 
 **IMPORTANT: Command execution failure handling**
 If any `task` command fails with an **execution error** (e.g., command not found, invalid task name, permission denied, unexpected crash — NOT code quality errors like test failures or lint violations):
-1. Record the exact command and error output
-2. Mark that category as FAIL with the raw error output
+1. The raw output and exit code are still written to the category files (the error is part of the output)
+2. Mark that category as FAIL in the summary
 3. Continue to the next category (do NOT retry, modify arguments, or investigate)
-4. In the final report, clearly distinguish execution errors from code quality errors
+4. In `QC_SUMMARY.md`, note that an execution error occurred so the caller can distinguish it from code quality errors
 
 ### Step 2b: Report Failure (ONLY IF go-task `task` CLI UNAVAILABLE)
 
-**If `task --list-all` failed, do NOT attempt to find or use alternative tools.**
+**If `task --list-all` failed AND no cache exists, do NOT attempt to find or use alternative tools.**
 
 Report the following to the caller/user:
 1. The exact command that was executed (`task --list-all`)
@@ -271,7 +276,7 @@ Report the following to the caller/user:
 
 ### Step 3: Write Summary and Return
 
-**No compilation or assembly step is needed.** Each check has already written its own `QC_<CATEGORY>.md` report in Sub-step B.
+**No compilation or assembly step is needed.** Each check has already written its own raw output and exit code.
 
 If a workspace directory was provided:
 
@@ -280,11 +285,9 @@ If a workspace directory was provided:
    END_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
    END_EPOCH=$(date +%s)
    DURATION=$((END_EPOCH - START_EPOCH))
-   MINUTES=$((DURATION / 60))
-   SECONDS=$((DURATION % 60))
    ```
 
-2. **Write `<work-dir>/QC_SUMMARY.md`** using the exit codes already collected from parallel Bash calls. See [output-template.md](output-template.md) for the required format. This requires **no content processing** — just map exit codes to PASS/FAIL and append statistics.
+2. **Write `<work-dir>/QC_SUMMARY.md`** using the `.exitcode` files. See [output-template.md](output-template.md) for the required format. This requires **no content processing** — just map exit codes to PASS/FAIL and append statistics.
 
 3. **Write `<work-dir>/QC_AUTOFIX.md`** (only if auto-fix was executed in Sub-step A). Record commands executed, files modified, and diff summaries.
 

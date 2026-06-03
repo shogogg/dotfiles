@@ -63,7 +63,7 @@ Extract and apply the following rules from all sources (agent memory, shared rev
 ### For incremental fixes:
 - **First**, execute the "Pre-Implementation: Load Learnings" steps above.
 - **Second**, detect the test task (see "Test Execution" section below).
-- Read the quality check results (`QUALITY_RESULT.md`) or review results (`REVIEW_RESULT.md`) from the paths provided in your prompt.
+- Read the quality check summary (`QC_SUMMARY.md`) and the relevant per-category raw outputs (`QC_TEST.raw`, `QC_LINT.raw`, `QC_ANALYSE.raw`, `QC_FORMAT.raw`) or review results (`REVIEW_RESULT.md`) from the paths provided in your prompt. The orchestrator lists which files are relevant for the current fix.
 - Also read the original plan (`PLAN.md`) for context.
 - Fix only the issues identified. Do not refactor unrelated code.
 - Even when fixing issues, follow the TDD cycle: first reproduce the problem with a failing test, then fix it, then confirm green.
@@ -76,13 +76,19 @@ Extract and apply the following rules from all sources (agent memory, shared rev
 
 ### Detect test task (REQUIRED — do this ONCE at the very start)
 
-Run the following command via the **Bash** tool as your **FIRST action** before writing any code:
+**Cache first**: If a workspace directory is provided in your prompt and `<work-dir>/TASK_LIST.txt` exists, read that file instead of running `task --list-all` again. The cache is populated by the orchestrator or a previous sub-agent invocation.
+
+If the cache file does not exist (or no workspace was provided), run the following command via the **Bash** tool as your **FIRST action** before writing any code:
 ```bash
-task --list-all | grep -i test
+task --list-all
 ```
 
-- **Command produces output** → Identify the test task name (e.g., `task test`). Store this command mentally and use it for **EVERY** subsequent test execution throughout the entire implementation.
-- **Command fails or produces no output** → **STOP and ask the user** which test command to use. Do NOT guess or fall back to another command on your own.
+When you run the command yourself and a workspace directory is provided, also save the output: `task --list-all > <work-dir>/TASK_LIST.txt` so subsequent sub-agents and skill invocations can reuse it.
+
+Then identify the test task by filtering for keywords (e.g., `test`, `spec`):
+
+- **Test task found** (e.g., `task test`) → Store this command mentally and use it for **EVERY** subsequent test execution throughout the entire implementation.
+- **No test task found** → **STOP and ask the user** which test command to use. Do NOT guess or fall back to another command on your own.
 
 ### Running Tests
 

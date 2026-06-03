@@ -19,7 +19,8 @@ Prompt must include:
 - Input file: `<work-dir>/PLAN.md` (includes both implementation plan and test plan)
 - **Work directory**: `<work-dir>` (for sub-agent to reference session-specific learnings)
 - **Which unit(s) to implement** (unit name and details from the plan)
-- **CRITICAL instruction**: "You MUST run `task --list-all` (go-task CLI, https://taskfile.dev) via the Bash tool first, and use go-task `task` CLI commands for ALL test executions. Do NOT use composer/npm/phpunit/jest/make directly. Note: go-task `task` is a CLI command run via Bash — it is NOT Claude Code's Task tool."
+- **Task list cache**: "Before running `task --list-all`, check whether `<work-dir>/TASK_LIST.txt` exists. If it exists, read its contents instead of re-running the command. If it does not exist, run `task --list-all` (go-task CLI, https://taskfile.dev) via the Bash tool and write the output to `<work-dir>/TASK_LIST.txt` for future reuse."
+- **CRITICAL instruction**: "Use go-task `task` CLI commands (via the Bash tool) for ALL test executions. Do NOT use composer/npm/phpunit/jest/make directly. Note: go-task `task` is a CLI command run via Bash — it is NOT Claude Code's Task tool."
 - **Return directive**: "Return ONLY a brief completion summary (3-5 sentences) to the orchestrator: list the files created/modified, state whether tests pass (and confirm you used go-task `task test` via Bash), and note any issues encountered. Do NOT include full file contents or large code blocks in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 5. Do not read, analyze, or modify code yourself.`"
 
 ## Execution Strategy

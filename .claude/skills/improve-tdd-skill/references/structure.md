@@ -89,15 +89,18 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
 ### Phase 5: Quality Checks
 - **Executor**: Skill (run-quality-checks)
 - **Key Actions**:
-  - Propose test scope
-  - Create progress tasks via TaskCreate (per detected category)
-  - **3 Sub-step Execution Strategy**:
-    - **Sub-step A**: Auto-fix (sequential) — format fix → lint fix to avoid file conflicts
-    - **Sub-step B**: All checks in parallel — test, lint, analyse, format issued as parallel Bash calls, each saving to `QC_<CATEGORY>_RAW.txt`
-    - **Sub-step C**: Lightweight report assembly — read individual result files and compile QUALITY_RESULT.md
-  - **Auto-fix commit** (Step 2.5): If auto-fix applied changes, commit them via `commit` skill before handling results
-  - Handle failures (max 3 retries)
-- **Control**: `phase5RetryCount` in STATE.json
+  - **Scope reuse** (Step 1): Read `STATE.json.qualityScope`; if non-null, reuse and skip Step 1.1/1.2. Otherwise prompt user and save selection to `qualityScope`.
+  - **Failed-category-only retry** (Step 2): Read `STATE.json.qualityFailedCategories`. If non-empty, pass `--categories=<failed>` so only previously-failed categories re-run. Previously-passing `.exitcode` files remain intact for overall state recovery.
+  - Create progress tasks via TaskCreate (per detected & filtered category)
+  - **3 Sub-step Execution Strategy** (run-quality-checks):
+    - **Sub-step A**: Auto-fix (sequential, only for in-scope categories) — format fix → lint fix to avoid file conflicts
+    - **Sub-step B**: All in-scope checks in parallel — each Bash call writes raw output directly to `QC_<CATEGORY>.raw` and the exit code to `QC_<CATEGORY>.exitcode` (no markdown wrapping)
+    - **Sub-step C**: Trivial summary write — derive `QC_SUMMARY.md` from `.exitcode` files (no content processing)
+  - **Auto-fix commit** (Step 2.5): If auto-fix applied changes, commit them via `commit` skill before handling results. Reads `QC_SUMMARY.md` for the `Auto-fix Applied` flag.
+  - **Result handling** (Step 3): Read `QC_SUMMARY.md` for status; read specific `QC_<CATEGORY>.raw` for failure details. Update `STATE.json.qualityFailedCategories` after each run.
+  - Handle failures (max 3 retries). The FAIL options include a "Change scope" action that resets `qualityScope` to `null`.
+- **Task list cache**: First invocation writes `<work-dir>/TASK_LIST.txt`. Subsequent invocations (this skill, sub-agents in Phase 4, etc.) reuse it.
+- **Control**: `phase5RetryCount`, `qualityScope`, `qualityFailedCategories` in STATE.json
 
 ### Phase 6: User Review
 - **Executor**: Skill (difit) + Sub-agent (feedback-validator) + knowledge distillation
@@ -136,7 +139,7 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
   - **Step 1 — Distillation check**: Read `STATE.json.learningDistillTaskId`. Skip re-launching if Phase 7 already pre-launched. If unset (Phase 7 skipped), launch fire-and-forget.
   - **Step 2 — Background final report generation**: Launch `general-purpose` sub-agent with `run_in_background=true` (max_turns=10) to compile FINAL_REPORT.md. Save `task_id` to `STATE.json.finalReportTaskId`. Never awaited.
   - **Step 3 — Minimal inline summary**: Issue parallel `git log --oneline` and `git diff --name-only | wc -l`. Present a short summary (task, commit list, FINAL_REPORT.md / LEARNING_SUMMARY.md path references, next steps). The user can move on immediately.
-- **Sub-agent responsibilities**: Read STATE.json, statistics files (EXPLORATION_REPORT.md, PLAN.md, IMPLEMENTATION_STATS.md, QUALITY_RESULT.md, REVIEW_RESULT.md, USER_FEEDBACK.md), call TaskList, parse git log, write FINAL_REPORT.md. Never embeds LEARNING_SUMMARY.md content (path reference only).
+- **Sub-agent responsibilities**: Read STATE.json, statistics files (EXPLORATION_REPORT.md, PLAN.md, IMPLEMENTATION_STATS.md, QC_SUMMARY.md, REVIEW_RESULT.md, USER_FEEDBACK.md), call TaskList, parse git log, write FINAL_REPORT.md. Never embeds LEARNING_SUMMARY.md content (path reference only).
 
 ### Phase 9: PR Review Comments (Optional)
 - **Executor**: Main agent + Skills (fetch-pr-review-comments) + Sub-agents (feedback-validator, tdd-implementer, knowledge-distiller)
@@ -172,6 +175,8 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
 | `explorationLevel` | string | quick, focused, full |
 | `learningDistillTaskId` | string/null | task_id of the comprehensive knowledge-distiller pre-launched at the end of Phase 7. Phase 8 reads this to skip re-launching. Fire-and-forget (never awaited). |
 | `finalReportTaskId` | string/null | task_id of the general-purpose sub-agent launched in Phase 8 Step 2 to generate FINAL_REPORT.md in background. Fire-and-forget (never awaited). |
+| `qualityScope` | object/null | Persisted test/target scope selection from Phase 5 Step 1. Shape: `{ test: { scope, args }, target: { mode, paths } }`. Reused on Phase 5 re-entry to skip re-prompting. Reset to null by the "Change scope" FAIL option. |
+| `qualityFailedCategories` | array | List of category names (`test`, `lint`, `analyse`, `format`) that failed in the most recent Phase 5 run. Passed as `--categories=<list>` to `run-quality-checks` on retry. Cleared on overall PASS. |
 
 ## Loop Control Rules
 
@@ -238,10 +243,12 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
 
 ### Auto-fix Priority & Parallel Execution
 - **Files**: `ai-agent/skills/run-quality-checks/SKILL.md`, `phases/5-quality-checks.md`, `ai-agent/skills/run-quality-checks/output-template.md`
-- **Execution Strategy**: 3 sub-steps — Sub-step A (auto-fix sequential), Sub-step B (all checks parallel), Sub-step C (lightweight report assembly)
+- **Execution Strategy**: 3 sub-steps — Sub-step A (auto-fix sequential), Sub-step B (all checks parallel, raw output only), Sub-step C (trivial summary write)
 - **Auto-fix**: Detect fix task variants from `task --list-all`, run fix sequentially (format → lint) to avoid file conflicts
-- **Parallel checks**: All check commands issued as parallel Bash tool calls, each saving to `QC_<CATEGORY>_RAW.txt`
-- **Report assembly**: Read individual result files and compile QUALITY_RESULT.md (lightweight, no re-processing)
+- **Parallel checks**: All in-scope check commands issued as parallel Bash tool calls; each writes raw stdout/stderr to `QC_<CATEGORY>.raw` and the single-line exit code to `QC_<CATEGORY>.exitcode`
+- **Summary**: `QC_SUMMARY.md` is derived purely from `.exitcode` files; the legacy `QUALITY_RESULT.md` is no longer produced
+- **Category filter**: `--categories=<list>` allows running only specified categories; out-of-scope categories' files remain untouched, preserving prior state for the orchestrator
+- **Task list cache**: First invocation writes `<work-dir>/TASK_LIST.txt`; subsequent calls (this skill + `tdd-implementer`) reuse it
 - **Parameters**: Category-to-fix-task mapping, execution order, commit behavior
 
 ### Retry/Cycle Limits
@@ -292,7 +299,14 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
     ├── EXPLORATION_PATTERNS.md # Agent C output (patterns/conventions, Full)
     ├── EXPLORATION_REPORT.md   # Integrated exploration report (or copy of EXPLORATION_CODE.md for Light)
     ├── PLAN.md                 # Work plan + Test Plan (merged)
-    ├── QUALITY_RESULT.md
+    ├── TASK_LIST.txt           # Cached `task --list-all` output (reused by sub-agents)
+    ├── QC_SUMMARY.md           # Quality check summary (PASS/FAIL per category)
+    ├── QC_TEST.raw             # Raw output of test run (per-category, only for executed categories)
+    ├── QC_TEST.exitcode        # Single-line exit code (0 = PASS)
+    ├── QC_LINT.raw / QC_LINT.exitcode
+    ├── QC_ANALYSE.raw / QC_ANALYSE.exitcode
+    ├── QC_FORMAT.raw / QC_FORMAT.exitcode
+    ├── QC_AUTOFIX.md           # Auto-fix command record (only if auto-fix was applied)
     ├── REVIEW_RESULT.md
     ├── FEEDBACK_VALIDATION.md
     ├── LEARNING_SUMMARY.md

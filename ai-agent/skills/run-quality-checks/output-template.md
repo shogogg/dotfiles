@@ -1,40 +1,52 @@
-# Output Template
+# Output Files
 
-Write results to `<work-dir>/QUALITY_RESULT.md` using the following format:
+The skill writes the following files to `<work-dir>` (the workspace directory provided as positional argument):
+
+## Per-category files (raw output + exit code)
+
+For each executed category, two files are written:
+
+- `QC_<CATEGORY>.raw` — Raw, unmodified stdout/stderr from the command (no markdown wrapping).
+- `QC_<CATEGORY>.exitcode` — A single line containing the exit code (e.g., `0` or `1`).
+
+`<CATEGORY>` is one of: `TEST`, `LINT`, `ANALYSE`, `FORMAT`.
+
+These files are written ONLY for categories actually executed in the current invocation. Pre-existing files from previous invocations (e.g., categories not in `--categories`) are NOT touched, allowing the orchestrator to retain prior state.
+
+## Summary file
+
+`<work-dir>/QC_SUMMARY.md`:
 
 ```markdown
-# Quality Check Result
+# Quality Check Summary
 
-## Summary
 - Overall: PASS / FAIL
-- Tests: PASS / FAIL / SKIPPED
+- Test: PASS / FAIL / SKIPPED
 - Lint: PASS / FAIL / SKIPPED
 - Static Analysis: PASS / FAIL / SKIPPED
 - Format: PASS / FAIL / SKIPPED
 - Auto-fix Applied: YES / NO
+- Categories Executed: test, lint, analyse, format
 
-## Details
+## Statistics
+- Start Time: {ISO 8601}
+- End Time: {ISO 8601}
+- Duration: {seconds} seconds
+- Commands Executed: {number}
+- Test Scope: {full/changed/directory/custom}
+- Task List Cache: HIT / MISS
+```
 
-### Tests
-- Command: `...`
-- Exit code: 0
-- Output: (truncated if long)
+**SKIPPED** appears for categories not present in `task --list-all` OR not in `--categories` when filtering.
 
-### Lint
-- Command: `...`
-- Exit code: 1
-- Output:
-  ```
-  (error details)
-  ```
+## Auto-fix file (conditional)
 
-<!-- Repeat for each category -->
+`<work-dir>/QC_AUTOFIX.md` — Written ONLY when auto-fix tasks were executed in Sub-step A:
 
-## Auto-fix Results
+```markdown
+# Auto-fix Results
 
-<!-- Include this section only if auto-fix tasks were executed -->
-
-### Format (auto-fix)
+## Format (auto-fix)
 - Command: `task format`
 - Files modified: YES / NO
 - Diff summary:
@@ -42,24 +54,22 @@ Write results to `<work-dir>/QUALITY_RESULT.md` using the following format:
   (git diff --stat output, or "No changes")
   ```
 
-### Lint (auto-fix)
+## Lint (auto-fix)
 - Command: `task lint:fix`
 - Files modified: YES / NO
 - Diff summary:
   ```
   (git diff --stat output, or "No changes")
   ```
-
-<!-- Include only categories where auto-fix was executed -->
-
----
-
-## Statistics
-
-- **Agent/Skill**: run-quality-checks
-- **Start Time**: {ISO 8601 timestamp}
-- **End Time**: {ISO 8601 timestamp}
-- **Duration**: {seconds} seconds ({human-readable format})
-- **Commands Executed**: {number of commands}
-- **Test Scope**: {full/changed/directory/custom} (if applicable)
 ```
+
+## Task list cache
+
+`<work-dir>/TASK_LIST.txt` — Raw output of `task --list-all`. Written on first execution, reused thereafter to avoid repeated invocations across this skill and `tdd-implementer` sub-agents.
+
+## Reading guidance for the orchestrator
+
+- For PASS/FAIL decision: read `QC_<CATEGORY>.exitcode` files (one byte; `0` = PASS, non-zero = FAIL).
+- For overall status: read `QC_SUMMARY.md`.
+- For error details (when investigating a FAIL): read the specific `QC_<CATEGORY>.raw` file.
+- Do NOT expect a consolidated `QUALITY_RESULT.md` — that file is no longer produced.
