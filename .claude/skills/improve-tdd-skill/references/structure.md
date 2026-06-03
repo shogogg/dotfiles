@@ -125,15 +125,18 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
   - **Launch distill-knowledge in background (parallel with fixes)**
   - Dynamic model selection for each Must Fix item based on complexity analysis
   - Fix Must Fix items and return to Phase 5 (flow goes 5→6→7, user reviews CodeRabbit fixes)
+  - **No Must Fix branch**: pre-launch comprehensive knowledge distillation (background, fire-and-forget) before proceeding to Phase 8, saving `task_id` to `STATE.json.learningDistillTaskId`. This eliminates the wait that was previously required in Phase 8.
 - **Control**: `cycleCount` (max 3 cycles)
 
 ### Phase 8: Final Report
-- **Executor**: Main agent + Sub-agent (general-purpose via distill-knowledge)
+- **Executor**: Main agent (orchestrator only) + Sub-agent (general-purpose, background) + knowledge-distiller (pre-launched in Phase 7, background)
+- **Design principle**: Phase 8 must NOT block the user. All heavy work (report compilation, knowledge distillation) runs in background. The main agent's inline footprint is limited to: optional squash → background launches → minimal summary.
 - **Key Actions**:
-  - Squash commits (optional)
-  - Comprehensive knowledge distillation via `distill-knowledge` skill (consolidates all session learnings into Serena Memory `x-coding-best-practices`)
-  - Sub-agent writes `LEARNING_SUMMARY.md`
-  - Main agent compiles final report using `LEARNING_SUMMARY.md`
+  - **Step 0 — Squash commits**: Auto-skipped when `COMMIT_COUNT <= 1`. Otherwise ask user (`統合する` / `統合しない`).
+  - **Step 1 — Distillation check**: Read `STATE.json.learningDistillTaskId`. Skip re-launching if Phase 7 already pre-launched. If unset (Phase 7 skipped), launch fire-and-forget.
+  - **Step 2 — Background final report generation**: Launch `general-purpose` sub-agent with `run_in_background=true` (max_turns=10) to compile FINAL_REPORT.md. Save `task_id` to `STATE.json.finalReportTaskId`. Never awaited.
+  - **Step 3 — Minimal inline summary**: Issue parallel `git log --oneline` and `git diff --name-only | wc -l`. Present a short summary (task, commit list, FINAL_REPORT.md / LEARNING_SUMMARY.md path references, next steps). The user can move on immediately.
+- **Sub-agent responsibilities**: Read STATE.json, statistics files (EXPLORATION_REPORT.md, PLAN.md, IMPLEMENTATION_STATS.md, QUALITY_RESULT.md, REVIEW_RESULT.md, USER_FEEDBACK.md), call TaskList, parse git log, write FINAL_REPORT.md. Never embeds LEARNING_SUMMARY.md content (path reference only).
 
 ### Phase 9: PR Review Comments (Optional)
 - **Executor**: Main agent + Skills (fetch-pr-review-comments) + Sub-agents (feedback-validator, tdd-implementer, knowledge-distiller)
@@ -167,6 +170,8 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
 | `cycleCount` | number | Phase 5-7 cycle counter (max 3) |
 | `lastReviewCommit` | string/null | HEAD hash at last review completion (Phase 6/7), used as "since last review" diff base option |
 | `explorationLevel` | string | quick, focused, full |
+| `learningDistillTaskId` | string/null | task_id of the comprehensive knowledge-distiller pre-launched at the end of Phase 7. Phase 8 reads this to skip re-launching. Fire-and-forget (never awaited). |
+| `finalReportTaskId` | string/null | task_id of the general-purpose sub-agent launched in Phase 8 Step 2 to generate FINAL_REPORT.md in background. Fire-and-forget (never awaited). |
 
 ## Loop Control Rules
 
@@ -249,9 +254,14 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
 
 ### Learning Capture / Knowledge Distillation
 - **Skill**: `ai-agent/skills/distill-knowledge/SKILL.md`
-- **Invoked from**: Phase 6 (background), Phase 7 (background), Phase 8 (foreground comprehensive)
+- **Invoked from**:
+  - Phase 6 (background, per round of user feedback)
+  - Phase 7 (background, per cycle when Must Fix items exist)
+  - Phase 7 → Phase 8 transition (background, fire-and-forget, comprehensive — pre-launched in the "No Must Fix" branch)
+  - Phase 8 (fire-and-forget; only launches as a fallback when Phase 7 did not pre-launch)
 - **Storage**: Serena Memory `x-coding-best-practices` (cross-session, cross-agent)
 - **Consumer**: `tdd-implementer` Pre-Implementation Step 2 reads `x-coding-best-practices`
+- **Phase 8 design**: Phase 8 NEVER waits for the distiller and NEVER embeds `LEARNING_SUMMARY.md` in the final report. The summary is referenced by file path only.
 - **Considerations**: Pattern quality, deduplication, pruning old entries
 
 ### Feedback Validation

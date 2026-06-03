@@ -112,7 +112,19 @@ Report: "Phase 7: Must Fix X / Consider Y / Ignorable Z"
 ## Next Steps
 
 ### No "Must Fix" items
-Proceed to Phase 8 (Final Report) (does not count as a cycle).
+
+**Pre-launch comprehensive knowledge distillation in background:**
+
+Before transitioning to Phase 8, kick off the comprehensive distillation so that Phase 8 does not need to wait for it to complete.
+
+```
+Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
+  prompt="files: <work-dir>/QUALITY_RESULT.md <work-dir>/REVIEW_RESULT.md <work-dir>/USER_FEEDBACK.md\nmemory: x-coding-best-practices\noutput: <work-dir>/LEARNING_SUMMARY.md")
+```
+
+Save the returned `task_id` to `STATE.json` as `learningDistillTaskId`. Phase 8 will read this field and skip re-launching the distiller. Do NOT wait for the task to complete — it runs fire-and-forget.
+
+Then proceed to Phase 8 (Final Report) (does not count as a cycle).
 
 ### "Must Fix" items exist
 
@@ -204,3 +216,4 @@ If the CodeRabbit sub-agent fails or the background task encounters an error:
 Update `STATE.json`:
 - Set `currentPhase` to `8`.
 - Set `lastReviewCommit` to the current HEAD commit hash (`git rev-parse HEAD`). This records the state at review time for use as a "since last review" option in future review cycles.
+- Set `learningDistillTaskId` to the `task_id` returned by the comprehensive distillation launch (only when proceeding via the "No Must Fix items" branch).

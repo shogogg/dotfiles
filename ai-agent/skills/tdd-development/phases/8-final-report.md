@@ -53,97 +53,88 @@ Report to user:
 - Number of commits before squash
 - Final commit message used
 
-## Step 1: Comprehensive Knowledge Distillation (Background)
+## Step 1: Comprehensive Knowledge Distillation (Background, Fire-and-Forget)
 
-Launch the `knowledge-distiller` sub-agent **in background** to distill all session learnings into Serena Memory (`x-coding-best-practices`) while compiling the final report in parallel.
+The comprehensive distillation is normally pre-launched at the end of Phase 7 (in the "No Must Fix items" branch). Phase 8 does NOT wait for it to complete and does NOT embed its output into the final report.
 
-### 1.1 Invoke Sub-Agent
+### 1.1 Check Pre-Launched Task
 
-```
-Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
-  prompt="files: <work-dir>/QUALITY_RESULT.md <work-dir>/REVIEW_RESULT.md <work-dir>/USER_FEEDBACK.md\nmemory: x-coding-best-practices\noutput: <work-dir>/LEARNING_SUMMARY.md")
-```
+Read `STATE.json.learningDistillTaskId`:
 
-Save the returned `task_id` for later retrieval.
+- **If set (pre-launched in Phase 7)**: Skip re-launching. The background task continues running independently.
+- **If not set (backward compatibility / Phase 7 was skipped)**: Launch the sub-agent now in background, fire-and-forget. Do NOT save the task_id, do NOT wait.
 
-The sub-agent will:
+  ```
+  Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
+    prompt="files: <work-dir>/QUALITY_RESULT.md <work-dir>/REVIEW_RESULT.md <work-dir>/USER_FEEDBACK.md\nmemory: x-coding-best-practices\noutput: <work-dir>/LEARNING_SUMMARY.md")
+  ```
+
+The sub-agent will (independently of Phase 8):
 - Read all available session files (skips any that do not exist)
 - Merge with any patterns already added during Phase 5/6/7 distillation cycles
 - Write consolidated patterns to Serena Memory `x-coding-best-practices`
 - Write `<work-dir>/LEARNING_SUMMARY.md`
 
-## Step 2: Compile Final Report (Parallel with Step 1)
+**Important**: Phase 8 proceeds immediately without waiting. The distillation output is referenced by file path only — it may not be available yet when the user reads the final report.
 
-Begin compiling the final report immediately — do NOT wait for the knowledge distiller to finish.
+## Step 2: Launch Background Final Report Generation
 
-### 2.0 Gather Statistics
+Delegate the full report compilation (statistics gathering, task aggregation, FINAL_REPORT.md writing) to a `general-purpose` sub-agent running in the background. The main agent does NOT wait — it proceeds directly to Step 3 (minimal inline summary) so the user can move on immediately.
 
-Read Statistics sections from all available output files:
-
-**Required files** (read if they exist):
-- `<work-dir>/EXPLORATION_REPORT.md` — Exploration statistics
-- `<work-dir>/PLAN.md` — Planning statistics
-- `<work-dir>/IMPLEMENTATION_STATS.md` — Implementation statistics (may have multiple entries)
-- `<work-dir>/QUALITY_RESULT.md` — Quality check statistics
-- `<work-dir>/REVIEW_RESULT.md` — Code review statistics
-
-**Parse each Statistics section** to extract:
-- Start Time (ISO 8601)
-- End Time (ISO 8601)
-- Duration (seconds and human-readable)
-- Agent/Skill name
-- Additional metadata (e.g., Model Used, Exploration Level, Planning Method)
-
-**Calculate total session duration**:
-- Session start = earliest Start Time across all phases
-- Session end = latest End Time across all phases
-- Total duration = (Session end epoch) - (Session start epoch)
-
-**Note**: If any file is missing or has no Statistics section, mark that phase as "N/A" in the statistics table.
-
-### 2.1 Gather Tasks Summary
-
-Call `TaskList` to retrieve all Tasks. Group them by naming prefix to populate the "Work Items (Tasks)" section:
-- **Implementation Units**: Tasks with subject starting with `"Implement Unit"` or `"Implement:"`
-- **Code Review Fixes**: Tasks with subject starting with `"Fix CR-"`
-- **User Feedback Fixes**: Tasks with subject starting with `"Fix UF-"`
-
-Count completed vs total for each group.
-
-### 2.2 Wait for Knowledge Distiller
-
-After assembling all other sections of the report, wait for the background distiller to complete:
+### 2.1 Launch Sub-Agent
 
 ```
-TaskOutput(task_id=..., block=true, timeout=120000)
+Task(subagent_type="general-purpose", max_turns=10, run_in_background=true,
+  prompt="<prompt below>")
 ```
 
-Then read `<work-dir>/LEARNING_SUMMARY.md` and embed it in the report.
+**Sub-agent prompt** (English):
 
-### 2.3 Write Final Report to File
+```
+Compile the final TDD development session report.
 
-Write the complete final report to `<work-dir>/FINAL_REPORT.md` using the following template:
+Working directory: <work-dir>
+Output file: <work-dir>/FINAL_REPORT.md
 
-```markdown
+Steps:
+1. Read STATE.json for session metadata (task description, startCommitHash, baseBranch, cycleCount, etc.).
+2. Read Statistics sections from any of these files that exist:
+   - EXPLORATION_REPORT.md (Exploration)
+   - PLAN.md (Planning, including Metadata.Planning Method)
+   - IMPLEMENTATION_STATS.md (Implementation — may contain multiple entries)
+   - QUALITY_RESULT.md (Quality Checks)
+   - REVIEW_RESULT.md (Code Review)
+   - USER_FEEDBACK.md (if exists — for user review record)
+3. Each Statistics section reports Start Time (ISO 8601), End Time (ISO 8601), Duration. Parse these and compute total session duration (earliest start to latest end).
+4. Call TaskList and group by subject prefix:
+   - "Implement Unit" / "Implement:" → Implementation Units
+   - "Fix CR-" → Code Review Fixes
+   - "Fix UF-" → User Feedback Fixes
+   Count completed vs total for each group.
+5. Read git log <startCommitHash>..HEAD to enumerate commits.
+6. Write FINAL_REPORT.md using the template below. Use "N/A" for any missing values; never block on missing data.
+
+Template:
+
 # TDD Development Session Report
 
 ## Implementation Summary
-- **Task**: [original task description]
-- **Planning Method**: [codex or self — read from PLAN.md Metadata section]
-- **Files changed**: [list of created/modified files]
-- **Key changes**: [brief summary of what was implemented]
+- **Task**: <task description from STATE.json>
+- **Planning Method**: <codex|self from PLAN.md Metadata>
+- **Files changed**: <list from git diff --name-only startCommitHash..HEAD>
+- **Key changes**: <brief summary from PLAN.md Overview>
 
 ## Test Results
 - **Status**: PASS / FAIL
-- **Details**: [pass/fail counts from last quality check]
+- **Details**: <pass/fail counts from last QUALITY_RESULT.md>
 
 ## Review Record
 - **User Review**: Approved / Approved after N revision(s)
 - **Code Review (CodeRabbit)**:
-  - **Must Fix**: [count and resolution status]
-  - **Consider**: [count and brief notes]
-  - **Ignorable**: [count]
-- **Cycles used**: N/3
+  - **Must Fix**: <count and resolution status>
+  - **Consider**: <count and brief notes>
+  - **Ignorable**: <count>
+- **Cycles used**: <cycleCount>/3
 
 ## Work Items (Tasks)
 - **Implementation Units**: <completed>/<total>
@@ -169,41 +160,72 @@ Write the complete final report to `<work-dir>/FINAL_REPORT.md` using the follow
 - N/A indicates the phase was skipped or statistics unavailable
 
 ## Commits Created
-[List of commits created during this session with their messages]
+<list from git log --oneline startCommitHash..HEAD>
 
 ## Learnings Summary
-[Embed contents of LEARNING_SUMMARY.md here]
+A detailed learnings summary is being distilled in the background and will be written to:
+- <work-dir>/LEARNING_SUMMARY.md
+
+If the file already exists when you read this report, open it directly. Distilled patterns are also persisted to Serena Memory (x-coding-best-practices) for future sessions.
 
 ## Next Steps
 - [ ] Review the commits in git log
 - [ ] Push to remote when ready
 - [ ] Create PR if needed
-- [ ] After PR review, run Phase 9 (`/coding` → Resume → Phase 9) to address review comments
+- [ ] After PR review, run Phase 9 (/coding → Resume → Phase 9) to address review comments
+
+Return directive: Write FINAL_REPORT.md to <work-dir>/FINAL_REPORT.md. Return ONLY a brief completion summary (1-2 sentences) — do NOT include the full report content. Do NOT embed LEARNING_SUMMARY.md content (the distillation may not be complete yet — always reference by path).
 ```
 
-### 2.4 Present Summary to User
+Save the returned `task_id` to `STATE.json` as `finalReportTaskId`. Fire-and-forget — the main agent never awaits this task.
 
-After writing `FINAL_REPORT.md`, present a brief summary to the user:
+## Step 3: Present Minimal Inline Summary
+
+Without waiting for Step 1 or Step 2 to complete, present a minimal completion summary to the user so they can move on immediately.
+
+### 3.1 Gather Minimal Inline Data
+
+Issue these in parallel via Bash:
+
+```bash
+git log --oneline <startCommitHash>..HEAD
+```
+
+```bash
+git diff --name-only <startCommitHash>..HEAD | wc -l
+```
+
+That's all the inline data needed. Do NOT read statistics files, do NOT parse durations — those are handled by the background sub-agent.
+
+### 3.2 Present Summary
 
 ```markdown
 ## 🎉 TDD Development セッション完了
 
 ### 概要
-- **タスク**: [original task description]
-- **実装ファイル**: [count] files
-- **テスト結果**: PASS / FAIL
-- **CodeRabbit レビュー**: Must Fix [count] 件（すべて修正済み）
-- **合計所要時間**: [N]分
+- **タスク**: <task description from STATE.json>
+- **変更ファイル数**: <count> files
+- **コミット数**: <commit count>
 
-### 詳細レポート
-完全なレポートは以下のファイルに出力されました:
+### コミット一覧
+<git log --oneline output>
+
+### 詳細レポート（バックグラウンド生成中）
+完全なレポートは以下のファイルに書き出されます:
 - `<work-dir>/FINAL_REPORT.md`
 
+### 学習内容（バックグラウンド蒸留中）
+学習結果は以下のファイルに書き出され、Serena Memory (`x-coding-best-practices`) にも保存されます:
+- `<work-dir>/LEARNING_SUMMARY.md`
+
 ### 次のステップ
-1. 変更内容を確認: `git log <startCommitHash>..HEAD`
-2. リモートにプッシュ: `git push`
-3. PR作成後、Phase 9 でレビューコメントに対応可能
+1. リモートにプッシュ: `git push`
+2. PR作成後、Phase 9 (`/coding` → Resume → Phase 9) でレビューコメントに対応可能
+
+> 詳細レポートと学習サマリーはバックグラウンドで生成中です。完了を待たずに次の作業に移れます。
 ```
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `9`.
+Update `STATE.json`:
+- Set `currentPhase` to `9`.
+- Set `finalReportTaskId` to the `task_id` returned by Step 2.1.
