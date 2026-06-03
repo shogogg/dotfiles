@@ -1,6 +1,6 @@
 ---
 name: tdd-implementer
-model: opus
+model: sonnet
 color: red
 memory: user
 description: |

@@ -10,5 +10,6 @@
 .serena/memories/x-*.md
 .shogogg
 .zcompdump
+phpstan.neon
 yarn-error.log
 Taskfile.yaml

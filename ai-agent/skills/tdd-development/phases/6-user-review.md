@@ -1,6 +1,6 @@
-# Phase 7: User Review
+# Phase 6: User Review
 
-Report: "Phase 7: ユーザーレビューを開始します..."
+Report: "Phase 6: ユーザーレビューを開始します..."
 
 ## Step 1: Read State and Show Commit History
 
@@ -130,7 +130,7 @@ Inspect the difit skill's return value:
 This file is consumed by:
 - `tdd-implementer` (reads it autonomously for feedback patterns)
 - `feedback-validator` (receives it as input)
-- Phase 9 learning sub-agent (references it for session learnings)
+- Phase 8 learning sub-agent (references it for session learnings)
 - `knowledge-distiller` (reads latest round for immediate distillation)
 
 ### When APPROVED
@@ -210,7 +210,7 @@ Present a concise summary to the user:
 
 ### Status: APPROVED
 
-Proceed to Phase 8 (Code Review).
+Proceed to Phase 7 (Code Review).
 
 ### Status: CHANGES_REQUESTED
 
@@ -296,12 +296,12 @@ For each feedback item (1 to N):
 7. Move to next item.
 
 After all feedback items are resolved:
-1. Reset `phase6RetryCount` to 0 in `STATE.json`.
-2. Return to Phase 6.
+1. Reset `phase5RetryCount` to 0 in `STATE.json`.
+2. Return to Phase 5.
 
 **Critical Rule**: Only explicit approval in `USER_FEEDBACK.md` (Status: APPROVED) constitutes approval.
 
 ## State Update
 Update `STATE.json`:
-- Set `currentPhase` to `8`.
+- Set `currentPhase` to `7`.
 - Set `lastReviewCommit` to the current HEAD commit hash (`git rev-parse HEAD`). This records the state at review time for use as a "since last review" option in future review cycles.

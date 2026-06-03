@@ -44,7 +44,7 @@ After Group A completes:
    BASE_BRANCH="HEAD"
    ```
 
-   **Note**: If `BASE_BRANCH` is "HEAD", warn the user that diff comparison may not work properly in Phase 8.
+   **Note**: If `BASE_BRANCH` is "HEAD", warn the user that diff comparison may not work properly in Phase 7.
 
 ### Group C: Workspace Setup (Sequential, after Group B)
 
@@ -67,7 +67,7 @@ After Group A completes:
    - `startCommitHash`: The HEAD commit hash at session start (obtained via `git rev-parse HEAD`)
    - `baseBranch`: The branch/ref determined in step 4 (e.g., "origin/main", "main", or "HEAD")
    - `featureBranch`: The current branch name after step 4
-   - `lastReviewCommit`: Updated after each review cycle (Phase 7/8) with the HEAD commit hash at review time. Used as a "since last review" diff base option.
+   - `lastReviewCommit`: Updated after each review cycle (Phase 6/7) with the HEAD commit hash at review time. Used as a "since last review" diff base option.
 
 ## State Update
 Update `STATE.json`: set `currentPhase` to `1`.

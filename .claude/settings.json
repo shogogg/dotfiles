@@ -27,8 +27,10 @@
       "mcp__serena__*",
       "mcp__plugin_serena_serena__*"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "auto"
   },
+  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
@@ -62,7 +64,9 @@
     "serena@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
+  "effortLevel": "xhigh",
   "feedbackSurveyState": {
     "lastShownTime": 1753946327912
-  }
+  },
+  "skipAutoPermissionPrompt": true
 }

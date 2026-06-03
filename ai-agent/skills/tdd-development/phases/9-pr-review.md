@@ -1,6 +1,6 @@
-# Phase 10: PR Review Comments
+# Phase 9: PR Review Comments
 
-Report: "Phase 10: PR レビューコメントへの対応を開始します..."
+Report: "Phase 9: PR レビューコメントへの対応を開始します..."
 
 ## Step 1: Obtain Review Comments
 
@@ -192,9 +192,9 @@ For each feedback item (1 to N):
 7. Move to next item.
 
 After all feedback items are resolved:
-1. Reset `phase6RetryCount` to 0 in `STATE.json`.
-2. Return to Phase 6 (Quality Checks → User Review → Code Review).
-   - **IMPORTANT**: Do NOT push to remote at this point. Changes must pass quality checks (Phase 6) and user review (Phase 7) first.
+1. Reset `phase5RetryCount` to 0 in `STATE.json`.
+2. Return to Phase 5 (Quality Checks → User Review → Code Review).
+   - **IMPORTANT**: Do NOT push to remote at this point. Changes must pass quality checks (Phase 5) and user review (Phase 6) first.
 
 ## Step 5: Completion
 
@@ -218,16 +218,16 @@ Update `PR_REVIEW_FEEDBACK.md` — append:
 COMPLETED (after N rounds of feedback)
 ```
 
-Update `STATE.json`: set `currentPhase` to `11`.
+Update `STATE.json`: set `currentPhase` to `10`.
 
 ## State Update
 
 When transitioning phases during the fix loop:
-- Return to Phase 6: set `currentPhase` to `6`
-- On completion: set `currentPhase` to `11`
+- Return to Phase 5: set `currentPhase` to `5`
+- On completion: set `currentPhase` to `10`
 
 ## Loop Control
 
-- Phase 10 → Phase 6 return: Reset `phase6RetryCount` to 0
-- Phase 10 does NOT count against `cycleCount`
-- There is no explicit limit on Phase 10 rounds (each round requires user initiation)
+- Phase 9 → Phase 5 return: Reset `phase5RetryCount` to 0
+- Phase 9 does NOT count against `cycleCount`
+- There is no explicit limit on Phase 9 rounds (each round requires user initiation)

@@ -1,6 +1,6 @@
-# Phase 9: Final Report
+# Phase 8: Final Report
 
-Report: "Phase 9: Generating final report..."
+Report: "Phase 8: Generating final report..."
 
 ## Step 0: Squash Commits
 
@@ -68,7 +68,7 @@ Save the returned `task_id` for later retrieval.
 
 The sub-agent will:
 - Read all available session files (skips any that do not exist)
-- Merge with any patterns already added during Phase 6/7/8 distillation cycles
+- Merge with any patterns already added during Phase 5/6/7 distillation cycles
 - Write consolidated patterns to Serena Memory `x-coding-best-practices`
 - Write `<work-dir>/LEARNING_SUMMARY.md`
 
@@ -178,7 +178,7 @@ Write the complete final report to `<work-dir>/FINAL_REPORT.md` using the follow
 - [ ] Review the commits in git log
 - [ ] Push to remote when ready
 - [ ] Create PR if needed
-- [ ] After PR review, run Phase 10 (`/coding` → Resume → Phase 10) to address review comments
+- [ ] After PR review, run Phase 9 (`/coding` → Resume → Phase 9) to address review comments
 ```
 
 ### 2.4 Present Summary to User
@@ -202,8 +202,8 @@ After writing `FINAL_REPORT.md`, present a brief summary to the user:
 ### 次のステップ
 1. 変更内容を確認: `git log <startCommitHash>..HEAD`
 2. リモートにプッシュ: `git push`
-3. PR作成後、Phase 10 でレビューコメントに対応可能
+3. PR作成後、Phase 9 でレビューコメントに対応可能
 ```
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `10`.
+Update `STATE.json`: set `currentPhase` to `9`.

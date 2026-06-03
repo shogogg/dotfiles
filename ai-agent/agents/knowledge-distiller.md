@@ -1,6 +1,6 @@
 ---
 name: knowledge-distiller
-model: sonnet
+model: haiku
 color: yellow
 memory: user
 description: |

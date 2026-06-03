@@ -1,6 +1,6 @@
-# Phase 5: TDD Implementation
+# Phase 4: TDD Implementation
 
-Report: "Phase 5: Implementing with TDD..."
+Report: "Phase 4: Implementing with TDD..."
 
 ## Sub-agent Configuration
 
@@ -20,7 +20,7 @@ Prompt must include:
 - **Work directory**: `<work-dir>` (for sub-agent to reference session-specific learnings)
 - **Which unit(s) to implement** (unit name and details from the plan)
 - **CRITICAL instruction**: "You MUST run `task --list-all` (go-task CLI, https://taskfile.dev) via the Bash tool first, and use go-task `task` CLI commands for ALL test executions. Do NOT use composer/npm/phpunit/jest/make directly. Note: go-task `task` is a CLI command run via Bash — it is NOT Claude Code's Task tool."
-- **Return directive**: "Return ONLY a brief completion summary (3-5 sentences) to the orchestrator: list the files created/modified, state whether tests pass (and confirm you used go-task `task test` via Bash), and note any issues encountered. Do NOT include full file contents or large code blocks in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 6. Do not read, analyze, or modify code yourself.`"
+- **Return directive**: "Return ONLY a brief completion summary (3-5 sentences) to the orchestrator: list the files created/modified, state whether tests pass (and confirm you used go-task `task test` via Bash), and note any issues encountered. Do NOT include full file contents or large code blocks in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 5. Do not read, analyze, or modify code yourself.`"
 
 ## Execution Strategy
 
@@ -63,7 +63,7 @@ Process units in dependency-order batches. Each batch contains units whose depen
 
 ### Step 4: Proceed
 
-After all units are complete, proceed to Phase 6.
+After all units are complete, proceed to Phase 5.
 
 ## Single-Unit Shortcut
 
@@ -79,7 +79,7 @@ If a sub-agent fails mid-implementation:
   - **Skip** the failed unit(s)
   - **Abort** the workflow
 
-Report: "Phase 5 complete: Implementation finished."
+Report: "Phase 4 complete: Implementation finished."
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `6`.
+Update `STATE.json`: set `currentPhase` to `5`.

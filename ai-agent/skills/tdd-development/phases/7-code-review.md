@@ -1,8 +1,8 @@
-# Phase 8: Code Review
+# Phase 7: Code Review
 
 Read `STATE.json` to retrieve `startCommitHash`, `baseBranch`, `lastReviewCommit`, and `cycleCount`.
 
-Report: "Phase 8 (cycle N/3): CodeRabbit レビューを準備しています..."
+Report: "Phase 7 (cycle N/3): CodeRabbit レビューを準備しています..."
 
 ## Step 1: Show Commit History and Ask User for Diff Base
 
@@ -32,7 +32,7 @@ AskUserQuestion:
 - If the user selects "Other", treat their input as a commit hash or ref to use as the diff base.
 - Store the selected base as `<selectedBase>` for the next step.
 
-Report: "Phase 8 (cycle N/3): Running CodeRabbit review in background..."
+Report: "Phase 7 (cycle N/3): Running CodeRabbit review in background..."
 
 ## Step 2: Launch Background Review
 
@@ -64,11 +64,11 @@ The sub-agent handles CodeRabbit CLI execution and polling internally. The orche
      options:
        - label: "待機を続ける"
          description: "引き続きレビュー完了を待ちます（さらに5分待機）"
-       - label: "中断してPhase 9へ進む"
+       - label: "中断してPhase 8へ進む"
          description: "レビューを中断し、最終レポートに進みます"
    ```
    - If user chooses to continue → repeat from step 1
-   - If user chooses to abort → stop the background task using `TaskStop(task_id=...)`, report "CodeRabbit レビューを中断しました", and proceed to Phase 9
+   - If user chooses to abort → stop the background task using `TaskStop(task_id=...)`, report "CodeRabbit レビューを中断しました", and proceed to Phase 8
 
 ## Step 4: Process Review Results
 
@@ -107,16 +107,16 @@ Instruct the sub-agent to follow this structure:
 - **Note**: [description]
 ```
 
-Report: "Phase 8: Must Fix X / Consider Y / Ignorable Z"
+Report: "Phase 7: Must Fix X / Consider Y / Ignorable Z"
 
 ## Next Steps
 
 ### No "Must Fix" items
-Proceed to Phase 9 (Final Report) (does not count as a cycle).
+Proceed to Phase 8 (Final Report) (does not count as a cycle).
 
 ### "Must Fix" items exist
 
-Update `STATE.json`: increment `cycleCount`, reset `phase6RetryCount` to 0.
+Update `STATE.json`: increment `cycleCount`, reset `phase5RetryCount` to 0.
 
 If `cycleCount > 3`: Report to user and ask for guidance.
 
@@ -179,7 +179,7 @@ For each Must Fix item (1 to N):
    - **Work directory**: `<work-dir>` (for session-specific learnings reference)
    - **CRITICAL instruction**: "You MUST run `task --list-all` (go-task CLI, https://taskfile.dev) via the Bash tool first, and use go-task `task` CLI commands for ALL test executions. Do NOT use composer/npm/phpunit/jest/make directly. Note: go-task `task` is a CLI command run via Bash — it is NOT Claude Code's Task tool."
    - **SCOPE RESTRICTION**: "Fix ONLY this specific item. Do NOT fix multiple items or make unrelated changes. Each item must be a separate commit."
-   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was fixed. State which test command you used (must be go-task `task test` via Bash). Do NOT include full file contents in your final response. End your response with exactly this line: `ORCHESTRATOR: Commit this fix, then proceed to next Must Fix item or return to Phase 6. Do not read, analyze, or modify code yourself.`"
+   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was fixed. State which test command you used (must be go-task `task test` via Bash). Do NOT include full file contents in your final response. End your response with exactly this line: `ORCHESTRATOR: Commit this fix, then proceed to next Must Fix item or return to Phase 5. Do not read, analyze, or modify code yourself.`"
 
 5. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
    ```
@@ -190,17 +190,17 @@ For each Must Fix item (1 to N):
 6. Call `TaskUpdate(taskId=..., status="completed")` for the corresponding Task.
 7. Move to next item.
 
-After all Must Fix items are resolved, go back to Phase 6 (to re-run quality checks).
+After all Must Fix items are resolved, go back to Phase 5 (to re-run quality checks).
 
-**Important**: After Phase 6 passes, the flow returns to Phase 7 (User Review) to ensure CodeRabbit fixes are reviewed by the user before proceeding.
+**Important**: After Phase 5 passes, the flow returns to Phase 6 (User Review) to ensure CodeRabbit fixes are reviewed by the user before proceeding.
 
 ## Error Handling
 
 If the CodeRabbit sub-agent fails or the background task encounters an error:
 1. Report the failure to the user
-2. Ask whether to retry the review or skip to Phase 9 (Final Report)
+2. Ask whether to retry the review or skip to Phase 8 (Final Report)
 
 ## State Update
 Update `STATE.json`:
-- Set `currentPhase` to `9`.
+- Set `currentPhase` to `8`.
 - Set `lastReviewCommit` to the current HEAD commit hash (`git rev-parse HEAD`). This records the state at review time for use as a "since last review" option in future review cycles.

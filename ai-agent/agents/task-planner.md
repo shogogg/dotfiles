@@ -1,6 +1,6 @@
 ---
 name: task-planner
-model: opus
+model: sonnet
 color: yellow
 memory: user
 description: |

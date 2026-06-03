@@ -7,7 +7,7 @@ allowed-tools: Task, Skill, Bash, Read, Write, TaskCreate, TaskUpdate, TaskList,
 
 # /coding Workflow Orchestrator
 
-This skill orchestrates a structured TDD development workflow across 10 phases (Phase 0–2, 4–10). Phase 3 (Test Design) has been merged into Phase 2 (Planning). Phase 10 (PR Review Comments) is optional and user-initiated.
+This skill orchestrates a structured TDD development workflow across 10 phases (Phase 0–9). Phase 9 (PR Review Comments) is optional and user-initiated.
 
 ## Orchestration Principle
 
@@ -36,13 +36,13 @@ Workflow Progress:
 - [ ] Phase 0: Pre-checks
 - [ ] Phase 1: Exploration
 - [ ] Phase 2: Planning (includes Test Plan)
-- [ ] Phase 4: Approval Gate
-- [ ] Phase 5: TDD Implementation
-- [ ] Phase 6: Quality Checks
-- [ ] Phase 7: User Review
-- [ ] Phase 8: Code Review
-- [ ] Phase 9: Final Report
-- [ ] Phase 10: PR Review Comments (optional)
+- [ ] Phase 3: Approval Gate
+- [ ] Phase 4: TDD Implementation
+- [ ] Phase 5: Quality Checks
+- [ ] Phase 6: User Review
+- [ ] Phase 7: Code Review
+- [ ] Phase 8: Final Report
+- [ ] Phase 9: PR Review Comments (optional)
 ```
 
 ## Resume Detection
@@ -66,31 +66,31 @@ Read each phase document **only when you are ready to execute that phase**. Do n
 1. [Pre-checks](phases/0-pre-checks.md) — Clarify task, create branch, verify tools, initialize workspace
 2. [Exploration](phases/1-exploration.md) — Load past learnings, check profile, explore codebase
 3. [Planning](phases/2-planning.md) — Create work plan and test plan based on exploration results
-4. [Approval Gate](phases/4-approval-gate.md) — Present plan (including test plan) to user for approval
-5. [Implementation](phases/5-implementation.md) — Implement code following TDD methodology
-6. [Quality Checks](phases/6-quality-checks.md) — Run tests, lint, formatting (max 3 retries)
-7. [User Review](phases/7-user-review.md) — Present changes to user for approval
-8. [Code Review](phases/8-code-review.md) — CodeRabbit review (max 3 cycles)
-9. [Final Report](phases/9-final-report.md) — Summarize results and present to user
-10. [PR Review Comments](phases/10-pr-review.md) — Address PR review comments (optional, user-initiated)
+4. [Approval Gate](phases/3-approval-gate.md) — Present plan (including test plan) to user for approval
+5. [Implementation](phases/4-implementation.md) — Implement code following TDD methodology
+6. [Quality Checks](phases/5-quality-checks.md) — Run tests, lint, formatting (max 3 retries)
+7. [User Review](phases/6-user-review.md) — Present changes to user for approval
+8. [Code Review](phases/7-code-review.md) — CodeRabbit review (max 3 cycles)
+9. [Final Report](phases/8-final-report.md) — Summarize results and present to user
+10. [PR Review Comments](phases/9-pr-review.md) — Address PR review comments (optional, user-initiated)
 
 ## Loop Control
 
-- Phase 6 retry limit: **3** (report to user on exceed)
-- Phase 7 user review: If user requests fixes → fix → return to Phase 6
-- Phase 7→6 return: Reset Phase 6 retry counter, does NOT count against cycleCount
-- Phase 6→8 cycle limit: **3** ("Must Fix" → fix → Phase 6 = 1 cycle)
-- Phase 8 "No Must Fix": Does not count as cycle
-- Phase 8→6 return: Reset Phase 6 retry counter (flow goes 6→7→8, user reviews CodeRabbit fixes)
-- Phase 10 PR review: If fixes needed → fix → return to Phase 6 (no push until quality checks pass)
-- Phase 10→6 return: Reset Phase 6 retry counter, does NOT count against cycleCount
+- Phase 5 retry limit: **3** (report to user on exceed)
+- Phase 6 user review: If user requests fixes → fix → return to Phase 5
+- Phase 6→5 return: Reset Phase 5 retry counter, does NOT count against cycleCount
+- Phase 5→7 cycle limit: **3** ("Must Fix" → fix → Phase 5 = 1 cycle)
+- Phase 7 "No Must Fix": Does not count as cycle
+- Phase 7→5 return: Reset Phase 5 retry counter (flow goes 5→6→7, user reviews CodeRabbit fixes)
+- Phase 9 PR review: If fixes needed → fix → return to Phase 5 (no push until quality checks pass)
+- Phase 9→5 return: Reset Phase 5 retry counter, does NOT count against cycleCount
 - State file: `<work-dir>/STATE.json` (initialize in Phase 0)
 
 ### CRITICAL: Phase File Re-read on Loop Return
 
-When returning to Phase 6 from Phase 7, 8, or 10, you MUST re-read the phase documents before executing them. This is because earlier phase instructions may have drifted out of your active attention due to intervening conversation.
+When returning to Phase 5 from Phase 6, 7, or 9, you MUST re-read the phase documents before executing them. This is because earlier phase instructions may have drifted out of your active attention due to intervening conversation.
 
-**Rule**: Before executing Phase 6, re-read `phases/6-quality-checks.md`. Before executing Phase 7, re-read `phases/7-user-review.md`. Before executing Phase 8, re-read `phases/8-code-review.md`.
+**Rule**: Before executing Phase 5, re-read `phases/5-quality-checks.md`. Before executing Phase 6, re-read `phases/6-user-review.md`. Before executing Phase 7, re-read `phases/7-code-review.md`.
 
 This applies every time you enter these phases, not just the first time. Treat each phase entry as if you are reading the instructions for the first time.
 
@@ -100,8 +100,8 @@ Use Claude Code's `TaskCreate`/`TaskUpdate`/`TaskList` tools for **work-item-lev
 
 ### Principles
 - **Do NOT use Tasks for phase tracking** — STATE.json handles phase transitions
-- **Create Tasks after Phase 4 approval** — from Implementation Units in PLAN.md
-- **Create Tasks for fix items** — in Phase 7 (Must Fix) and Phase 8 (User Feedback)
+- **Create Tasks after Phase 3 approval** — from Implementation Units in PLAN.md
+- **Create Tasks for fix items** — in Phase 6 (User Feedback) and Phase 7 (Must Fix)
 - **Only the orchestrator manages Tasks** — sub-agents must NOT call TaskCreate/TaskUpdate/TaskList
 
 ### Naming Convention
