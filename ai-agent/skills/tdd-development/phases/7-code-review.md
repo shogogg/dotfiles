@@ -52,10 +52,12 @@ Save the returned `output_file` path and `task_id` for polling.
 
 The sub-agent handles CodeRabbit CLI execution and polling internally. The orchestrator only monitors the sub-agent's overall completion and checks in with the user periodically.
 
+**Note**: The sub-agent may finish in **a few seconds** when CodeRabbit approves with no review comments — in that case `TaskOutput` returns almost immediately with status `completed`. Do not interpret a short duration as a failure; trust the task status returned by `TaskOutput` (NOT the textual output length) as the completion signal.
+
 **Monitoring loop:**
 
 1. Use `TaskOutput(task_id=..., block=true, timeout=300000)` to wait up to 5 minutes for the sub-agent to complete
-2. If the sub-agent completes → proceed to Step 4
+2. If the sub-agent's status becomes `completed` / `failed` / `stopped` → proceed to Step 4 (do NOT re-poll)
 3. If timeout (5 minutes elapsed without completion) → ask the user:
    ```
    AskUserQuestion:

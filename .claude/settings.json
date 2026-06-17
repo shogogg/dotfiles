@@ -30,7 +30,6 @@
     "deny": [],
     "defaultMode": "auto"
   },
-  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
@@ -65,8 +64,8 @@
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "xhigh",
+  "skipAutoPermissionPrompt": true,
   "feedbackSurveyState": {
     "lastShownTime": 1753946327912
-  },
-  "skipAutoPermissionPrompt": true
+  }
 }

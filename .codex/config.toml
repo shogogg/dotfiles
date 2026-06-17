@@ -1,4 +1,4 @@
-model = "gpt-5.4"
+model = "gpt-5.5"
 model_reasoning_effort = "xhigh"
 approval_policy = "on-request"
 hide_agent_reasoning = true
@@ -13,6 +13,9 @@ notifications = [
   "agent-turn-complete",
   "approval-requested"
 ]
+
+[tui.model_availability_nux]
+"gpt-5.5" = 2
 
 [features]
 skills = true
@@ -44,8 +47,12 @@ approval_mode = "approve"
 [notice.model_migrations]
 "gpt-5.1-codex-max" = "gpt-5.2-codex"
 "gpt-5.3-codex" = "gpt-5.4"
+"gpt-5.4" = "gpt-5.5"
 
 [projects."/Users/shogo.kawase/ghq/github.com/PRTIMES/prtimes"]
+trust_level = "trusted"
+
+[projects."/Users/shogo.kawase/ghq/github.com/shogogg/hamelin"]
 trust_level = "trusted"
 
 [plugins."github@openai-curated"]
