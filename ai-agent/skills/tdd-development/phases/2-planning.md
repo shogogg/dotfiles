@@ -20,7 +20,7 @@ Prompt must include:
 - **Project profile summary** (if available): relevant patterns and conventions
 - **Past learnings summary** (if any were loaded in Phase 1)
 - **Lightening directive** (CRITICAL): "Keep Implementation Units HIGH-LEVEL. For each unit, fill ONLY: Files, Changes (one-line summary of the high-level change), Dependencies, Dependency Type, Model. Do NOT include step-by-step implementation instructions, code snippets, or pseudocode — that is the implementer's job. **The Test Plan section IS the exception**: enumerate test method names thoroughly (Happy Path / Boundary / Edge Cases), since these drive TDD."
-- **Return directive**: "Write the complete plan (including Test Plan and Metadata section) to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, state the number of implementation units, note whether there are unresolved questions, and report the planning method used (codex or self). Do NOT include the full plan content in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 3. Do not read or analyze the plan yourself.`"
+- **Return directive**: "Write the complete plan (including Test Plan) to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, state the number of implementation units, and note whether there are unresolved questions. Do NOT include the full plan content in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 3. Do not read or analyze the plan yourself.`"
 
 ## Output Template (PLAN.md)
 
@@ -67,9 +67,6 @@ Instruct the sub-agent to follow this structure:
 
 ## Learnings Applied
 - [List of past learnings that were considered in this plan, or "None"]
-
-## Metadata
-- **Planning Method**: codex | self
 ```
 
 **Key rule for the planner**: Implementation Units list **what**, never **how**. The "how" is the implementer's responsibility in Phase 4. The only place to be thorough is the **Test Plan** — enumerate cases generously, since they drive TDD.

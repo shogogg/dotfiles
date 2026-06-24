@@ -56,14 +56,12 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
 - **Report format**: Lightweight — required sections are Task Summary, Related Files, Key Concerns. Other sections (Dependencies, Test Patterns, Existing Patterns) are optional.
 
 ### Phase 2: Planning (Lightweight, includes Test Plan)
-- **Executor**: Sub-agent (task-planner), `max_turns=15`, model `sonnet` (default)
+- **Executor**: Sub-agent (task-planner), `max_turns=15`, model `opus` (default)
 - **Design principle**: Plan provides the **shape** of the work, not the implementation. Implementation Units stay high-level. **Test Plan is the exception** — keep test case enumeration thorough.
 - **Output**: `<work-dir>/PLAN.md`
-- **Key Sections**: Overview, Affected Files, Implementation Units (high-level), **Test Plan** (detailed), Unresolved Questions, Learnings Applied, Metadata
+- **Key Sections**: Overview, Affected Files, Implementation Units (high-level), **Test Plan** (detailed), Unresolved Questions, Learnings Applied
 - **Implementation Units format**: Each unit includes only Files, Changes (one-line), Dependencies, Dependency Type, Model. No step-by-step implementation or code snippets.
 - **Test Plan format**: Test method names grouped by class/method, categorized by Happy Path / Boundary / Edge Cases, with notes on test strategy (data providers, mocks, etc.)
-- **Codex MCP delegation**: task-planner prefers delegating initial plan draft to Codex MCP (`mcp__codex__codex`) when available, then reviews/refines the output. Falls back to self-planning silently if Codex is unavailable.
-- **Metadata tracking**: PLAN.md includes a `## Metadata` section with `Planning Method: codex | self` to record which method was used. This is reported in the final report (Phase 8).
 
 ### Phase 3: Approval Gate
 - **Executor**: Main agent + Sub-agents (feedback-validator, general-purpose for plan edits)
@@ -204,7 +202,7 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
 | Agent | Model | Memory Scope | Key Learnings |
 |-------|-------|-------------|---------------|
 | `codebase-explorer` | sonnet | `user` | Codebase structures, architectural patterns, project conventions |
-| `task-planner` | sonnet | `user` | Planning patterns, decomposition strategies, architectural decisions |
+| `task-planner` | opus | `user` | Planning patterns, decomposition strategies, architectural decisions |
 | `unit-test-designer` | opus | `user` | Test patterns, naming conventions, edge cases |
 | `tdd-implementer` | sonnet (default; per-unit override) | `user` | Coding patterns, common mistakes, implementation-specific learnings |
 | `feedback-validator` | sonnet | `user` | Feedback types, recurring concerns, user preferences |
@@ -239,7 +237,7 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
 - **File**: `phases/2-planning.md`
 - **Key design**: Implementation Units are HIGH-LEVEL only (Files, Changes one-line, Dependencies, Model). Detailed how-to belongs in Phase 4.
 - **Exception**: Test Plan stays thorough (test case enumeration drives TDD).
-- **Parameters**: `task-planner` max_turns (currently 15), default model (currently sonnet)
+- **Parameters**: `task-planner` max_turns (currently 15), default model (currently opus)
 
 ### Auto-fix Priority & Parallel Execution
 - **Files**: `ai-agent/skills/run-quality-checks/SKILL.md`, `phases/5-quality-checks.md`, `ai-agent/skills/run-quality-checks/output-template.md`

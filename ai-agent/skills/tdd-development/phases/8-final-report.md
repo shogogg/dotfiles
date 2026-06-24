@@ -100,7 +100,7 @@ Steps:
 1. Read STATE.json for session metadata (task description, startCommitHash, baseBranch, cycleCount, etc.).
 2. Read Statistics sections from any of these files that exist:
    - EXPLORATION_REPORT.md (Exploration)
-   - PLAN.md (Planning, including Metadata.Planning Method)
+   - PLAN.md (Planning)
    - IMPLEMENTATION_STATS.md (Implementation — may contain multiple entries)
    - QC_SUMMARY.md (Quality Checks summary; per-category details in QC_<CATEGORY>.raw files)
    - REVIEW_RESULT.md (Code Review)
@@ -120,7 +120,6 @@ Template:
 
 ## Implementation Summary
 - **Task**: <task description from STATE.json>
-- **Planning Method**: <codex|self from PLAN.md Metadata>
 - **Files changed**: <list from git diff --name-only startCommitHash..HEAD>
 - **Key changes**: <brief summary from PLAN.md Overview>
 

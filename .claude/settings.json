@@ -30,7 +30,7 @@
     "deny": [],
     "defaultMode": "auto"
   },
-  "model": "claude-opus-4-7[1m]",
+  "model": "sonnet[1m]",
   "hooks": {
     "Notification": [
       {
