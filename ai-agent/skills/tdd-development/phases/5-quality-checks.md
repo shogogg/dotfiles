@@ -1,3 +1,4 @@
+<!-- phase-id: quality-checks -->
 # Phase 5: Quality Checks
 
 ## Step 1: Determine Quality Check Scope
@@ -187,4 +188,4 @@ After successful commit, if `firstCommitHash` is not yet set in `STATE.json`:
 
 ## State Update
 
-Update `STATE.json`: set `currentPhase` to `6`.
+Update `STATE.json`: set `currentPhase` to `6` and `currentPhaseId` to `"user-review"`.

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `tdd-development` skill is a structured TDD workflow orchestrator with 10 contiguous phases (0-9). Phase 9 (PR Review Comments) is optional and user-initiated. Phase numbers have been consolidated — historical Phase 3 (Test Design) and Phase 10 are no longer used; their contents merged into Phase 2 and Phase 9 respectively. The orchestrator follows a strict delegation principle where the main agent only manages phase transitions and state, while sub-agents perform all substantive work.
+The `tdd-development` skill is a structured TDD workflow orchestrator with 9 contiguous phases (0-8). Phase 8 (PR Review Comments) is optional and user-initiated. Phase numbers have been consolidated — historical Phase 3 (Test Design), Phase 7 (CodeRabbit CLI review), and Phase 10 are no longer used. The orchestrator follows a strict delegation principle where the main agent only manages phase transitions and state, while sub-agents perform all substantive work.
 
 ## File Locations
 
@@ -18,9 +18,8 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
 | `phases/4-implementation.md` | TDD implementation via tdd-implementer sub-agent |
 | `phases/5-quality-checks.md` | Tests, lint, formatting via run-quality-checks skill |
 | `phases/6-user-review.md` | User review via difit skill |
-| `phases/7-code-review.md` | CodeRabbit review via coderabbit-reviewer sub-agent |
-| `phases/8-final-report.md` | Summary, squash commits, learning capture |
-| `phases/9-pr-review.md` | PR review comments response (optional, user-initiated) |
+| `phases/7-final-report.md` | Summary, squash commits, learning capture |
+| `phases/8-pr-review.md` | PR review comments response (optional, user-initiated) |
 
 **Related Skills:**
 
@@ -75,7 +74,7 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
 
 ### Phase 4: Implementation
 - **Executor**: Multiple sub-agents (tdd-implementer, parallel when possible)
-- **Model Selection**: Each Implementation Unit in PLAN.md specifies a `Model` field (haiku/sonnet/opus). Phase 4 reads this field and passes it to tdd-implementer via `Task(model="<value>")`. Interface stub creation uses `haiku` by default. The agent's default model is `sonnet`.
+- **Model Selection**: Each Implementation Unit in PLAN.md specifies a `Model` field (sonnet/opus). Phase 4 reads this field and passes it to tdd-implementer via `Task(model="<value>")`. `haiku` is always upgraded to `sonnet` (minimum quality floor). Interface stub creation uses `sonnet`. The agent's default model is `sonnet`.
 - **Key Actions**:
   - Read plan and analyze dependency graph (independent, contract, implementation dependencies)
   - **Interface stub creation**: If contract dependencies exist, create interface/type stubs first to unblock parallel units (uses haiku)
@@ -114,32 +113,17 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
   - Dynamic model selection for each feedback item based on complexity analysis
   - Return to Phase 5 if fixes needed
 
-### Phase 7: Code Review
-- **Executor**: Sub-agent (coderabbit-reviewer, **background execution**) + knowledge distillation
-- **Output**: `<work-dir>/REVIEW_RESULT.md`
-- **Model Selection**: Each Must Fix item is analyzed for complexity before launching tdd-implementer. Simple changes (typos, formatting, method reordering) use haiku; moderate changes (logic modifications, new methods) use sonnet; complex changes (architectural, large refactoring) use opus. Defaults to sonnet when in doubt.
-- **Key Actions**:
-  - Launch CodeRabbit review in background (`run_in_background: true`)
-  - Poll output_file every ~30 seconds for completion
-  - Every 5 minutes, ask user to continue waiting or abort
-  - Classify findings (Must Fix, Consider, Ignorable)
-  - **Launch distill-knowledge in background (parallel with fixes)**
-  - Dynamic model selection for each Must Fix item based on complexity analysis
-  - Fix Must Fix items and return to Phase 5 (flow goes 5→6→7, user reviews CodeRabbit fixes)
-  - **No Must Fix branch**: pre-launch comprehensive knowledge distillation (background, fire-and-forget) before proceeding to Phase 8, saving `task_id` to `STATE.json.learningDistillTaskId`. This eliminates the wait that was previously required in Phase 8.
-- **Control**: `cycleCount` (max 3 cycles)
-
-### Phase 8: Final Report
-- **Executor**: Main agent (orchestrator only) + Sub-agent (general-purpose, background) + knowledge-distiller (pre-launched in Phase 7, background)
-- **Design principle**: Phase 8 must NOT block the user. All heavy work (report compilation, knowledge distillation) runs in background. The main agent's inline footprint is limited to: optional squash → background launches → minimal summary.
+### Phase 7: Final Report
+- **Executor**: Main agent (orchestrator only) + Sub-agent (general-purpose, background) + knowledge-distiller (background)
+- **Design principle**: Phase 7 must NOT block the user. All heavy work (report compilation, knowledge distillation) runs in background. The main agent's inline footprint is limited to: optional squash → background launches → minimal summary.
 - **Key Actions**:
   - **Step 0 — Squash commits**: Auto-skipped when `COMMIT_COUNT <= 1`. Otherwise ask user (`統合する` / `統合しない`).
-  - **Step 1 — Distillation check**: Read `STATE.json.learningDistillTaskId`. Skip re-launching if Phase 7 already pre-launched. If unset (Phase 7 skipped), launch fire-and-forget.
+  - **Step 1 — Distillation launch**: Always launch distill-knowledge fire-and-forget (background). No pre-launch check needed (Phase 7 code-review was removed).
   - **Step 2 — Background final report generation**: Launch `general-purpose` sub-agent with `run_in_background=true` (max_turns=10) to compile FINAL_REPORT.md. Save `task_id` to `STATE.json.finalReportTaskId`. Never awaited.
   - **Step 3 — Minimal inline summary**: Issue parallel `git log --oneline` and `git diff --name-only | wc -l`. Present a short summary (task, commit list, FINAL_REPORT.md / LEARNING_SUMMARY.md path references, next steps). The user can move on immediately.
-- **Sub-agent responsibilities**: Read STATE.json, statistics files (EXPLORATION_REPORT.md, PLAN.md, IMPLEMENTATION_STATS.md, QC_SUMMARY.md, REVIEW_RESULT.md, USER_FEEDBACK.md), call TaskList, parse git log, write FINAL_REPORT.md. Never embeds LEARNING_SUMMARY.md content (path reference only).
+- **Sub-agent responsibilities**: Read STATE.json, statistics files (EXPLORATION_REPORT.md, PLAN.md, IMPLEMENTATION_STATS.md, QC_SUMMARY.md, USER_FEEDBACK.md), call TaskList, parse git log, write FINAL_REPORT.md. Never embeds LEARNING_SUMMARY.md content (path reference only).
 
-### Phase 9: PR Review Comments (Optional)
+### Phase 8: PR Review Comments (Optional)
 - **Executor**: Main agent + Skills (fetch-pr-review-comments) + Sub-agents (feedback-validator, tdd-implementer, knowledge-distiller)
 - **Model Selection**: Each PR review item is analyzed for complexity before launching tdd-implementer. Simple changes (typos, formatting, method reordering) use haiku; moderate changes (logic modifications, new methods) use sonnet; complex changes (architectural, large refactoring) use opus. Defaults to sonnet when in doubt.
 - **Key Actions**:
@@ -152,7 +136,6 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
   - Fix each item individually with tdd-implementer, commit each one
   - Return to Phase 5 (no push — full quality loop: 5→6→7)
   - No explicit round limit (each round requires user initiation)
-- **Control**: Does NOT count against `cycleCount`
 
 ## State Management
 
@@ -162,28 +145,24 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
 
 | Field | Type | Purpose |
 |-------|------|---------|
-| `currentPhase` | number | Current phase (0-9) |
+| `currentPhase` | number | Current phase (0-8) |
+| `currentPhaseId` | string | Stable string identifier for the current phase (e.g., `"exploration"`, `"quality-checks"`). Used by Resume Detection to identify the correct phase even if phase numbers are renumbered. |
 | `baseBranch` | string | Original branch before feature branch |
 | `featureBranch` | string | Created feature branch |
 | `startCommitHash` | string | HEAD at session start |
-| `firstCommitHash` | string | First commit in session |
-| `phase5RetryCount` | number | Phase 5 retry counter (resets on return from 6, 7, or 9) |
-| `cycleCount` | number | Phase 5-7 cycle counter (max 3) |
-| `lastReviewCommit` | string/null | HEAD hash at last review completion (Phase 6/7), used as "since last review" diff base option |
+| `firstCommitHash` | string/null | First commit created in this session. Initialized as `null` in Phase 0; set by Phase 4 State Update. Phase 7 reads it first; falls back to `git log --reverse` if null. |
+| `phase5RetryCount` | number | Phase 5 retry counter (resets on return from 6 or 8) |
+| `lastReviewCommit` | string/null | HEAD hash at last review completion (Phase 6), used as "since last review" diff base option |
 | `explorationLevel` | string | quick, focused, full |
-| `learningDistillTaskId` | string/null | task_id of the comprehensive knowledge-distiller pre-launched at the end of Phase 7. Phase 8 reads this to skip re-launching. Fire-and-forget (never awaited). |
-| `finalReportTaskId` | string/null | task_id of the general-purpose sub-agent launched in Phase 8 Step 2 to generate FINAL_REPORT.md in background. Fire-and-forget (never awaited). |
+| `finalReportTaskId` | string/null | task_id of the general-purpose sub-agent launched in Phase 7 Step 2 to generate FINAL_REPORT.md in background. Fire-and-forget (never awaited). |
 | `qualityScope` | object/null | Persisted test/target scope selection from Phase 5 Step 1. Shape: `{ test: { scope, args }, target: { mode, paths } }`. Reused on Phase 5 re-entry to skip re-prompting. Reset to null by the "Change scope" FAIL option. |
 | `qualityFailedCategories` | array | List of category names (`test`, `lint`, `analyse`, `format`) that failed in the most recent Phase 5 run. Passed as `--categories=<list>` to `run-quality-checks` on retry. Cleared on overall PASS. |
 
 ## Loop Control Rules
 
-1. **Phase 5 retries**: Max 3 per cycle
-2. **Return from Phase 6**: Resets Phase 5 retry counter, does NOT count against cycleCount
-3. **Phase 5-7 cycles**: Max 3 (Must Fix → fix → Phase 5 = 1 cycle)
-4. **Phase 7 "No Must Fix"**: Does not count as cycle
-5. **Return from Phase 7**: Resets Phase 5 retry counter (flow goes 5→6→7, user reviews CodeRabbit fixes)
-6. **Return from Phase 9**: Resets Phase 5 retry counter, does NOT count against cycleCount
+1. **Phase 5 retries**: Max 3 per round
+2. **Return from Phase 6**: Resets Phase 5 retry counter
+3. **Return from Phase 8**: Resets Phase 5 retry counter, does NOT count against any cycle limit
 
 ## Knowledge & Memory Architecture
 
@@ -191,7 +170,7 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 10 co
 
 Cross-session, cross-agent knowledge is stored in Serena Memory `x-coding-best-practices`. This is the primary store for review and feedback patterns, managed by the `distill-knowledge` skill.
 
-- **Written by**: distill-knowledge sub-agent (Phase 6/7 background, Phase 8 comprehensive)
+- **Written by**: distill-knowledge sub-agent (Phase 6 background, Phase 7 comprehensive)
 - **Read by**: All sub-agents (especially `tdd-implementer` in Pre-Implementation Step 2)
 - **Scope**: Project-level, persists across sessions
 
@@ -236,7 +215,9 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
 ### Planning Lightening
 - **File**: `phases/2-planning.md`
 - **Key design**: Implementation Units are HIGH-LEVEL only (Files, Changes one-line, Dependencies, Model). Detailed how-to belongs in Phase 4.
+- **TDD enforcement**: Test-only implementation units are explicitly prohibited. Tests are written by tdd-implementer within each unit's TDD cycle; test cases belong in the Test Plan section only.
 - **Exception**: Test Plan stays thorough (test case enumeration drives TDD).
+- **Model choices**: `sonnet` or `opus` only (haiku excluded from planning to prevent mismatch with Phase 4 minimum).
 - **Parameters**: `task-planner` max_turns (currently 15), default model (currently opus)
 
 ### Auto-fix Priority & Parallel Execution
@@ -261,12 +242,10 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
 - **Skill**: `ai-agent/skills/distill-knowledge/SKILL.md`
 - **Invoked from**:
   - Phase 6 (background, per round of user feedback)
-  - Phase 7 (background, per cycle when Must Fix items exist)
-  - Phase 7 → Phase 8 transition (background, fire-and-forget, comprehensive — pre-launched in the "No Must Fix" branch)
-  - Phase 8 (fire-and-forget; only launches as a fallback when Phase 7 did not pre-launch)
+  - Phase 7 (background, fire-and-forget, comprehensive — always launched)
 - **Storage**: Serena Memory `x-coding-best-practices` (cross-session, cross-agent)
 - **Consumer**: `tdd-implementer` Pre-Implementation Step 2 reads `x-coding-best-practices`
-- **Phase 8 design**: Phase 8 NEVER waits for the distiller and NEVER embeds `LEARNING_SUMMARY.md` in the final report. The summary is referenced by file path only.
+- **Phase 7 design**: Phase 7 NEVER waits for the distiller and NEVER embeds `LEARNING_SUMMARY.md` in the final report. The summary is referenced by file path only.
 - **Considerations**: Pattern quality, deduplication, pruning old entries
 
 ### Feedback Validation
@@ -305,7 +284,6 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
     ├── QC_ANALYSE.raw / QC_ANALYSE.exitcode
     ├── QC_FORMAT.raw / QC_FORMAT.exitcode
     ├── QC_AUTOFIX.md           # Auto-fix command record (only if auto-fix was applied)
-    ├── REVIEW_RESULT.md
     ├── FEEDBACK_VALIDATION.md
     ├── LEARNING_SUMMARY.md
     └── PR_REVIEW_FEEDBACK.md   # PR review comments (Phase 9, append mode)

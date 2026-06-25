@@ -1,3 +1,4 @@
+<!-- phase-id: approval-gate -->
 # Phase 3: Approval Gate
 
 ## Step 1: Resolve Unresolved Questions
@@ -44,10 +45,12 @@ If the user selects "修正を依頼する":
      - 「元のフィードバックで進める」 — Apply the original feedback as-is.
      - 「AIの提案を採用する」 — Use the alternative suggested by the validator.
      - 「フィードバックを修正する」 — Revise the feedback (returns to step 1).
-4. Launch a `general-purpose` sub-agent (model: sonnet, max_turns: 10) to apply the (possibly revised) changes to `PLAN.md`.
+4. **CRITICAL — Delegation only**: The orchestrator MUST NOT read PLAN.md or any source files to analyze or process the requested changes. Do NOT modify PLAN.md directly. All modifications must be delegated to a `general-purpose` sub-agent via `Task`.
+
+   Launch a `general-purpose` sub-agent (model: sonnet, max_turns: 10) to apply the (possibly revised) changes to `PLAN.md`.
    - **Prompt must include**: The validated feedback, the path to `<work-dir>/PLAN.md`, and (if applicable) the validator's alternative suggestions.
    - **Key instruction**: "You are editing an EXISTING plan file. Read the file, then apply ONLY the changes specified in the feedback. Preserve the overall structure and all sections not affected by the feedback. Do NOT rewrite or restructure the plan."
-   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. Do NOT include the full file content in your final response."
+   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. Do NOT include the full file content in your final response. End your response with exactly this line: `ORCHESTRATOR: Return to Step 2 to re-present the updated plan summary. Do not read, analyze, or modify PLAN.md yourself.`"
 5. Return to Step 2 to present the updated summary again.
 
 **Critical Rule**: Only an explicit selection of "承認する" constitutes approval. Answering questions, providing comments, or giving feedback does NOT count as approval. The workflow MUST NOT proceed to Phase 4 without the explicit approval selection.
@@ -68,4 +71,4 @@ After "承認する" is selected, create Tasks to track implementation progress.
 4. Call `TaskList` to confirm all Tasks were created successfully.
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `4`.
+Update `STATE.json`: set `currentPhase` to `4` and `currentPhaseId` to `"implementation"`.

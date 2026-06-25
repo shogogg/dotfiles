@@ -68,5 +68,6 @@
   "skipAutoPermissionPrompt": true,
   "feedbackSurveyState": {
     "lastShownTime": 1753946327912
-  }
+  },
+  "tui": "fullscreen"
 }

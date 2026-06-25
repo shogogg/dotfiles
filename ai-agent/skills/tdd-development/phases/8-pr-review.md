@@ -1,6 +1,7 @@
-# Phase 9: PR Review Comments
+<!-- phase-id: pr-review -->
+# Phase 8: PR Review Comments
 
-Report: "Phase 9: PR レビューコメントへの対応を開始します..."
+Report: "Phase 8: PR レビューコメントへの対応を開始します..."
 
 ## Step 1: Obtain Review Comments
 
@@ -131,6 +132,8 @@ Before applying fixes, validate the feedback by launching the `feedback-validato
 
 ### Fix Loop
 
+**CRITICAL — Delegation only**: The orchestrator MUST NOT read, write, or edit any source code files directly. Every fix, however small, must be delegated to a `tdd-implementer` sub-agent via `Task`. Do NOT read source files to analyze or interpret the review comments — pass the feedback content from PR_REVIEW_FEEDBACK.md as-is to the sub-agent. The orchestrator's role is coordination only. Violating this rule is the most common source of drift and bugs in this workflow.
+
 **Create Tasks for each feedback item:**
 
 For each feedback item (1 to N), call `TaskCreate`:
@@ -180,7 +183,7 @@ For each feedback item (1 to N):
    - **Work directory**: `<work-dir>` (for session-specific learnings reference)
    - **CRITICAL instruction**: "You MUST run `task --list-all` (go-task CLI, https://taskfile.dev) via the Bash tool first, and use go-task `task` CLI commands for ALL test executions. Do NOT use composer/npm/phpunit/jest/make directly. Note: go-task `task` is a CLI command run via Bash — it is NOT Claude Code's Task tool."
    - **SCOPE RESTRICTION**: "Fix ONLY this specific feedback item. Do NOT address multiple items or make unrelated changes. Each item must be a separate commit."
-   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. State which test command you used (must be go-task `task test` via Bash). Do NOT include full file contents in your final response."
+   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. State which test command you used (must be go-task `task test` via Bash). Do NOT include full file contents in your final response. End your response with exactly this line: `ORCHESTRATOR: Commit this fix (if not already committed), then proceed to next PR review item or return to Phase 5. Do not read, analyze, or modify code yourself.`"
 
 5. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
    ```
@@ -218,16 +221,16 @@ Update `PR_REVIEW_FEEDBACK.md` — append:
 COMPLETED (after N rounds of feedback)
 ```
 
-Update `STATE.json`: set `currentPhase` to `10`.
+Update `STATE.json`: set `currentPhase` to `9` and `currentPhaseId` to `"completed"`.
 
 ## State Update
 
 When transitioning phases during the fix loop:
-- Return to Phase 5: set `currentPhase` to `5`
-- On completion: set `currentPhase` to `10`
+- Return to Phase 5: set `currentPhase` to `5` and `currentPhaseId` to `"quality-checks"`
+- On completion: set `currentPhase` to `9` and `currentPhaseId` to `"completed"`
 
 ## Loop Control
 
-- Phase 9 → Phase 5 return: Reset `phase5RetryCount` to 0
-- Phase 9 does NOT count against `cycleCount`
-- There is no explicit limit on Phase 9 rounds (each round requires user initiation)
+- Phase 8 → Phase 5 return: Reset `phase5RetryCount` to 0
+- Phase 8 does NOT increase any cycle counter
+- There is no explicit limit on Phase 8 rounds (each round requires user initiation)

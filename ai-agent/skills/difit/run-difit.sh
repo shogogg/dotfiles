@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Wraps npx difit with a pseudo-tty to avoid STDIN mode.
+# Wraps npx difit. Uses script (pseudo-tty) only when stdin is a pipe to avoid
+# difit entering STDIN mode. Otherwise runs difit directly with stdin from
+# /dev/null, bypassing script's tcgetattr failure on socket stdin (e.g. Claude Code).
 
 set -euo pipefail
 
@@ -36,12 +38,22 @@ set -- "${flags[@]+"${flags[@]}"}" "${converted_args[@]}"
 MIN_EXPECTED_SECONDS=3
 start_time=$(date +%s)
 
-if [[ "$(uname)" == "Darwin" ]]; then
-  # macOS: script <file> <command...>
-  script -q /dev/null npx difit "$@" | tr -d '\r'
+if [ -p /dev/stdin ]; then
+  # stdin is a pipe — difit would enter STDIN (pipe) mode without a PTY.
+  # Use script to provide a pseudo-tty so difit starts in web server mode.
+  if [[ "$(uname)" == "Darwin" ]]; then
+    # macOS: script <file> <command...>
+    script -q /dev/null npx difit "$@" | tr -d '\r'
+  else
+    # Linux: script -c <command> <file>
+    script -qc "npx difit $(printf '%q ' "$@")" /dev/null | tr -d '\r'
+  fi
 else
-  # Linux: script -c <command> <file>
-  script -qc "npx difit $(printf '%q ' "$@")" /dev/null | tr -d '\r'
+  # stdin is not a pipe (socket / tty / file).
+  # script would fail with "tcgetattr/ioctl: Operation not supported on socket"
+  # in environments like Claude Code where stdin is a Unix socket.
+  # Run difit directly with stdin from /dev/null to prevent it from reading stdin.
+  npx difit "$@" < /dev/null | tr -d '\r'
 fi
 
 elapsed=$(( $(date +%s) - start_time ))

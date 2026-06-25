@@ -1,6 +1,7 @@
-# Phase 8: Final Report
+<!-- phase-id: final-report -->
+# Phase 7: Final Report
 
-Report: "Phase 8: Generating final report..."
+Report: "Phase 7: Generating final report..."
 
 ## Step 0: Squash Commits
 
@@ -10,9 +11,16 @@ Consolidate all commits created during this session into a single commit.
 
 Read `STATE.json` and retrieve:
 - `startCommitHash`: HEAD at session start
-- `firstCommitHash`: Hash of the first commit created in this session
+- `firstCommitHash`: Hash of the first commit created in this session (may be `null` if not recorded)
 
-If `firstCommitHash` does not exist (no commits were made), skip to Step 1.
+Resolve `FIRST_COMMIT_HASH` using the following priority:
+1. If `firstCommitHash` is non-null in STATE.json → use it directly as `FIRST_COMMIT_HASH`
+2. Otherwise → compute via git (fallback):
+   ```bash
+   FIRST_COMMIT_HASH=$(git log --format=%H --reverse ${startCommitHash}..HEAD | head -n 1)
+   ```
+
+If `FIRST_COMMIT_HASH` is empty after the fallback (no commits were made), skip to Step 1.
 
 ### 0.2 Check Commit Count
 
@@ -26,7 +34,7 @@ COMMIT_COUNT=$(git rev-list --count ${startCommitHash}..HEAD)
 ### 0.3 Get First Commit Message
 
 ```bash
-FIRST_COMMIT_MSG=$(git log --format=%B -n 1 ${firstCommitHash})
+FIRST_COMMIT_MSG=$(git log --format=%B -n 1 ${FIRST_COMMIT_HASH})
 ```
 
 ### 0.4 User Confirmation
@@ -55,27 +63,22 @@ Report to user:
 
 ## Step 1: Comprehensive Knowledge Distillation (Background, Fire-and-Forget)
 
-The comprehensive distillation is normally pre-launched at the end of Phase 7 (in the "No Must Fix items" branch). Phase 8 does NOT wait for it to complete and does NOT embed its output into the final report.
+Launch comprehensive distillation in background. Phase 7 does NOT wait for it to complete and does NOT embed its output into the final report.
 
-### 1.1 Check Pre-Launched Task
+### 1.1 Launch Distillation
 
-Read `STATE.json.learningDistillTaskId`:
+```
+Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
+  prompt="files: <work-dir>/QC_SUMMARY.md <work-dir>/QC_TEST.raw <work-dir>/QC_LINT.raw <work-dir>/QC_ANALYSE.raw <work-dir>/QC_FORMAT.raw <work-dir>/USER_FEEDBACK.md\nmemory: x-coding-best-practices\noutput: <work-dir>/LEARNING_SUMMARY.md")
+```
 
-- **If set (pre-launched in Phase 7)**: Skip re-launching. The background task continues running independently.
-- **If not set (backward compatibility / Phase 7 was skipped)**: Launch the sub-agent now in background, fire-and-forget. Do NOT save the task_id, do NOT wait.
-
-  ```
-  Task(subagent_type="knowledge-distiller", max_turns=15, run_in_background=true,
-    prompt="files: <work-dir>/QC_SUMMARY.md <work-dir>/QC_TEST.raw <work-dir>/QC_LINT.raw <work-dir>/QC_ANALYSE.raw <work-dir>/QC_FORMAT.raw <work-dir>/REVIEW_RESULT.md <work-dir>/USER_FEEDBACK.md\nmemory: x-coding-best-practices\noutput: <work-dir>/LEARNING_SUMMARY.md")
-  ```
-
-The sub-agent will (independently of Phase 8):
+The sub-agent will (independently of Phase 7):
 - Read all available session files (skips any that do not exist)
-- Merge with any patterns already added during Phase 5/6/7 distillation cycles
+- Merge with any patterns already added during Phase 5/6 distillation cycles
 - Write consolidated patterns to Serena Memory `x-coding-best-practices`
 - Write `<work-dir>/LEARNING_SUMMARY.md`
 
-**Important**: Phase 8 proceeds immediately without waiting. The distillation output is referenced by file path only — it may not be available yet when the user reads the final report.
+**Important**: Phase 7 proceeds immediately without waiting. The distillation output is referenced by file path only — it may not be available yet when the user reads the final report.
 
 ## Step 2: Launch Background Final Report Generation
 
@@ -97,19 +100,18 @@ Working directory: <work-dir>
 Output file: <work-dir>/FINAL_REPORT.md
 
 Steps:
-1. Read STATE.json for session metadata (task description, startCommitHash, baseBranch, cycleCount, etc.).
+1. Read STATE.json for session metadata (task description, startCommitHash, baseBranch, etc.).
 2. Read Statistics sections from any of these files that exist:
    - EXPLORATION_REPORT.md (Exploration)
    - PLAN.md (Planning)
    - IMPLEMENTATION_STATS.md (Implementation — may contain multiple entries)
    - QC_SUMMARY.md (Quality Checks summary; per-category details in QC_<CATEGORY>.raw files)
-   - REVIEW_RESULT.md (Code Review)
    - USER_FEEDBACK.md (if exists — for user review record)
 3. Each Statistics section reports Start Time (ISO 8601), End Time (ISO 8601), Duration. Parse these and compute total session duration (earliest start to latest end).
 4. Call TaskList and group by subject prefix:
    - "Implement Unit" / "Implement:" → Implementation Units
-   - "Fix CR-" → Code Review Fixes
    - "Fix UF-" → User Feedback Fixes
+   - "Fix PR-" → PR Review Fixes
    Count completed vs total for each group.
 5. Read git log <startCommitHash>..HEAD to enumerate commits.
 6. Write FINAL_REPORT.md using the template below. Use "N/A" for any missing values; never block on missing data.
@@ -129,15 +131,9 @@ Template:
 
 ## Review Record
 - **User Review**: Approved / Approved after N revision(s)
-- **Code Review (CodeRabbit)**:
-  - **Must Fix**: <count and resolution status>
-  - **Consider**: <count and brief notes>
-  - **Ignorable**: <count>
-- **Cycles used**: <cycleCount>/3
 
 ## Work Items (Tasks)
 - **Implementation Units**: <completed>/<total>
-- **Code Review Fixes**: <completed>/<total>
 - **User Feedback Fixes**: <completed>/<total>
 
 ## Execution Time Statistics
@@ -149,7 +145,6 @@ Template:
 | Planning | <N>分<N>秒 | HH:MM | HH:MM |
 | Implementation | <N>分<N>秒 | HH:MM | HH:MM |
 | Quality Checks | <N>分<N>秒 | HH:MM | HH:MM |
-| Code Review | <N>分<N>秒 | HH:MM | HH:MM |
 | **Total Session** | **<N>分<N>秒** | HH:MM | HH:MM |
 
 ### Notes
@@ -171,9 +166,9 @@ If the file already exists when you read this report, open it directly. Distille
 - [ ] Review the commits in git log
 - [ ] Push to remote when ready
 - [ ] Create PR if needed
-- [ ] After PR review, run Phase 9 (/coding → Resume → Phase 9) to address review comments
+- [ ] After PR review, run Phase 8 (/coding → Resume → Phase 8) to address review comments
 
-Return directive: Write FINAL_REPORT.md to <work-dir>/FINAL_REPORT.md. Return ONLY a brief completion summary (1-2 sentences) — do NOT include the full report content. Do NOT embed LEARNING_SUMMARY.md content (the distillation may not be complete yet — always reference by path).
+Return directive: Write FINAL_REPORT.md to <work-dir>/FINAL_REPORT.md. Return ONLY a brief completion summary (1-2 sentences) — do NOT include the full report content. Do NOT embed LEARNING_SUMMARY.md content (the distillation may not be complete yet — always reference by path). Do NOT run `git push` or `gh pr create` — the Next Steps section is informational text only.
 ```
 
 Save the returned `task_id` to `STATE.json` as `finalReportTaskId`. Fire-and-forget — the main agent never awaits this task.
@@ -198,6 +193,8 @@ That's all the inline data needed. Do NOT read statistics files, do NOT parse du
 
 ### 3.2 Present Summary
 
+**IMPORTANT — Do NOT execute the 次のステップ items below.** They are informational text for the user to act on manually. The orchestrator MUST NOT run `git push`, `gh pr create`, or any equivalent command.
+
 ```markdown
 ## 🎉 TDD Development セッション完了
 
@@ -217,14 +214,16 @@ That's all the inline data needed. Do NOT read statistics files, do NOT parse du
 学習結果は以下のファイルに書き出され、Serena Memory (`x-coding-best-practices`) にも保存されます:
 - `<work-dir>/LEARNING_SUMMARY.md`
 
-### 次のステップ
+### 次のステップ（ユーザーが手動で行う操作）
+以下はオーケストレーターが自動実行するものではありません。必要に応じてご自身で実行してください:
 1. リモートにプッシュ: `git push`
-2. PR作成後、Phase 9 (`/coding` → Resume → Phase 9) でレビューコメントに対応可能
+2. PR 作成: `gh pr create`（必要に応じて）
+3. PR レビュー後は Phase 8 (`/coding` → Resume → Phase 8) でレビューコメントに対応可能
 
 > 詳細レポートと学習サマリーはバックグラウンドで生成中です。完了を待たずに次の作業に移れます。
 ```
 
 ## State Update
 Update `STATE.json`:
-- Set `currentPhase` to `9`.
+- Set `currentPhase` to `8` and `currentPhaseId` to `"pr-review"`.
 - Set `finalReportTaskId` to the `task_id` returned by Step 2.1.

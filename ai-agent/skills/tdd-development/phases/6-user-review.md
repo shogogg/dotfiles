@@ -1,3 +1,4 @@
+<!-- phase-id: user-review -->
 # Phase 6: User Review
 
 Report: "Phase 6: ユーザーレビューを開始します..."
@@ -62,10 +63,11 @@ Store the selection as `<reviewUnit>` (`all` or `per-commit`).
 Launch the `difit` skill to open a browser-based diff review:
 
 ```
-Skill("difit", args="HEAD <selectedBase>")
+Skill("difit", args="HEAD <selectedBase> <work-dir>/DIFIT_OUTPUT.md")
 ```
 
 - `HEAD` and `<selectedBase>` are passed as-is. The difit skill handles `HEAD` → `@` conversion internally.
+- `<work-dir>/DIFIT_OUTPUT.md` is the file where difit writes its output. The difit skill reads this file to determine approval status.
 - Timeout handling (background polling with user check-in) is managed within the difit skill.
 
 ### 3-B. When `<reviewUnit>` is `per-commit`
@@ -85,16 +87,16 @@ Review each commit individually:
    # → <parentHash>
    ```
    ```
-   Skill("difit", args="<commitHash> <parentHash>")
+   Skill("difit", args="<commitHash> <parentHash> <work-dir>/DIFIT_OUTPUT_<commitHash first 7 chars>.md")
    ```
 
    **Example** (3 commits, `<selectedBase>` = `abc1234`):
 
    | Order | Commit | difit args | Diff shown |
    |-------|--------|-----------|------------|
-   | 1 | `def5678` (feat: add user model) | `Skill("difit", args="def5678 abc1234")` | abc1234 → def5678 |
-   | 2 | `ghi9012` (feat: add user repo) | `Skill("difit", args="ghi9012 def5678")` | def5678 → ghi9012 |
-   | 3 | `jkl3456` (test: add tests) | `Skill("difit", args="jkl3456 ghi9012")` | ghi9012 → jkl3456 |
+   | 1 | `def5678` (feat: add user model) | `Skill("difit", args="def5678 abc1234 <work-dir>/DIFIT_OUTPUT_def5678.md")` | abc1234 → def5678 |
+   | 2 | `ghi9012` (feat: add user repo) | `Skill("difit", args="ghi9012 def5678 <work-dir>/DIFIT_OUTPUT_ghi9012.md")` | def5678 → ghi9012 |
+   | 3 | `jkl3456` (test: add tests) | `Skill("difit", args="jkl3456 ghi9012 <work-dir>/DIFIT_OUTPUT_jkl3456.md")` | ghi9012 → jkl3456 |
 
 3. **Collect feedback per commit**:
    - If difit returns `"No user feedback. It is APPROVED."` → skip (no feedback for this commit).
@@ -210,7 +212,7 @@ Present a concise summary to the user:
 
 ### Status: APPROVED
 
-Proceed to Phase 7 (Code Review).
+Proceed to Phase 7 (Final Report).
 
 ### Status: CHANGES_REQUESTED
 
@@ -231,6 +233,8 @@ Before applying fixes, validate the feedback by launching the `feedback-validato
      - 「フィードバックを修正する」 — Revise the feedback (return to Step 6 with CHANGES_REQUESTED and updated feedback).
 
 #### Apply Fixes
+
+**CRITICAL — Delegation only**: The orchestrator MUST NOT read, write, or edit any source code files directly. Every fix, however small, must be delegated to a `tdd-implementer` sub-agent via `Task`. Do NOT read source files to analyze or interpret the feedback — pass the feedback content from USER_FEEDBACK.md as-is to the sub-agent. The orchestrator's role is coordination only. Violating this rule is the most common source of drift and bugs in this workflow.
 
 **Note**: Knowledge distillation was already launched in Step 5.5 (immediately after writing feedback). Do NOT launch it again here.
 
@@ -284,7 +288,7 @@ For each feedback item (1 to N):
    - **Work directory**: `<work-dir>` (for session-specific learnings reference)
    - **CRITICAL instruction**: "You MUST run `task --list-all` (go-task CLI, https://taskfile.dev) via the Bash tool first, and use go-task `task` CLI commands for ALL test executions. Do NOT use composer/npm/phpunit/jest/make directly. Note: go-task `task` is a CLI command run via Bash — it is NOT Claude Code's Task tool."
    - **SCOPE RESTRICTION**: "Fix ONLY this specific feedback item. Do NOT address multiple items or make unrelated changes. Each item must be a separate commit."
-   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. State which test command you used (must be go-task `task test` via Bash). Do NOT include full file contents in your final response."
+   - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was changed. State which test command you used (must be go-task `task test` via Bash). Do NOT include full file contents in your final response. End your response with exactly this line: `ORCHESTRATOR: Commit this fix (if not already committed), then proceed to next feedback item or return to Phase 5. Do not read, analyze, or modify code yourself.`"
 
 5. **IMPORTANT: Commit IMMEDIATELY after each fix** - Do NOT batch multiple fixes into one commit. Message format:
    ```
@@ -303,5 +307,5 @@ After all feedback items are resolved:
 
 ## State Update
 Update `STATE.json`:
-- Set `currentPhase` to `7`.
+- Set `currentPhase` to `7` and `currentPhaseId` to `"final-report"`.
 - Set `lastReviewCommit` to the current HEAD commit hash (`git rev-parse HEAD`). This records the state at review time for use as a "since last review" option in future review cycles.

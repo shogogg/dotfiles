@@ -106,13 +106,12 @@ ai-agent/skills/tdd-development/
     ├── 0-pre-checks.md
     ├── 1-exploration.md
     ├── 2-planning.md
-    ├── 3-test-design.md
-    ├── 4-approval-gate.md
-    ├── 5-implementation.md
-    ├── 6-quality-checks.md
-    ├── 7-user-review.md
-    ├── 8-code-review.md
-    └── 9-final-report.md
+    ├── 3-approval-gate.md
+    ├── 4-implementation.md
+    ├── 5-quality-checks.md
+    ├── 6-user-review.md
+    ├── 7-final-report.md
+    └── 8-pr-review.md
 ```
 
 ## Important Notes

@@ -56,11 +56,12 @@ After Group A completes:
    ```json
    {
      "currentPhase": 1,
+     "currentPhaseId": "exploration",
      "phase5RetryCount": 0,
-     "cycleCount": 0,
      "baseBranch": "<BASE_BRANCH>",
      "featureBranch": "<current-branch-name>",
      "startCommitHash": "<current-HEAD-hash>",
+     "firstCommitHash": null,
      "lastReviewCommit": null,
      "qualityScope": null,
      "qualityFailedCategories": []
@@ -69,9 +70,10 @@ After Group A completes:
    - `startCommitHash`: The HEAD commit hash at session start (obtained via `git rev-parse HEAD`)
    - `baseBranch`: The branch/ref determined in step 4 (e.g., "origin/main", "main", or "HEAD")
    - `featureBranch`: The current branch name after step 4
-   - `lastReviewCommit`: Updated after each review cycle (Phase 6/7) with the HEAD commit hash at review time. Used as a "since last review" diff base option.
+   - `lastReviewCommit`: Updated after each review cycle (Phase 6) with the HEAD commit hash at review time. Used as a "since last review" diff base option.
    - `qualityScope`: Saved in Phase 5 Step 1 after the user selects test/target scope. Format: `{ "test": { "scope": "<full|changed|directory|custom>", "args": "<args-string>" }, "target": { "mode": "<full|files|directories|custom>", "paths": [<paths>] } }`. Reused on subsequent Phase 5 invocations to skip re-prompting. `null` until first selection.
+   - `currentPhaseId`: Stable string identifier for the current phase (e.g., `"exploration"`, `"quality-checks"`). Updated alongside `currentPhase` at every phase transition. Used by Resume Detection to identify the correct phase even if phase numbers are renumbered.
    - `qualityFailedCategories`: List of category names (`test`, `lint`, `analyse`, `format`) that failed in the most recent Phase 5 run. Used by Phase 5 Step 2 to pass `--categories=<failed>` on retry so only failed checks re-run. Cleared on overall PASS.
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `1`.
+Update `STATE.json`: set `currentPhase` to `1` and `currentPhaseId` to `"exploration"`.

@@ -1,3 +1,4 @@
+<!-- phase-id: exploration -->
 # Phase 1: Exploration
 
 Report: "Phase 1: Exploring codebase..."
@@ -184,4 +185,4 @@ If any sub-agent fails or returns no output:
 Report: "Phase 1 complete: Exploration report written to `<work-dir>/EXPLORATION_REPORT.md`"
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `2`.
+Update `STATE.json`: set `currentPhase` to `2` and `currentPhaseId` to `"planning"`.

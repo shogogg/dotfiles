@@ -1,3 +1,4 @@
+<!-- phase-id: planning -->
 # Phase 2: Planning
 
 Report: "Phase 2: Creating work plan..."
@@ -20,6 +21,7 @@ Prompt must include:
 - **Project profile summary** (if available): relevant patterns and conventions
 - **Past learnings summary** (if any were loaded in Phase 1)
 - **Lightening directive** (CRITICAL): "Keep Implementation Units HIGH-LEVEL. For each unit, fill ONLY: Files, Changes (one-line summary of the high-level change), Dependencies, Dependency Type, Model. Do NOT include step-by-step implementation instructions, code snippets, or pseudocode — that is the implementer's job. **The Test Plan section IS the exception**: enumerate test method names thoroughly (Happy Path / Boundary / Edge Cases), since these drive TDD."
+- **TDD anti-pattern warning** (CRITICAL): "Do NOT create test-only implementation units (e.g., 'Write tests for X', 'Add unit tests for Y'). In TDD, each unit's tdd-implementer writes tests as part of the Red→Green→Refactor cycle. Test cases belong exclusively in the Test Plan section — they are NOT separate Implementation Units. Every Implementation Unit must represent production code changes, not test writing."
 - **Return directive**: "Write the complete plan (including Test Plan) to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, state the number of implementation units, and note whether there are unresolved questions. Do NOT include the full plan content in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 3. Do not read or analyze the plan yourself.`"
 
 ## Output Template (PLAN.md)
@@ -44,9 +46,8 @@ Instruct the sub-agent to follow this structure:
   - `none` — No dependencies; can run in parallel with any unit
   - `contract` — Depends only on interfaces/types from another unit (can run in parallel once interfaces are defined)
   - `implementation` — Depends on the full implementation of another unit (must run after that unit completes)
-- **Model**: [haiku / sonnet / opus]
-  - `haiku` — Simple tasks (single file, clear spec, small changes)
-  - `sonnet` — Standard tasks (typical complexity, multiple files)
+- **Model**: [sonnet / opus]
+  - `sonnet` — Standard tasks (single file to multiple files, typical complexity)
   - `opus` — Complex tasks (architecture design, complex logic, many dependencies)
 
 ## Test Plan
@@ -78,4 +79,4 @@ If the sub-agent fails or returns no output, report the failure to the user with
 Report: "Phase 2 complete: Work plan written to `<work-dir>/PLAN.md`"
 
 ## State Update
-Update `STATE.json`: set `currentPhase` to `3`.
+Update `STATE.json`: set `currentPhase` to `3` and `currentPhaseId` to `"approval-gate"`.
