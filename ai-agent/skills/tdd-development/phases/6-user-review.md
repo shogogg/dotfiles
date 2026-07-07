@@ -63,12 +63,12 @@ Store the selection as `<reviewUnit>` (`all` or `per-commit`).
 Launch the `difit` skill to open a browser-based diff review:
 
 ```
-Skill("difit", args="HEAD <selectedBase> <work-dir>/DIFIT_OUTPUT.md")
+Skill("difit", args="<work-dir>/DIFIT_OUTPUT.md HEAD <selectedBase>")
 ```
 
+- `<work-dir>/DIFIT_OUTPUT.md` is the required first argument — the file where difit writes its server output (used for startup detection and port discovery).
 - `HEAD` and `<selectedBase>` are passed as-is. The difit skill handles `HEAD` → `@` conversion internally.
-- `<work-dir>/DIFIT_OUTPUT.md` is the file where difit writes its output. The difit skill reads this file to determine approval status.
-- Timeout handling (background polling with user check-in) is managed within the difit skill.
+- The difit skill (runs inline, `context: inherit`) launches difit in the background, confirms completion with the user via `AskUserQuestion`, fetches review comments over HTTP, stops the server, and returns the result. No coordination is needed here beyond reading the return value in Step 4.
 
 ### 3-B. When `<reviewUnit>` is `per-commit`
 
@@ -87,16 +87,16 @@ Review each commit individually:
    # → <parentHash>
    ```
    ```
-   Skill("difit", args="<commitHash> <parentHash> <work-dir>/DIFIT_OUTPUT_<commitHash first 7 chars>.md")
+   Skill("difit", args="<work-dir>/DIFIT_OUTPUT_<commitHash first 7 chars>.md <commitHash> <parentHash>")
    ```
 
    **Example** (3 commits, `<selectedBase>` = `abc1234`):
 
    | Order | Commit | difit args | Diff shown |
    |-------|--------|-----------|------------|
-   | 1 | `def5678` (feat: add user model) | `Skill("difit", args="def5678 abc1234 <work-dir>/DIFIT_OUTPUT_def5678.md")` | abc1234 → def5678 |
-   | 2 | `ghi9012` (feat: add user repo) | `Skill("difit", args="ghi9012 def5678 <work-dir>/DIFIT_OUTPUT_ghi9012.md")` | def5678 → ghi9012 |
-   | 3 | `jkl3456` (test: add tests) | `Skill("difit", args="jkl3456 ghi9012 <work-dir>/DIFIT_OUTPUT_jkl3456.md")` | ghi9012 → jkl3456 |
+   | 1 | `def5678` (feat: add user model) | `Skill("difit", args="<work-dir>/DIFIT_OUTPUT_def5678.md def5678 abc1234")` | abc1234 → def5678 |
+   | 2 | `ghi9012` (feat: add user repo) | `Skill("difit", args="<work-dir>/DIFIT_OUTPUT_ghi9012.md ghi9012 def5678")` | def5678 → ghi9012 |
+   | 3 | `jkl3456` (test: add tests) | `Skill("difit", args="<work-dir>/DIFIT_OUTPUT_jkl3456.md jkl3456 ghi9012")` | ghi9012 → jkl3456 |
 
 3. **Collect feedback per commit**:
    - If difit returns `"No user feedback. It is APPROVED."` → skip (no feedback for this commit).

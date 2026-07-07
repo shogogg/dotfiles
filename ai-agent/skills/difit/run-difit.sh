@@ -2,6 +2,11 @@
 # Wraps npx difit. Uses script (pseudo-tty) only when stdin is a pipe to avoid
 # difit entering STDIN mode. Otherwise runs difit directly with stdin from
 # /dev/null, bypassing script's tcgetattr failure on socket stdin (e.g. Claude Code).
+#
+# Usage: run-difit.sh [--flags] <output_file> <target> <base>
+#
+# <output_file> is required (1st positional arg). difit output is written directly
+# to that file (no pipe through tr) to ensure stdout is flushed on exit.
 
 set -euo pipefail
 
@@ -15,46 +20,28 @@ for arg in "$@"; do
   esac
 done
 
-# Validate: require exactly 2 positional args (target and base).
-if [[ ${#positional_args[@]} -lt 2 ]]; then
-  echo "Error: difit requires both <target> and <base> arguments." >&2
-  echo "Usage: run-difit.sh [--clean] <target> <base>" >&2
+# Validate: require exactly 3 positional args (output_file, target, base).
+if [[ ${#positional_args[@]} -lt 3 ]]; then
+  echo "Error: run-difit.sh requires <output_file>, <target>, and <base> arguments." >&2
+  echo "Usage: run-difit.sh [--clean] <output_file> <target> <base>" >&2
   exit 1
 fi
 
-# Convert HEAD to @ (difit convention) in positional arguments.
-converted_args=()
-for arg in "${positional_args[@]}"; do
-  if [[ "$arg" == "HEAD" ]]; then
-    converted_args+=("@")
-  else
-    converted_args+=("$arg")
-  fi
-done
+output_file="${positional_args[0]}"
+target="${positional_args[1]}"
+base="${positional_args[2]}"
 
-# Rebuild full argument list: flags + converted positional args.
-set -- "${flags[@]+"${flags[@]}"}" "${converted_args[@]}"
+# Convert HEAD to @ (difit convention).
+[[ "$target" == "HEAD" ]] && target="@"
+[[ "$base" == "HEAD" ]] && base="@"
 
 MIN_EXPECTED_SECONDS=3
 start_time=$(date +%s)
 
-if [ -p /dev/stdin ]; then
-  # stdin is a pipe — difit would enter STDIN (pipe) mode without a PTY.
-  # Use script to provide a pseudo-tty so difit starts in web server mode.
-  if [[ "$(uname)" == "Darwin" ]]; then
-    # macOS: script <file> <command...>
-    script -q /dev/null npx difit "$@" | tr -d '\r'
-  else
-    # Linux: script -c <command> <file>
-    script -qc "npx difit $(printf '%q ' "$@")" /dev/null | tr -d '\r'
-  fi
-else
-  # stdin is not a pipe (socket / tty / file).
-  # script would fail with "tcgetattr/ioctl: Operation not supported on socket"
-  # in environments like Claude Code where stdin is a Unix socket.
-  # Run difit directly with stdin from /dev/null to prevent it from reading stdin.
-  npx difit "$@" < /dev/null | tr -d '\r'
-fi
+# Redirect difit output directly to the output file (no pipe).
+# Avoids broken pipe data loss when the process is terminated — without a pipe,
+# Node.js flushes its stdout buffer to the file on exit (including signal handlers).
+npx difit "${flags[@]+"${flags[@]}"}" "$target" "$base" < /dev/null > "$output_file" 2>&1
 
 elapsed=$(( $(date +%s) - start_time ))
 if [[ $elapsed -lt $MIN_EXPECTED_SECONDS ]]; then

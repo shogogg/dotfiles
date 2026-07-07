@@ -30,7 +30,7 @@
     "deny": [],
     "defaultMode": "auto"
   },
-  "model": "sonnet[1m]",
+  "model": "sonnet",
   "hooks": {
     "Notification": [
       {
@@ -65,9 +65,9 @@
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "xhigh",
+  "tui": "fullscreen",
   "skipAutoPermissionPrompt": true,
   "feedbackSurveyState": {
     "lastShownTime": 1753946327912
-  },
-  "tui": "fullscreen"
+  }
 }
