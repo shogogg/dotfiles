@@ -54,13 +54,15 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 9 con
     - **Medium/Full**: Agent D (general-purpose, max_turns=10) merges results → `EXPLORATION_REPORT.md` + `PROJECT_PROFILE.md`
 - **Report format**: Lightweight — required sections are Task Summary, Related Files, Key Concerns. Other sections (Dependencies, Test Patterns, Existing Patterns) are optional.
 
-### Phase 2: Planning (Lightweight, includes Test Plan)
-- **Executor**: Sub-agent (task-planner), `max_turns=15`, model `opus` (default)
+### Phase 2: Planning (Lightweight, includes Test Plan + Autonomous Review Cycle)
+- **Executor**: Sub-agent (task-planner), `max_turns=15`, model `sonnet` (default) + Sub-agents (test-plan-reviewer, general-plan-reviewer), `max_turns=10`, model `opus`
 - **Design principle**: Plan provides the **shape** of the work, not the implementation. Implementation Units stay high-level. **Test Plan is the exception** — keep test case enumeration thorough.
-- **Output**: `<work-dir>/PLAN.md`
+- **Output**: `<work-dir>/PLAN.md`, `<work-dir>/PLAN_REVIEW_TEST.md`, `<work-dir>/PLAN_REVIEW_GENERAL.md`
 - **Key Sections**: Overview, Affected Files, Implementation Units (high-level), **Test Plan** (detailed), Unresolved Questions, Learnings Applied
 - **Implementation Units format**: Each unit includes only Files, Changes (one-line), Dependencies, Dependency Type, Model. No step-by-step implementation or code snippets.
 - **Test Plan format**: Test method names grouped by class/method, categorized by Happy Path / Boundary / Edge Cases, with notes on test strategy (data providers, mocks, etc.)
+- **Autonomous Review Cycle (Step 1.5)**: After the initial draft, `test-plan-reviewer` (reviews `## Test Plan` only) and `general-plan-reviewer` (reviews everything else) run **in parallel** — two `Task` calls in one message, each isolated from the main context. If either returns `CHANGES_REQUESTED`, `task-planner` is re-launched in revision mode (targeted edits only, no rewrite) and the pair re-reviews. Capped at **3 rounds** (`STATE.json.planReviewCycleCount`); on exceed, unresolved findings are appended to PLAN.md's `## Unresolved Questions` and the user decides in Phase 3. This loop is fully autonomous — no user interaction until Phase 3.
+- **Body language exception**: `test-plan-reviewer.md` and `general-plan-reviewer.md` are written in Japanese (frontmatter stays English) — deliberate deviation from the usual English-body convention, so the project-specific Japanese review knowledge they embed (see below) reads naturally.
 
 ### Phase 3: Approval Gate
 - **Executor**: Main agent + Sub-agents (feedback-validator, general-purpose for plan edits)
@@ -104,7 +106,7 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 9 con
 - **Model Selection**: Each feedback item is analyzed for complexity before launching tdd-implementer. Simple changes (typos, formatting, method reordering) use haiku; moderate changes (logic modifications, new methods) use sonnet; complex changes (architectural, large refactoring) use opus. Defaults to sonnet when in doubt.
 - **Key Actions**:
   - **Review unit selection** (Step 2.5): User chooses between "all changes" (default) or "per-commit" review
-  - Launch difit for visual diff review (timeout handling is within difit skill via background execution + polling)
+  - Launch difit for visual diff review — difit runs inline (`context: inherit`), launches the diff server in the background with `--keep-alive`, confirms completion via `AskUserQuestion` (not polling), fetches comments over HTTP via `fetch-comments.sh`, then stops the server via `TaskStop`
   - Per-commit mode: iterates through commits oldest-first, launching difit for each with resolved parent hash
   - Handle user feedback
   - **USER_FEEDBACK.md uses append mode**: Each round is appended, never overwritten, to preserve full feedback history
@@ -157,12 +159,14 @@ The `tdd-development` skill is a structured TDD workflow orchestrator with 9 con
 | `finalReportTaskId` | string/null | task_id of the general-purpose sub-agent launched in Phase 7 Step 2 to generate FINAL_REPORT.md in background. Fire-and-forget (never awaited). |
 | `qualityScope` | object/null | Persisted test/target scope selection from Phase 5 Step 1. Shape: `{ test: { scope, args }, target: { mode, paths } }`. Reused on Phase 5 re-entry to skip re-prompting. Reset to null by the "Change scope" FAIL option. |
 | `qualityFailedCategories` | array | List of category names (`test`, `lint`, `analyse`, `format`) that failed in the most recent Phase 5 run. Passed as `--categories=<list>` to `run-quality-checks` on retry. Cleared on overall PASS. |
+| `planReviewCycleCount` | number | Phase 2 Step 1.5 autonomous review/revise round counter (`test-plan-reviewer` + `general-plan-reviewer` → `task-planner` revision). Initialized to 0 at Step 1.5 start. Capped at 3; on exceed, unresolved findings are appended to PLAN.md instead of incrementing further. |
 
 ## Loop Control Rules
 
-1. **Phase 5 retries**: Max 3 per round
-2. **Return from Phase 6**: Resets Phase 5 retry counter
-3. **Return from Phase 8**: Resets Phase 5 retry counter, does NOT count against any cycle limit
+1. **Phase 2 plan review cycle**: Max 3 rounds, fully autonomous (no user interaction). On exceed, unresolved findings go to PLAN.md's Unresolved Questions for the user to judge in Phase 3.
+2. **Phase 5 retries**: Max 3 per round
+3. **Return from Phase 6**: Resets Phase 5 retry counter
+4. **Return from Phase 8**: Resets Phase 5 retry counter, does NOT count against any cycle limit
 
 ## Knowledge & Memory Architecture
 
@@ -181,7 +185,9 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
 | Agent | Model | Memory Scope | Key Learnings |
 |-------|-------|-------------|---------------|
 | `codebase-explorer` | sonnet | `user` | Codebase structures, architectural patterns, project conventions |
-| `task-planner` | opus | `user` | Planning patterns, decomposition strategies, architectural decisions |
+| `task-planner` | sonnet | `user` | Planning patterns, decomposition strategies, architectural decisions |
+| `test-plan-reviewer` | opus | `user` | Recurring Test Plan gaps, project-specific test conventions |
+| `general-plan-reviewer` | opus | `user` | Recurring design/architecture concerns, project-specific architecture conventions |
 | `unit-test-designer` | opus | `user` | Test patterns, naming conventions, edge cases |
 | `tdd-implementer` | sonnet (default; per-unit override) | `user` | Coding patterns, common mistakes, implementation-specific learnings |
 | `feedback-validator` | sonnet | `user` | Feedback types, recurring concerns, user preferences |
@@ -218,7 +224,14 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
 - **TDD enforcement**: Test-only implementation units are explicitly prohibited. Tests are written by tdd-implementer within each unit's TDD cycle; test cases belong in the Test Plan section only.
 - **Exception**: Test Plan stays thorough (test case enumeration drives TDD).
 - **Model choices**: `sonnet` or `opus` only (haiku excluded from planning to prevent mismatch with Phase 4 minimum).
-- **Parameters**: `task-planner` max_turns (currently 15), default model (currently opus)
+- **Parameters**: `task-planner` max_turns (currently 15), default model (currently sonnet — drafting is cheap; review is where opus judgment is spent)
+
+### Plan Review Sub-agents (Autonomous Review Cycle)
+- **Files**: `phases/2-planning.md` (Step 1.5), `ai-agent/agents/test-plan-reviewer.md`, `ai-agent/agents/general-plan-reviewer.md`, `SKILL.md` (Loop Control)
+- **Key design**: Two review sub-agents split PLAN.md by concern — `test-plan-reviewer` (Test Plan section only) and `general-plan-reviewer` (everything else) — and run **in parallel** via two `Task` calls in one message, each in an isolated context. `task-planner` (sonnet) drafts and revises; the reviewers (opus) judge. This mirrors the existing convention that review/judgment roles are sub-agents, not skills (skills in this codebase are for deterministic tool procedures like `difit`/`run-quality-checks`, not open-ended LLM review, and are invoked serially by convention).
+- **Loop**: draft → review (parallel) → revise → review (parallel) → ... capped at 3 rounds via `STATE.json.planReviewCycleCount`. Fully autonomous; unresolved findings after 3 rounds are appended to PLAN.md's Unresolved Questions rather than looping further, deferring to the user in Phase 3.
+- **Content design**: Each reviewer's review criteria focus on judgment-level (not mechanical/formatter-fixable) recurring issues — e.g. test coverage gaps, if/foreach-in-tests anti-patterns, magic numbers, DI/wrapper-interface conventions, "horizontal" fixes across sibling classes. Mechanical style issues (cast spacing, alignment, etc.) are intentionally excluded since Phase 5's quality checks already handle those.
+- **Parameters**: `test-plan-reviewer`/`general-plan-reviewer` max_turns (currently 10), model (currently opus), round cap (currently 3)
 
 ### Auto-fix Priority & Parallel Execution
 - **Files**: `ai-agent/skills/run-quality-checks/SKILL.md`, `phases/5-quality-checks.md`, `ai-agent/skills/run-quality-checks/output-template.md`
@@ -276,6 +289,8 @@ All custom sub-agents have `memory: user` configured, providing persistent memor
     ├── EXPLORATION_PATTERNS.md # Agent C output (patterns/conventions, Full)
     ├── EXPLORATION_REPORT.md   # Integrated exploration report (or copy of EXPLORATION_CODE.md for Light)
     ├── PLAN.md                 # Work plan + Test Plan (merged)
+    ├── PLAN_REVIEW_TEST.md     # test-plan-reviewer output (Phase 2 Step 1.5, overwritten each round)
+    ├── PLAN_REVIEW_GENERAL.md  # general-plan-reviewer output (Phase 2 Step 1.5, overwritten each round)
     ├── TASK_LIST.txt           # Cached `task --list-all` output (reused by sub-agents)
     ├── QC_SUMMARY.md           # Quality check summary (PASS/FAIL per category)
     ├── QC_TEST.raw             # Raw output of test run (per-category, only for executed categories)

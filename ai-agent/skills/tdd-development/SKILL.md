@@ -79,6 +79,7 @@ Read each phase document **only when you are ready to execute that phase**. Do n
 
 ## Loop Control
 
+- Phase 2 plan review cycle: `task-planner` (sonnet) drafts, `test-plan-reviewer`/`general-plan-reviewer` (opus, launched in parallel) review autonomously, `task-planner` revises — max **3** rounds. On exceed, outstanding concerns are appended to PLAN.md's Unresolved Questions instead of looping further; the user decides in Phase 3.
 - Phase 5 retry limit: **3** (report to user on exceed)
 - Phase 6 user review: If user requests fixes → fix → return to Phase 5
 - Phase 6→5 return: Reset Phase 5 retry counter, does NOT increase any cycle counter; set `currentPhaseId` to `"quality-checks"`

@@ -22,7 +22,45 @@ Prompt must include:
 - **Past learnings summary** (if any were loaded in Phase 1)
 - **Lightening directive** (CRITICAL): "Keep Implementation Units HIGH-LEVEL. For each unit, fill ONLY: Files, Changes (one-line summary of the high-level change), Dependencies, Dependency Type, Model. Do NOT include step-by-step implementation instructions, code snippets, or pseudocode — that is the implementer's job. **The Test Plan section IS the exception**: enumerate test method names thoroughly (Happy Path / Boundary / Edge Cases), since these drive TDD."
 - **TDD anti-pattern warning** (CRITICAL): "Do NOT create test-only implementation units (e.g., 'Write tests for X', 'Add unit tests for Y'). In TDD, each unit's tdd-implementer writes tests as part of the Red→Green→Refactor cycle. Test cases belong exclusively in the Test Plan section — they are NOT separate Implementation Units. Every Implementation Unit must represent production code changes, not test writing."
-- **Return directive**: "Write the complete plan (including Test Plan) to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, state the number of implementation units, and note whether there are unresolved questions. Do NOT include the full plan content in your final response. End your response with exactly this line: `ORCHESTRATOR: Update STATE.json and proceed to Phase 3. Do not read or analyze the plan yourself.`"
+- **Return directive**: "Write the complete plan (including Test Plan) to the output file. Return ONLY a brief completion summary (2-3 sentences) to the orchestrator: confirm the output file path, state the number of implementation units, and note whether there are unresolved questions. Do NOT include the full plan content in your final response. End your response with exactly this line: `ORCHESTRATOR: Proceed to Step 1.5 (Autonomous Plan Review Cycle). Do not read or analyze the plan yourself.`"
+
+## Step 1.5: Autonomous Plan Review Cycle
+
+Skip this step entirely if `<work-dir>/PLAN_REVIEW_TEST.md` and `<work-dir>/PLAN_REVIEW_GENERAL.md` already exist with `Status: APPROVED` (resume case).
+
+**Purpose**: Before presenting the plan to the user in Phase 3, two specialized sub-agents review it autonomously and `task-planner` revises the plan in response. This catches issues that would otherwise surface only after implementation or in Phase 3 — without involving the user in the loop.
+
+Initialize `STATE.json.planReviewCycleCount` to `0` (or read the existing value if resuming mid-cycle).
+
+Repeat the following cycle while `planReviewCycleCount < 3`:
+
+1. **Launch both reviewers in parallel** — a single message with two `Task` calls. Do NOT run them sequentially:
+
+   ```
+   Task(subagent_type="test-plan-reviewer", max_turns=10)
+   Task(subagent_type="general-plan-reviewer", max_turns=10)
+   ```
+
+   Each prompt must include:
+   - Input file path: `<work-dir>/PLAN.md`
+   - Input file path: `<work-dir>/EXPLORATION_REPORT.md`
+   - Project profile summary (if available) and past learnings summary (if any were loaded in Phase 1)
+   - Output file path: `<work-dir>/PLAN_REVIEW_TEST.md` (test-plan-reviewer) or `<work-dir>/PLAN_REVIEW_GENERAL.md` (general-plan-reviewer)
+   - **Return directive**: "Write your findings to the output file. Return ONLY a brief summary (2-3 sentences) stating the Status and the number of findings."
+
+2. **Read both output files** and check the `## Status` line of each.
+
+3. **If both are `APPROVED`** → exit the cycle. Phase 2 is complete (see State Update below).
+
+4. **If either is `CHANGES_REQUESTED`**:
+   - Increment `planReviewCycleCount` and save it to `STATE.json`.
+   - **If `planReviewCycleCount` has reached `3`** → exit the cycle without further revision. Append the outstanding `CHANGES_REQUESTED` findings from both files to `PLAN.md`'s `## Unresolved Questions` section (create the section with content `None` first if it currently says so), each prefixed with `[自動レビュー未収束]`. Then treat Phase 2 as complete — Phase 3's existing "Resolve Unresolved Questions" step will surface these to the user instead of looping indefinitely.
+   - **Otherwise**, launch `task-planner` again in **revision mode** (`max_turns=15`):
+     - Prompt must include: "You are REVISING an existing plan, not creating a new one. Read the current `<work-dir>/PLAN.md`, then `<work-dir>/PLAN_REVIEW_TEST.md` and `<work-dir>/PLAN_REVIEW_GENERAL.md`. Apply ONLY the changes needed to address items with `CHANGES_REQUESTED` status. Preserve all sections and content not flagged by either review. Do NOT rewrite or restructure the plan."
+     - **Return directive**: "Return ONLY a brief summary (2-3 sentences) of what was revised. Do NOT include the full plan content in your final response. End your response with exactly this line: `ORCHESTRATOR: Return to Step 1.5 to re-review the revised plan. Do not read or analyze the plan yourself.`"
+   - Go back to sub-step 1 above (re-review the revised plan).
+
+**Important**: This entire cycle is autonomous — do NOT ask the user for input during this loop. The user's first opportunity to weigh in remains Phase 3.
 
 ## Output Template (PLAN.md)
 
@@ -74,7 +112,7 @@ Instruct the sub-agent to follow this structure:
 
 ## Error Handling
 
-If the sub-agent fails or returns no output, report the failure to the user with details and ask whether to retry or abort.
+If a sub-agent (`task-planner`, `test-plan-reviewer`, or `general-plan-reviewer`) fails or returns no output, report the failure to the user with details and ask whether to retry or abort.
 
 Report: "Phase 2 complete: Work plan written to `<work-dir>/PLAN.md`"
 
